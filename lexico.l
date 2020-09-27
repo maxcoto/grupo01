@@ -2,103 +2,91 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <curses.h>
-FILE  *yyin;
-int yylval;
-char *yytext;
+
+char *ptr;
+long ret;
+FILE  *yyin, *tsout;
 %}
+
 %option noyywrap
 %option yylineno
 
-INTEGER            "Integer"
-FLOAT              "Float"
-DECVAR             "DECVAR"
-ENDDEC             "ENDDEC"
-WRITE              "write"
-WHILE              "while"
-A_PAREN            "("
-C_PAREN            ")"
-A_CORCH            "{"
-C_CORCH            "}"
-IF                 "if"
-ELSE               "else"
 
+DIGITO            [0-9]
+LETRA             [a-zA-Z]
+ENTERO            {DIGITO}+
+GUIONB            [_]
+REAL              {DIGITO}+"."{DIGITO}+
+ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
+TEXTO             \"(.)*\"
+BINARIO           "0b"[0-1]+
+HEXADECIMAL       "0x"([a-f]|[A-F]|[0-9])+
 
-DIGITO    [0-9]
-LETRA     [a-zA-Z]
-ENTERO    {DIGITO}+
-GUIONB    [_]
-REAL      {DIGITO}+"."{DIGITO}+
-ID        {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
-TEXTO     \"(.)*\"
-
-ASSIGN    ":"
-SUM       "+"
-MIN_EQ    "<="
-MIN       "<"
-MAY_EQ    ">="
-MAY       ">"
-NOT_EQ    "!="
-EQ        "=="
-DIVIDE    "/"
-MULTIPLY  "*"
-END       ";"
-
+/* Falta lista de variables */
 
 %%
-{WRITE}            printf("\nWrite: %s\n", yytext);
-{INTEGER}          printf("\nInteger: %s\n", yytext);
-{FLOAT}            printf("\nFloat: %s\n", yytext);
-{ENTERO}           printf("\nConstante entera: %s\n", yytext);
-{WHILE}            printf("\nWhile: %s\n", yytext);
-{TEXTO}            printf("\nTexto: %s\n", yytext);
-{REAL}             printf("\nReal: %s\n", yytext);
-{SUM}              printf("\nSuma: %s\n", yytext);
-{DIVIDE}           printf("\nDivision: %s\n", yytext);
-{MULTIPLY}         printf("\nMultiplicacion: %s\n", yytext);
-{ASSIGN}           printf("\nAsignacion: %s\n", yytext);
-{MIN_EQ}           printf("\nMenor igual: %s\n", yytext);
-{MIN}              printf("\nMenor: %s\n", yytext);
-{MAY_EQ}           printf("\nMayor igual: %s\n", yytext);
-{MAY}              printf("\nMayor: %s\n", yytext);
-{EQ}               printf("\nComparacion igual: %s\n", yytext);
-{NOT_EQ}           printf("\nComparacion distinto: %s\n", yytext);
-{END}              printf("\nPunto y coma: %s\n", yytext);
-{A_PAREN}          printf("\nAbre Parentesis: %s\n", yytext);
-{C_PAREN}          printf("\nCierra Parentesis: %s\n", yytext);
-{A_CORCH}          printf("\nAbre corchete: %s\n", yytext);
-{C_CORCH}          printf("\nCierra corchete: %s\n", yytext);
-{IF}               printf("\nIf: %s\n", yytext);
-{ELSE}             printf("\nElse: %s\n", yytext);
-{DECVAR}           printf("\nDecvar: %s\n", yytext);
-{ENDDEC}           printf("\nEnddec: %s\n", yytext);
-{ID}               printf("\nId: %s\n", yytext);
+";"			          { return PUNTOCOMA; }
+":"			          { return DOSPUNTOS; }
+","			          { return COMA; }
+"("			          { return P_A; }
+")"	    		      { return P_C; }
+"{"			          { return L_A; }
+"}"			          { return L_C; }
+
+"+"   		       	{ return OP_SUMA; }
+"-"		          	{ return OP_RESTA; }
+"*"		           	{ return OP_MUL; }
+"/"			          { return OP_DIV; }
+
+"+="     		      { return OP_ASIG_ESPECIAL; }
+"-=" 		          { return OP_ASIG_ESPECIAL; }
+"*=" 		          { return OP_ASIG_ESPECIAL; }
+"/="     		      { return OP_ASIG_ESPECIAL; }
+
+":="    		      { return OP_ASIGNACION; }
+
+"<"	    		      { return OP_COMPARACION; }
+">"			          { return OP_COMPARACION; }
+">="		          { return OP_COMPARACION; }
+"<="    		      { return OP_COMPARACION; }
+"=="		          { return OP_COMPARACION; }
+"!="		          { return OP_COMPARACION; }
+
+"AND"   		      { return OP_LOGICO; }
+"OR"		          { return OP_LOGICO; }
+"NOT"		          { return OP_NEGACION; }
+
+"DIM"		          { return DIM; }
+"AS"		          { return AS; }
+
+"GET"	            { return GET; }
+"PUT"             { return PUT; }
+
+"INT"	    	      { return INT; }
+"FLOAT"	    	    { return FLOAT; }
+"STRING"    	    { return STRING; }
+
+"IF"		          { return IF; }
+"ELSE"		        { return ELSE; }
+"ENDIF"           { return ENDIF; }
+"WHILE"	    	    { return WHILE; }
+
+"Integer"         { return INTEGER; }
+"Float"           { return FLOAT; }
+"CONST"           { return CONST; }
+
+{ENTERO}          { printf("\nEntero: %s\n", yytext); return ENTERO; }
+{TEXTO}           { printf("\nString: %s\n", yytext); return TEXTO; }
+{REAL}            { printf("\nReal: %s\n", yytext); return REAL; }
+{BINARIO}         { printf("\nBinario: %s\n", yytext); return BINARIO; }
+{HEXADECIMAL}     { printf("\nHexa: %s\n", yytext); return HEXADECIMAL; }
+
+{ID}              { printf("\nId: %s\n", yytext); return ID; }
+
+/*
+  meter codiogo para los comentarios --> *- comentario -*
+*/
 
 "\n"
 "\t"
 %%
-
-int main(int argc, char *argv[]) {
-
-  if((yyin = fopen(argv[1], "rt")) == NULL) {
-    printf("\nNo se pudo abrir el archivo: %s\n", argv[1]);
-  } else {
-    yylex();
-  }
-
-  fclose(yyin);
-  return 0;
-}
-
-int yyerror(void)  {
-  printf("\nSyntax error\n");
-  system("Pause");
-  exit(1);
-}
-
-
-
-
-
-
-
-
