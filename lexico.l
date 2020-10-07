@@ -95,33 +95,33 @@ CONST_FLOAT     {DIGITO}*["."]{DIGITO}*
   meter codiogo para los comentarios --> *- comentario -*
 */
 
-{CONST_INT}    			{
-							int nro = atoi(yytext);
-							if(nro < 0 || nro > 65535) {
-								char msg[100];
-								fprintf(stderr, "ERROR Lexico - Entero fuera de rango. Debe estar entre [0; 65535]\n");
-								exit(1);
-							}
-							return CONST_INT;
-						}
+{CONST_INT}{
+	int nro = atoi(yytext);
+	if(nro < 0 || nro > 65535) {
+	    char msg[100];
+		fprintf(stderr, "ERROR Lexico - Entero fuera de rango. Debe estar entre [0; 65535]\n");
+		exit(1);
+	}
+	return CONST_INT;
+}
 
-{CONST_FLOAT}      		{
-							double nro = atof(yytext);
-							if(nro < 0 || nro > FLT_MAX) {
-								fprintf(stderr, "ERROR Lexico - Float fuera de rango. Debe estar entre [0; 3.40282e38]\n");
-								exit(1);
-							}
-							return CONST_FLOAT;
-						}
+{CONST_FLOAT}{
+	double nro = atof(yytext);
+	if(nro < 0 || nro > FLT_MAX) {
+	    fprintf(stderr, "ERROR Lexico - Float fuera de rango. Debe estar entre [0; 3.40282e38]\n");
+	    exit(1);
+	}
+    return CONST_FLOAT;
+}
 
-{CONST_STRING}    		{	
-							int longitud = strlen(yytext);
-							if(longitud > 32){ 	//en lugar de 30 verifica con 32 porque el string viene entre comillas
-								fprintf(stderr,  "ERROR Lexico - Cadena demasiado larga. Maximo permitido 30 caracteres\n");
-								exit(1);
-							}
-							return CONST_STRING;	
-						}
+{CONST_STRING} {	
+	int longitud = strlen(yytext);
+	if(longitud > 32){ 	//en lugar de 30 verifica con 32 porque el string viene entre comillas
+	    fprintf(stderr,  "ERROR Lexico - Cadena demasiado larga. Maximo permitido 30 caracteres\n");
+		exit(1);
+	}
+    return CONST_STRING;	
+}
 
 /*Falta definir bien los comentarios
 //Deberán estar delimitados por “*- “ y “-*” y podrán estar anidados en un solo nivel.
@@ -145,5 +145,3 @@ CONST_FLOAT     {DIGITO}*["."]{DIGITO}*
 "\n"
 "\t"
 %%
-
-
