@@ -21,7 +21,6 @@ typedef struct {
 t_ts tablaSimbolos[5000];
 
 char *yytext;
-extern char yytext[];
 
 int posicionTabla=0;
 int cantComparaciones=0;
@@ -58,10 +57,10 @@ void validarTipos();
 %token PUT GET
 %token INTEGER FLOAT STRING
 %token IF ELSE
-%token DIM AS
+%token DIM AS CONTAR CONST
 %token WHILE
-%token TEXTO ENTERO REAL
-%token ID
+%token <strVal>TEXTO ENTERO REAL HEXADECIMAL BINARIO
+%token <strVal>ID
 
 %%
 
@@ -169,10 +168,6 @@ entrada:
 
 %%
 
-int yyerror(char * s) {
-  fprintf(stderr, "%s\n", s);
-}
-
 int main(int argc,char *argv[]) //falta terminar
 {
 	if((yyin = fopen(argv[1], "rt")) == NULL){
@@ -204,17 +199,11 @@ int yyerror(void)
   printf("Error de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
-  system ("Pause");
   exit (1);
 }
 
 //Funcion para validar ID
 int validarID(char *str){
-	if(contvariableActual>=50){
-		printf("\nNo puede declarar mas de 50 variables\n", str);
-		yyerror();
-	}
-
 	int largo=strlen(str);
 	if(largo > 20){
 		printf("\nERROR: ID \"%s\" demasiado largo (<20)\n", str);
@@ -246,7 +235,6 @@ int validarInt(int entero){
 
 	return 1;
 }
-
 
 //Funcion para validar string
 int validarString(char *str){
@@ -300,11 +288,11 @@ void validarTipos(){
 		printf("TIPO: %s\n",tiposComparados[x]);
 
 		if(x==0){
-			if(strcmpi(tiposComparados[x],"String")!=0)
+			if(strcmp(tiposComparados[x],"String")!=0)
 				flgNumerico=1;
 		}
 		else{
-			if((flgNumerico == 0 && (strcmpi(tiposComparados[x],"Int")==0 || strcmpi(tiposComparados[x],"Float")==0)) || (flgNumerico == 1 && strcmpi(tiposComparados[x],"String")==0)){
+			if((flgNumerico == 0 && (strcmp(tiposComparados[x],"Int")==0 || strcmp(tiposComparados[x],"Float")==0)) || (flgNumerico == 1 && strcmp(tiposComparados[x],"String")==0)){
 				//Si (no es numerico pero me vienen enteros o float) ó (si es numerico y me viene un string) = ERROR
 				flgOK=0;
 				break;
@@ -320,7 +308,6 @@ void validarTipos(){
 		yyerror();
 	}
 }
-
 
 /* -- FUNCIONES TABLA DE SIMBOLOS -- */
 
@@ -369,7 +356,7 @@ void guardarTipo(){
 int buscarEnTablaSimbolo(char *id){
 	int i;
 	for(i=0; i<5000; i++){
-		if(strcmpi(id,tablaSimbolos[i].nombre)==0)
+		if(strcmp(id,tablaSimbolos[i].nombre)==0)
 			return i;
 	}
 	return -1;
@@ -387,11 +374,11 @@ void existeEnTablaSimbolo(char *id){
 void escribirTablaSimbolo(){
 	int i;
 	for(i=0; i<posicionTabla; i++){
-		if( strcmpi(tablaSimbolos[i].tipo,"") != 0 &&
-			strcmpi(tablaSimbolos[i].tipo,"Cte") != 0 &&
-			strcmpi(tablaSimbolos[i].tipo,"CteFloat") !=0 &&
-			strcmpi(tablaSimbolos[i].tipo,"CteInt") != 0 &&
-			strcmpi(tablaSimbolos[i].tipo,"CteStr")!= 0 ){
+		if(strcmp(tablaSimbolos[i].tipo,"") != 0 &&
+			strcmp(tablaSimbolos[i].tipo,"Cte") != 0 &&
+			strcmp(tablaSimbolos[i].tipo,"CteFloat") !=0 &&
+			strcmp(tablaSimbolos[i].tipo,"CteInt") != 0 &&
+			strcmp(tablaSimbolos[i].tipo,"CteStr")!= 0){
 			//si es ID
 			fprintf(tsout, "%-30s|  %-7s  |                  -               	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].tipo);
 		}else{ //Si es cte

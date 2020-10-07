@@ -13,11 +13,13 @@ FILE  *yyin, *tsout;
 DIGITO            [0-9]
 LETRA             [a-zA-Z]
 GUIONB            [_]
+
+BINARIO           ["0b"][0-1]+
+HEXADECIMAL       ["0x"]([a-f]|[A-F]|[0-9])+
+
 ENTERO         		{DIGITO}+
 REAL              {DIGITO}*"."{DIGITO}*
 TEXTO             \"(.)*\"
-BINARIO           "0b"[0-1]+
-HEXADECIMAL       "0x"([a-f]|[A-F]|[0-9])+
 ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 %%
@@ -67,14 +69,40 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "Integer"         { return INTEGER; }
 "Float"           { return FLOAT; }
 "STRING"    	    { return STRING; }
-"CONST"           { return CONST; }
 
-{ENTERO}       		{ printf("\nEntero: %s\n", yytext); return ENTERO; }
-{TEXTO}           { printf("\nString: %s\n", yytext); return TEXTO; }
-{REAL}            { printf("\nReal: %s\n", yytext); return REAL; }
-{BINARIO}         { printf("\nBinario: %s\n", yytext); return BINARIO; }
-{HEXADECIMAL}     { printf("\nHexa: %s\n", yytext); return HEXADECIMAL; }
-{ID}              { printf("\nIdentificador: %s\n", yytext); return ID; }
+"contar"					{ return CONTAR; }
+"COSNT"						{ return CONST; }
+
+{ENTERO}       		{
+										printf("\nEntero: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return ENTERO;
+									}
+{TEXTO}           {
+										printf("\nString: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return TEXTO;
+									}
+{REAL}            {
+										printf("\nReal: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return REAL;
+									}
+{BINARIO}         {
+										printf("\nBinario: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return BINARIO;
+									}
+{HEXADECIMAL}     {
+										printf("\nHexa: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return HEXADECIMAL;
+									}
+{ID}              {
+										printf("\nIdentificador: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return ID;
+									}
 
 "\n"
 "\t"
