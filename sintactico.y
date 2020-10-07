@@ -94,7 +94,7 @@ tipo_variables:
 
 tipo:
 	FLOAT 			{strcpy(tipoActual,"Float");}					{printf("Regla xx: tipo es FLOAT\n");}
-	|INTEGER 		{strcpy(tipoActual,"Int");}						{printf("Regla xx: tipo es INT\n");}
+	|INTEGER 		{strcpy(tipoActual,"Int");}						{printf("Regla xx: tipo es INTEGER\n");}
 	|STRING 		{strcpy(tipoActual,"String");}				{printf("Regla xx: tipo es STRING\n");}
 ;
 
@@ -107,9 +107,9 @@ bloque_sentencias:
 sentencia:
 	ciclo											{printf("Regla xx: sentencia es ciclo\n");}
 	|if  											{printf("Regla xx: sentencia es if\n");}
-	|asignacion								{printf("Regla xx: sentencia es asignacion \n");}
+	|asignacion 							{printf("Regla xx: sentencia es asignacion \n");}
 	|salida										{printf("Regla xx: sentencia es salida\n");}
-	|entrada									{printf("Regla xx: sentencia es entrada\n");}
+	|entrada 									{printf("Regla xx: sentencia es entrada\n");}
 ;
 
 ciclo:
@@ -117,53 +117,59 @@ ciclo:
 ;
 
 if:
-  IF P_A decision P_C L_A bloque_sentencias L_C                           				{printf("IF.\n");}
-	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C   {printf("IF - ELSE.\n");}
+	IF P_A decision P_C L_A bloque_sentencias L_C                           				{printf("Regla XX: IF.\n");}
+	|IF P_A decision P_C sentencia                           												{printf("Regla XX: IF sentencia simple.\n");}
+	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C   {printf("Regla XX: IF - ELSE.\n");}
+	|IF P_A decision P_C sentencia ELSE sentencia																	  {printf("Regla XX: IF - ELSE simple.\n");}
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion
-	| ID OP_ASIG_ESPECIAL expresion
+  ID OP_ASIGNACION expresion PUNTOCOMA				  										{printf("Regla XX: Asignacion simple.\n");}
+	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  											{printf("Regla XX: Asignacion especial.\n");}
 ;
 
 decision:
-  condicion                                                         {printf("Decision simple.\n");}
-  |condicion OP_LOGICO condicion                                    {printf("Decision multiple.\n");}
-  |OP_NEGACION condicion                                            {printf("Decision negada.\n");}
+  condicion                                                         {printf("Regla XX: Decision simple.\n");}
+  |condicion OP_LOGICO condicion                                    {printf("Regla XX: Decision multiple.\n");}
+  |OP_NEGACION condicion                                            {printf("Regla XX: Decision negada.\n");}
 ;
 
 // Condicion puede ser solo una variable ?? --> if(VARIABLE) { .. }
 condicion:
-  expresion OP_COMPARACION expresion                                {printf("Comparacion.\n");}
+	expresion OP_COMPARACION expresion                                {printf("Regla XX: Comparacion.\n");}
+  |expresion OP_MAYOR expresion           		                      {printf("Regla XX: Comparacion.\n");}
+	|expresion OP_MENOR expresion      			                          {printf("Regla XX: Comparacion.\n");}
 ;
 
 expresion:
-  termino                                                           {printf("Termino.\n");}
-  |expresion OP_SUMA termino                                        {printf("Expresion suma Termino.\n");}
-  |expresion OP_RESTA termino                                       {printf("Expresion resta Termino.\n");}
+  termino                                                           {printf("Regla XX: Termino.\n");}
+  |expresion OP_SUMA termino                                      	{printf("Regla XX: Expresion suma Termino.\n");}
+  |expresion OP_RESTA termino                                      	{printf("Regla XX: Expresion resta Termino.\n");}
 ;
 
 termino:
-  factor                                                            {printf("Factor.\n");}
-  |termino OP_MUL factor                                            {printf("Termino por Factor.\n");}
-  |termino OP_DIV factor                                            {printf("Termino dividido Factor.\n");}
+  factor                                                            {printf("Regla XX: Factor.\n");}
+  |termino OP_MUL factor                                            {printf("Regla XX: Termino por Factor.\n");}
+  |termino OP_DIV factor                                            {printf("Regla XX: Termino dividido Factor.\n");}
 ;
 
 factor:
-	ID 					{existeEnTablaSimbolo($1); strcpy(tiposComparados[cantComparaciones],tablaSimbolos[buscarEnTablaSimbolo($1)].tipo); cantComparaciones++;}
-	| TEXTO 		{validarString(yylval.strVal); strcpy(tiposComparados[cantComparaciones], "String"); cantComparaciones++;}
-	| ENTERO    {validarInt(atoi(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Int"); cantComparaciones++;}
-	| REAL  		{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
+	ID 							{existeEnTablaSimbolo($1); strcpy(tiposComparados[cantComparaciones],tablaSimbolos[buscarEnTablaSimbolo($1)].tipo); cantComparaciones++;}
+	| TEXTO 				{validarString(yylval.strVal); strcpy(tiposComparados[cantComparaciones], "String"); cantComparaciones++;}
+	| ENTERO    		{validarInt(atoi(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Int"); cantComparaciones++;}
+	| REAL  				{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
+	| HEXADECIMAL
+	| BINARIO
 	| P_A expresion P_C
 ;
 
 salida:
-  PUT TEXTO
-  |PUT ID
+  PUT TEXTO PUNTOCOMA
+  |PUT ID PUNTOCOMA
 ;
 
 entrada:
-  GET ID
+  GET ID PUNTOCOMA
 ;
 
 %%

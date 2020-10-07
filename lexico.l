@@ -14,8 +14,8 @@ DIGITO            [0-9]
 LETRA             [a-zA-Z]
 GUIONB            [_]
 
-BINARIO           ["0b"][0-1]+
-HEXADECIMAL       ["0x"]([a-f]|[A-F]|[0-9])+
+BINARIO           "0b"[0-1]+
+HEXADECIMAL       "0x"([a-f]|[A-F]|[0-9])+
 
 ENTERO         		{DIGITO}+
 REAL              {DIGITO}*"."{DIGITO}*
@@ -51,10 +51,14 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "<="    		      { return OP_COMPARACION; }
 "=="		          { return OP_COMPARACION; }
 "!="		          { return OP_COMPARACION; }
+"<>"		          { return OP_COMPARACION; }
 
 "AND"   		      { return OP_LOGICO; }
+"and"   		      { return OP_LOGICO; }
 "OR"		          { return OP_LOGICO; }
+"or"		          { return OP_LOGICO; }
 "NOT"		          { return OP_NEGACION; }
+"not"		          { return OP_NEGACION; }
 
 "DIM"		          { return DIM; }
 "AS"		          { return AS; }
@@ -63,8 +67,11 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "PUT"             { return PUT; }
 
 "IF"		          { return IF; }
+"if"		          { return IF; }
 "ELSE"		        { return ELSE; }
+"else"		        { return ELSE; }
 "WHILE"	    	    { return WHILE; }
+"while"						{ return WHILE; }
 
 "Integer"         { return INTEGER; }
 "Float"           { return FLOAT; }
@@ -73,6 +80,16 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "contar"					{ return CONTAR; }
 "COSNT"						{ return CONST; }
 
+{HEXADECIMAL}     {
+										printf("\nHexa: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return HEXADECIMAL;
+									}
+{BINARIO}         {
+										printf("\nBinario: %s\n", yytext);
+										yylval.strVal = strdup(yytext);
+										return BINARIO;
+									}
 {ENTERO}       		{
 										printf("\nEntero: %s\n", yytext);
 										yylval.strVal = strdup(yytext);
@@ -87,16 +104,6 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 										printf("\nReal: %s\n", yytext);
 										yylval.strVal = strdup(yytext);
 										return REAL;
-									}
-{BINARIO}         {
-										printf("\nBinario: %s\n", yytext);
-										yylval.strVal = strdup(yytext);
-										return BINARIO;
-									}
-{HEXADECIMAL}     {
-										printf("\nHexa: %s\n", yytext);
-										yylval.strVal = strdup(yytext);
-										return HEXADECIMAL;
 									}
 {ID}              {
 										printf("\nIdentificador: %s\n", yytext);

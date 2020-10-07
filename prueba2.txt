@@ -1,45 +1,23 @@
-DECVAR
-  contador: Integer;
-  promedio: Float;
-  actual, suma: Float;
-ENDDEC
+DIM < contador,promedio,actual,suma> AS < Integer,Float,Float,Float >
 
-write "Hola mundo!";
-contador: 0;
+PUT "Prueba.txt LyC Tema 1!";
+PUT "Ingrese un valor entero para actual: ";
+GET actual;
 
-actual: 999;
-suma: 02;
-contador: contador+1;
+contador:= 0;
+suma:= 02.5+0xA2B0;
 
 while (contador <= 92) {
-  contador: contador + 1;
-  actual: (contador/0.342) + (contador*contador);
-  suma: suma + actual;
+  contador:= contador + 1;
+  actual:= (contador/0.342) + (contador* contar (actual*contador ; [256,0b10,52,4]));
+  suma:= suma + actual;
 }
 
-write "La suma es: ";
-write suma;
+PUT "La suma es: ";
+PUT suma;
 
-if (actual > 2){
-  write "2 > 3";
-}
-
-if (actual < 3){
-  if(actual >= 3){
-    write "soy true";
-  }
-
-  if(actual <= 3){
-    write "soy true";
-  }
-
-  if(actual != 3){
-    write "soy true";
-  }
-
-  if(actual == 3){
-    write "soy true";
-  }
-}else{
-  actual:333.3333;
+IF (actual > 0b10 and actual <> 0){
+  PUT "actual es mayor que 2 y distinto de cero";
+} ELSE {
+  PUT "no es mayor que 2";
 }

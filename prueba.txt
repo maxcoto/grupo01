@@ -6,15 +6,18 @@ GET actual;
 
 contador:= 0;
 suma:= 02.5+0xA2B0;
+
 while (contador <= 92) {
   contador:= contador + 1;
-  actual:= (contador/0.342) + (contador* contar (actual*contador ; [256,0b10,52,4]));
+  actual:= (contador/0.342) + (contador* 2);
   suma:= suma + actual;
 }
-PUT "La suma es: "; PUT suma;
-if (actual > 0b10 and actual <> 0){
+
+PUT "La suma es: ";
+PUT suma;
+
+IF (actual > 0b10 and actual <> 0){
   PUT "actual es mayor que 2 y distinto de cero";
-}
-Else {
-  PUT “no es mayor que 2”;
+} ELSE {
+  PUT "no es mayor que 2";
 }
