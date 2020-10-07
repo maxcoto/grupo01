@@ -1,10 +1,11 @@
-flex -d lexico.l
+flex lexico.l
 sleep 1
-bison sintactico.y
+bison -dy sintactico.y
 sleep 1
-gcc lex.yy.c sin.yy.c -o compilador.c
+gcc lex.yy.c y.tab.c -o compilador.c
 sleep 1
 ./compilador.c prueba.txt
 rm lex.yy.c
-rm sin.yy.c
+rm y.tab.c
+rm y.tab.h
 rm compilador.c
