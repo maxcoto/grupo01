@@ -83,8 +83,8 @@ bloque_declaracion:
 ;
 
 variables:
-	ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla xx: lista_var es ID\n");}
-	|variables COMA ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();} {printf("Regla xx: lista_var es lista_var PUNTOCOMA ID\n");}
+	ID 									{printf("Variable: %s\n",yylval.strVal); validarID(yylval.strVal); guardarTipo();} {printf("Regla xx: variables es ID\n");}
+	|variables COMA ID 	{printf("Variable: %s\n",yylval.strVal); validarID(yylval.strVal); guardarTipo();} {printf("Regla xx: variables es variable COMA ID\n");}
 ;
 
 tipo_variables:
@@ -98,7 +98,6 @@ tipo:
 	|STRING 		{strcpy(tipoActual,"String");}				{printf("Regla xx: tipo es STRING\n");}
 ;
 
-//////////////////////////////////////////////////////////
 bloque_sentencias:
 	sentencia
 	|bloque_sentencias sentencia
@@ -126,6 +125,7 @@ if:
 asignacion:
   ID OP_ASIGNACION expresion PUNTOCOMA				  										{printf("Regla XX: Asignacion simple.\n");}
 	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  											{printf("Regla XX: Asignacion especial.\n");}
+	| CONST asignacion														  					 				{printf("Regla XX: Asignacion CONST.\n"); validarID(yylval.strVal); guardarTipo();}
 ;
 
 decision:
@@ -154,13 +154,13 @@ termino:
 ;
 
 factor:
-	ID 							{existeEnTablaSimbolo($1); strcpy(tiposComparados[cantComparaciones],tablaSimbolos[buscarEnTablaSimbolo($1)].tipo); cantComparaciones++;}
-	| TEXTO 				{validarString(yylval.strVal); strcpy(tiposComparados[cantComparaciones], "String"); cantComparaciones++;}
-	| ENTERO    		{validarInt(atoi(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Int"); cantComparaciones++;}
-	| REAL  				{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
-	| HEXADECIMAL
-	| BINARIO
-	| P_A expresion P_C
+	ID 						{existeEnTablaSimbolo($1); strcpy(tiposComparados[cantComparaciones],tablaSimbolos[buscarEnTablaSimbolo($1)].tipo); cantComparaciones++;}
+	|TEXTO 				{validarString(yylval.strVal); strcpy(tiposComparados[cantComparaciones], "String"); cantComparaciones++;}
+	|ENTERO    		{validarInt(atoi(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Int"); cantComparaciones++;}
+	|REAL  				{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
+	|HEXADECIMAL
+	|BINARIO
+	|P_A expresion P_C
 	|CONTAR P_A expresion PUNTOCOMA lista P_C													{printf("Regla XX: Funcion Contar\n");}
 ;
 

@@ -62,6 +62,7 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 "DIM"		          { return DIM; }
 "AS"		          { return AS; }
+"CONST"						{ return CONST; }
 
 "GET"	            { return GET; }
 "PUT"             { return PUT; }
@@ -78,7 +79,6 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "STRING"    	    { return STRING; }
 
 "contar"					{ return CONTAR; }
-"COSNT"						{ return CONST; }
 
 {HEXADECIMAL}     {
 										printf("\nHexa: %s\n", yytext);
