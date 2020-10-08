@@ -59,12 +59,12 @@ void validarTipos();
 %token IF ELSE
 %token DIM AS CONTAR CONST
 %token WHILE
-%token <strVal>TEXTO ENTERO REAL HEXADECIMAL BINARIO
+%token <strVal>TEXTO ENTERO REAL HEXADECIMAL BINARIO BOOLEAN
 %token <strVal>ID
 
 %%
 
-Inicio:
+inicio:
   {printf("\n\nINICIA COMPILACION\n\n");}
 	programa
 	{printf("\n\nCOMPILACION EXITOSA!\n\n\n");}
@@ -79,6 +79,11 @@ programa:
 
 // Declaracion de variables
 bloque_declaracion:
+	declaracion
+	|bloque_declaracion declaracion
+;
+
+declaracion:
   DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
 ;
 
@@ -106,26 +111,35 @@ bloque_sentencias:
 sentencia:
 	ciclo											{printf("Regla xx: sentencia es ciclo\n");}
 	|if  											{printf("Regla xx: sentencia es if\n");}
-	|asignacion 							{printf("Regla xx: sentencia es asignacion \n");}
+	|asignacion 							{printf("Regla xx: sentencia es asignacion.\n");}
+	|asignacion_especial			{printf("Regla xx: sentencia es asignacion operacion.\n");}
 	|salida										{printf("Regla xx: sentencia es salida\n");}
 	|entrada 									{printf("Regla xx: sentencia es entrada\n");}
 ;
 
 ciclo:
   WHILE P_A decision P_C L_A bloque_sentencias L_C
+	|WHILE P_A decision P_C sentencia
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                           				{printf("Regla XX: IF.\n");}
-	|IF P_A decision P_C sentencia                           												{printf("Regla XX: IF sentencia simple.\n");}
-	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C   {printf("Regla XX: IF - ELSE.\n");}
-	// |IF P_A decision P_C sentencia ELSE sentencia																	  {printf("Regla XX: IF - ELSE simple.\n");}
+	bloque_if ELSE L_A bloque_sentencias L_C 													{printf("Regla XX: IF - ELSE multiple sentencia.\n");}
+	|bloque_if ELSE sentencia 																				{printf("Regla XX: IF - ELSE simple.\n");}
+	|bloque_if
+;
+
+bloque_if:
+	IF P_A decision P_C L_A bloque_sentencias L_C									  	{printf("Regla XX: IF multiple.\n");}
+	|IF P_A decision P_C sentencia																		{printf("Regla XX: IF simple.\n");}
 ;
 
 asignacion:
   ID OP_ASIGNACION expresion PUNTOCOMA				  										{printf("Regla XX: Asignacion simple.\n");}
-	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  											{printf("Regla XX: Asignacion especial.\n");}
 	| CONST asignacion														  					 				{printf("Regla XX: Asignacion CONST.\n"); validarID(yylval.strVal); guardarTipo();}
+;
+
+asignacion_especial:
+	ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  												{printf("Regla XX: Asignacion especial.\n");}
 ;
 
 decision:
@@ -134,11 +148,11 @@ decision:
   |OP_NEGACION condicion                                            {printf("Regla XX: Decision negada.\n");}
 ;
 
-// Condicion puede ser solo una variable ?? --> if(VARIABLE) { .. }
 condicion:
 	expresion OP_COMPARACION expresion                                {printf("Regla XX: Comparacion.\n");}
   |expresion OP_MAYOR expresion           		                      {printf("Regla XX: Comparacion.\n");}
 	|expresion OP_MENOR expresion      			                          {printf("Regla XX: Comparacion.\n");}
+	|expresion																												{printf("Regla XX: Expresion simple.\n");}
 ;
 
 expresion:
@@ -160,6 +174,7 @@ factor:
 	|REAL  				{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
 	|HEXADECIMAL
 	|BINARIO
+	|BOOLEAN
 	|P_A expresion P_C
 	|CONTAR P_A expresion PUNTOCOMA lista P_C													{printf("Regla XX: Funcion Contar\n");}
 ;

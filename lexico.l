@@ -53,16 +53,17 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "!="		          { return OP_COMPARACION; }
 "<>"		          { return OP_COMPARACION; }
 
-"AND"   		      { return OP_LOGICO; }
+"&&"   		      { return OP_LOGICO; }
 "and"   		      { return OP_LOGICO; }
 "OR"		          { return OP_LOGICO; }
 "or"		          { return OP_LOGICO; }
 "NOT"		          { return OP_NEGACION; }
 "not"		          { return OP_NEGACION; }
+"true"						{ return BOOLEAN; }
+"false"						{ return BOOLEAN; }
 
 "DIM"		          { return DIM; }
 "AS"		          { return AS; }
-"CONST"						{ return CONST; }
 
 "GET"	            { return GET; }
 "PUT"             { return PUT; }
@@ -79,6 +80,7 @@ ID                {LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "STRING"    	    { return STRING; }
 
 "contar"					{ return CONTAR; }
+"COSNT"						{ return CONST; }
 
 {HEXADECIMAL}     {
 										printf("\nHexa: %s\n", yytext);
