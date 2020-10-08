@@ -120,7 +120,7 @@ if:
 	IF P_A decision P_C L_A bloque_sentencias L_C                           				{printf("Regla XX: IF.\n");}
 	|IF P_A decision P_C sentencia                           												{printf("Regla XX: IF sentencia simple.\n");}
 	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C   {printf("Regla XX: IF - ELSE.\n");}
-	|IF P_A decision P_C sentencia ELSE sentencia																	  {printf("Regla XX: IF - ELSE simple.\n");}
+	// |IF P_A decision P_C sentencia ELSE sentencia																	  {printf("Regla XX: IF - ELSE simple.\n");}
 ;
 
 asignacion:
@@ -161,6 +161,13 @@ factor:
 	| HEXADECIMAL
 	| BINARIO
 	| P_A expresion P_C
+	|CONTAR P_A expresion PUNTOCOMA lista P_C													{printf("Regla XX: Funcion Contar\n");}
+;
+
+lista:
+	expresion
+	|lista COMA expresion
+	|C_A lista C_C
 ;
 
 salida:
