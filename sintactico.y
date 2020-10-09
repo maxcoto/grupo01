@@ -36,7 +36,7 @@ char *todasLasConstantes[100];
 int validarInt(int entero);
 int validarString(char *str);
 int validarFloat(float flotante);
-int almacenarID(char *str);
+int almacenarID(char *str,char *valor,int es_const);
 int escribirTabla(int tipoDato, char *yytext, char *valor);
 void escribirArchivo(void);
 int buscarEnTablaSimbolo(char *);
@@ -96,11 +96,11 @@ declaracion:
 ;
 
 variable:
-	ID { printf("Variable: %s Tipo: CONST \n", yylval.strVal); almacenarID(yylval.strVal); guardarConst($1);}  {printf("Regla 01: lista_var es ID\n");}
+	ID { printf("Variable: %s Tipo: CONST \n", yylval.strVal); almacenarID($1,"const",1); guardarConst($1);}  {printf("Regla 01: lista_var es ID\n");}
 
 variables:
-	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
-	| variables COMA ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo(); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
+	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID($1,yylval.strVal,0); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
+	| variables COMA ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID($3,yylval.strVal,0); guardarTipo(); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
 ;
 
 tipo_variables:
@@ -141,7 +141,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} { validarReasignacion(yylval.strVal); }
+  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} { validarReasignacion($1); }
 ;
 
 operasignacion:
@@ -229,14 +229,18 @@ int yyerror(void){
 
 /*-------------------------------------------------------------FUNCIONES PARA VALIDAR------------------------------------------------------------*/
 //Funcion para validar ID
-int almacenarID(char *str){
+int almacenarID(char *str, char *valor, int es_const){
 	// Compruebo que ID no exista ya en la tabla de simbolos
+	printf("\t\t idNombre: %s ,  valor: %s \n", str,valor);
 	if(buscarEnTablaSimbolo(str) != -1){
 		printf("\nERROR: ID \"%s\" duplicado\n", str);
 		yyerror();
 	}
 
-	escribirTabla(1, str, str);
+	if(es_const==0)
+	escribirTabla(1, str,valor);
+	else
+	escribirTabla(5,str,valor);
 
 	return 1;
 }
@@ -336,17 +340,27 @@ void validarTipos(){
 
 
 void validarReasignacion(char *nombre){
-	printf("\n\nHOLAAA- -------------------------\n\n");
-	
-	printf("%s", nombre);
-	
-	printf("\n\nHOLAAA- -------------------------\n\n");
+
 	// for(int i=0; i<10; i++){
 	// 	if( strcmp(todasLasConstantes[i], nombre) == 0 ){
 	// 		printf("\nERROR: Reasignacion de constante\n");
 	// 		yyerror();
 	// 	}
 	// }
+	
+	int i =0;
+	int es_reasignacion=0;
+	while ( i<500 &&  es_reasignacion==0){
+		if(strcmp(tablaSimbolos[i].tipo,"CteConst")==0 && strcmp(tablaSimbolos[i].nombre,nombre)==0 )
+			es_reasignacion=1;
+		i++;
+	}
+	if(es_reasignacion==1){
+		printf("\n ERROR  no se puede reasignar el valor para la constante: %s\n" , nombre);
+		//creo que seria mejor pasarle el mensaje a yyerror 
+		yyerror();
+	}
+	return ;
 }
 
 
@@ -357,6 +371,7 @@ int escribirTabla(int tipoDato, char *str, char *valor ) {
 	switch(tipoDato){
 		case 1:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
+				strcpy(tablaSimbolos[posicionTabla].tipo,"idVar");
 				posicionTabla++;
 				break;
 
@@ -384,7 +399,6 @@ int escribirTabla(int tipoDato, char *str, char *valor ) {
 				
 		case 5:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				strcpy(tablaSimbolos[posicionTabla].valor,str);
 				strcpy(tablaSimbolos[posicionTabla].tipo,"CteConst");
 				posicionTabla++;
 				break;
