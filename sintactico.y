@@ -30,15 +30,20 @@ int contVariableActual=0;
 char tiposComparados[5000][10];
 char listaVariables[50][2]={""};
 
+int indiceConstantes = 0;
+char *todasLasConstantes[100];
+
 int validarInt(int entero);
 int validarString(char *str);
 int validarFloat(float flotante);
-int validarID(char *str);
+int almacenarID(char *str);
 int escribirTabla(int tipoDato, char *yytext, char *valor);
 void escribirArchivo(void);
 int buscarEnTablaSimbolo(char *);
 void existeEnTablaSimbolo(char *);
 void guardarTipo();
+void guardarConst(char *nombre);
+void validarReasignacion(char *nombre);
 int yyerror();
 
 void validarTipos();
@@ -91,11 +96,11 @@ declaracion:
 ;
 
 variable:
-	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
+	ID { printf("Variable: %s Tipo: CONST \n", yylval.strVal); almacenarID(yylval.strVal); guardarConst($1);}  {printf("Regla 01: lista_var es ID\n");}
 
 variables:
-	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
-	| variables COMA ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); validarID(yylval.strVal); guardarTipo(); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
+	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
+	| variables COMA ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo(); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
 ;
 
 tipo_variables:
@@ -136,7 +141,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} 
+  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} { validarReasignacion(yylval.strVal); }
 ;
 
 operasignacion:
@@ -205,9 +210,6 @@ int main(int argc,char *argv[]) {
 			return 1;
 		}
 
-		fprintf(tsout, "NOMBRE                        |   TIPO    |                VALOR                | L |\n");
-		fprintf(tsout, "-------------------------------------------------------------------------------------\n");
-
 		yyparse();
 		escribirArchivo();
 	}
@@ -222,12 +224,12 @@ int yyerror(void){
   printf("Error de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
-  exit (1);
+  exit(1);
 }
 
 /*-------------------------------------------------------------FUNCIONES PARA VALIDAR------------------------------------------------------------*/
 //Funcion para validar ID
-int almacenarID(char *str, int es_const){
+int almacenarID(char *str){
 	// Compruebo que ID no exista ya en la tabla de simbolos
 	if(buscarEnTablaSimbolo(str) != -1){
 		printf("\nERROR: ID \"%s\" duplicado\n", str);
@@ -333,6 +335,20 @@ void validarTipos(){
 /*---------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
+void validarReasignacion(char *nombre){
+	printf("\n\nHOLAAA- -------------------------\n\n");
+	
+	printf("%s", nombre);
+	
+	printf("\n\nHOLAAA- -------------------------\n\n");
+	// for(int i=0; i<10; i++){
+	// 	if( strcmp(todasLasConstantes[i], nombre) == 0 ){
+	// 		printf("\nERROR: Reasignacion de constante\n");
+	// 		yyerror();
+	// 	}
+	// }
+}
+
 
 /*------------------------------------------------------ FUNCIONES TABLA DE SIMBOLOS ---------------------------------------------------------------*/
 
@@ -379,7 +395,12 @@ int escribirTabla(int tipoDato, char *str, char *valor ) {
 }
 
 //Funcion para actualizar el tipo de una variable en la tabla de simbolos
-void guardarTipo(int es_const){
+void guardarConst(char *nombre){
+  todasLasConstantes[indiceConstantes] = nombre;
+	indiceConstantes++;
+}
+
+void guardarTipo(){
   int pos = buscarEnTablaSimbolo(listaVariables[contVariableActual]);
   if(pos != -1) strcpy(tablaSimbolos[pos].tipo, tipoActual);
 }
@@ -405,6 +426,10 @@ void existeEnTablaSimbolo(char *id){
 //Funcion para crear la ts de simbolos en un archivo, en base a la Tabla declarada
 void escribirArchivo(){
 	int i;
+	
+	fprintf(tsout, "NOMBRE                        |   TIPO    |                VALOR                | L |\n");
+	fprintf(tsout, "-------------------------------------------------------------------------------------\n");
+	
 	for(i=0; i<posicionTabla; i++){
 		if(
 			strcmp(tablaSimbolos[i].tipo, "") != 0 &&
