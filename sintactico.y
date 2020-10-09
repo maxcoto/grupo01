@@ -16,7 +16,7 @@ typedef struct {
 	char tipo[10];
 	char valor[30];
 	int longitud;
-	boolean es_const;
+	int es_const;
 } t_ts;
 
 t_ts tablaSimbolos[5000];
@@ -106,11 +106,12 @@ bloque_sentencias:
 ;
 
 sentencia:
-	ciclo						{printf("Regla 06: sentencia es ciclo\n");}
-	| if  					{printf("Regla 07: sentencia es if\n");}
-	| asignacion 		{printf("Regla 08: sentencia es asignacion \n");}
-	| salida				{printf("Regla 09: sentencia es salida\n");}
-	| entrada 			{printf("Regla 10: sentencia es entrada\n");}
+	ciclo						 {printf("Regla 06: sentencia es ciclo\n");}
+	| if  					 {printf("Regla 07: sentencia es if\n");}
+	| asignacion 		 {printf("Regla 08: sentencia es asignacion \n");}
+	| operasignacion {printf("Regla 09: sentencia es operacion y asignacion \n");}
+	| salida				 {printf("Regla 10: sentencia es salida\n");}
+	| entrada 			 {printf("Regla 11: sentencia es entrada\n");}
 ;
 
 ciclo:
@@ -127,6 +128,15 @@ if:
 asignacion:
   ID OP_ASIGNACION expresion PUNTOCOMA				  {printf("Regla 15: Asignacion simple.\n");}
 	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  	{printf("Regla 16: Asignacion especial.\n");}
+;
+
+asignacion:
+  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");}
+	| CONST asignacion											  {printf("Regla XX: Asignacion CONST.\n"); validarID(yylval.strVal); guardarTipo();}
+;
+
+operasignacion:
+	ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA   {printf("Regla XX: Asignacion especial.\n");}
 ;
 
 decision:
