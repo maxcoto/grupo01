@@ -17,7 +17,10 @@ PUT "La suma es: ";
 PUT suma;
 
 IF (actual > 0b10 and actual <> 0){
-  PUT "actual es mayor que 2 y distinto de cero";
+  PUT "actual es mayor que 2 y distinto de cero"; *- probando el comentario -*
 } ELSE {
-  PUT "no es mayor que 2";
+  PUT "no es mayor que 2"; *- probando el comentario 2 -*
 }
+
+
+*- Inicio comentario uno *- (lo que no se debe hacer)-* fin comentario uno -*
