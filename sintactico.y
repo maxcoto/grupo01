@@ -83,8 +83,8 @@ bloque_declaracion:
 ;
 
 variables:
-	ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla xx: lista_var es ID\n");}
-	|variables COMA ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();} {printf("Regla xx: lista_var es lista_var PUNTOCOMA ID\n");}
+	ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
+	|variables COMA ID {printf("Variable: %s Tipo: %s \n",yylval.strVal,tipoActual); validarID(yylval.strVal); guardarTipo();} {printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n");}
 ;
 
 tipo_variables:
@@ -93,9 +93,9 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 			{strcpy(tipoActual,"Float");}					{printf("Regla xx: tipo es FLOAT\n");}
-	|INTEGER 		{strcpy(tipoActual,"Int");}						{printf("Regla xx: tipo es INTEGER\n");}
-	|STRING 		{strcpy(tipoActual,"String");}				{printf("Regla xx: tipo es STRING\n");}
+	FLOAT 			{strcpy(tipoActual,"Float");}					{printf("Regla 03: tipo es FLOAT\n");}
+	|INTEGER 		{strcpy(tipoActual,"Int");}					{printf("Regla 04: tipo es INTEGER\n");}
+	|STRING 		{strcpy(tipoActual,"String");}					{printf("Regla 05: tipo es STRING\n");}
 ;
 
 //////////////////////////////////////////////////////////
@@ -105,11 +105,11 @@ bloque_sentencias:
 ;
 
 sentencia:
-	ciclo											{printf("Regla xx: sentencia es ciclo\n");}
-	|if  											{printf("Regla xx: sentencia es if\n");}
-	|asignacion 							{printf("Regla xx: sentencia es asignacion \n");}
-	|salida										{printf("Regla xx: sentencia es salida\n");}
-	|entrada 									{printf("Regla xx: sentencia es entrada\n");}
+	ciclo											{printf("Regla 06: sentencia es ciclo\n");}
+	|if  											{printf("Regla 07: sentencia es if\n");}
+	|asignacion 										{printf("Regla 08: sentencia es asignacion \n");}
+	|salida											{printf("Regla 09: sentencia es salida\n");}
+	|entrada 										{printf("Regla 10: sentencia es entrada\n");}
 ;
 
 ciclo:
@@ -117,40 +117,40 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                           				{printf("Regla XX: IF.\n");}
-	|IF P_A decision P_C sentencia                           												{printf("Regla XX: IF sentencia simple.\n");}
-	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C   {printf("Regla XX: IF - ELSE.\n");}
-	// |IF P_A decision P_C sentencia ELSE sentencia																	  {printf("Regla XX: IF - ELSE simple.\n");}
+	IF P_A decision P_C L_A bloque_sentencias L_C                           		{printf("Regla 11: IF.\n");}
+	|IF P_A decision P_C sentencia                           				{printf("Regla 12: IF sentencia simple.\n");}
+	|IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{printf("Regla 13: IF - ELSE.\n");}
+	|IF P_A decision P_C sentencia ELSE sentencia						{printf("Regla 14: IF - ELSE simple.\n");}											  {printf("Regla XX: IF - ELSE simple.\n");}
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA				  										{printf("Regla XX: Asignacion simple.\n");}
-	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  											{printf("Regla XX: Asignacion especial.\n");}
+  ID OP_ASIGNACION expresion PUNTOCOMA				  				{printf("Regla 15: Asignacion simple.\n");}
+	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  					{printf("Regla 16: Asignacion especial.\n");}
 ;
 
 decision:
-  condicion                                                         {printf("Regla XX: Decision simple.\n");}
-  |condicion OP_LOGICO condicion                                    {printf("Regla XX: Decision multiple.\n");}
-  |OP_NEGACION condicion                                            {printf("Regla XX: Decision negada.\n");}
+  condicion                                                         				{printf("Regla 17: Decision simple.\n");}
+  |condicion OP_LOGICO condicion                                    				{printf("Regla 18: Decision multiple.\n");}
+  |OP_NEGACION condicion                                            				{printf("Regla 19: Decision negada.\n");}
 ;
 
 // Condicion puede ser solo una variable ?? --> if(VARIABLE) { .. }
 condicion:
-	expresion OP_COMPARACION expresion                                {printf("Regla XX: Comparacion.\n");}
-  |expresion OP_MAYOR expresion           		                      {printf("Regla XX: Comparacion.\n");}
-	|expresion OP_MENOR expresion      			                          {printf("Regla XX: Comparacion.\n");}
+	expresion OP_COMPARACION expresion                                			{printf("Regla 20: Comparacion.\n");}
+  |expresion OP_MAYOR expresion           		                      			{printf("Regla 21: Comparacion.\n");}
+	|expresion OP_MENOR expresion      			                          	{printf("Regla 22: Comparacion.\n");}
 ;
 
 expresion:
-  termino                                                           {printf("Regla XX: Termino.\n");}
-  |expresion OP_SUMA termino                                      	{printf("Regla XX: Expresion suma Termino.\n");}
-  |expresion OP_RESTA termino                                      	{printf("Regla XX: Expresion resta Termino.\n");}
+  termino                                                           				{printf("Regla 23: Termino.\n");}
+  |expresion OP_SUMA termino                                      				{printf("Regla 24: Expresion suma Termino.\n");}
+  |expresion OP_RESTA termino                                      				{printf("Regla 25: Expresion resta Termino.\n");}
 ;
 
 termino:
-  factor                                                            {printf("Regla XX: Factor.\n");}
-  |termino OP_MUL factor                                            {printf("Regla XX: Termino por Factor.\n");}
-  |termino OP_DIV factor                                            {printf("Regla XX: Termino dividido Factor.\n");}
+  factor                                                            				{printf("Regla 26: Factor.\n");}
+  |termino OP_MUL factor                                            				{printf("Regla 27: Termino por Factor.\n");}
+  |termino OP_DIV factor                                            				{printf("Regla 28: Termino dividido Factor.\n");}
 ;
 
 factor:
@@ -161,7 +161,7 @@ factor:
 	| HEXADECIMAL
 	| BINARIO
 	| P_A expresion P_C
-	|CONTAR P_A expresion PUNTOCOMA lista P_C													{printf("Regla XX: Funcion Contar\n");}
+	|CONTAR P_A expresion PUNTOCOMA lista P_C						{printf("Regla 29: Funcion Contar\n");}
 ;
 
 lista:
@@ -215,6 +215,7 @@ int yyerror(void)
   exit (1);
 }
 
+/*-------------------------------------------------------------FUNCIONES PARA VALIDAR------------------------------------------------------------*/
 //Funcion para validar ID
 int validarID(char *str){
 	int largo=strlen(str);
@@ -321,8 +322,11 @@ void validarTipos(){
 		yyerror();
 	}
 }
+/*---------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-/* -- FUNCIONES TABLA DE SIMBOLOS -- */
+
+
+/*------------------------------------------------------ FUNCIONES TABLA DE SIMBOLOS ---------------------------------------------------------------*/
 
 //Funcion para guardar en la Tabla de Simbolos
 int guardarEnTablaSimbolo(int num, char *str, char *valor ) {
@@ -403,3 +407,4 @@ void escribirTablaSimbolo(){
 		}
 	}
 }
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
