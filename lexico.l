@@ -39,27 +39,27 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "*"					{ return OP_MUL; }
 "/"					{ return OP_DIV; }
 
-"+="				{ return OP_ASIG_ESPECIAL; }
-"-="				{ return OP_ASIG_ESPECIAL; }
-"*="				{ return OP_ASIG_ESPECIAL; }
-"/="				{ return OP_ASIG_ESPECIAL; }
+"+="				{ return OP_ASIG_SUMA; }
+"-="				{ return OP_ASIG_RESTA; }
+"*="				{ return OP_ASIG_POR; }
+"/="				{ return OP_ASIG_DIV; }
 
 ":="				{ return OP_ASIGNACION; }
 
 "<"					{ return OP_MENOR; }
 ">"					{ return OP_MAYOR; }
-">="				{ return OP_COMPARACION; }
-"<="				{ return OP_COMPARACION; }
-"=="				{ return OP_COMPARACION; }
-"!="				{ return OP_COMPARACION; }
-"<>"				{ return OP_COMPARACION; }
+">="				{ return OP_COMP_MAY_IGUAL; }
+"<="				{ return OP_COMP_MEN_IGUAL; }
+"=="				{ return OP_COMP_IGUAL; }
+"!="				{ return OP_COMP_DIST; }
+"<>"				{ return OP_COMP_DIST; }
 
-"AND"				{ return OP_LOGICO; }
-"and"				{ return OP_LOGICO; }
-"OR"				{ return OP_LOGICO; }
-"or"				{ return OP_LOGICO; }
-"NOT"				{ return OP_NEGACION; }
-"not"				{ return OP_NEGACION; }
+"AND"				{ return OP_AND; }
+"and"				{ return OP_AND; }
+"OR"				{ return OP_OR; }
+"or"				{ return OP_OR; }
+"NOT"				{ return OP_NOT; }
+"not"				{ return OP_NOT; }
 
 "DIM"				{ return DIM; }
 "AS"				{ return AS; }
@@ -81,24 +81,23 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "contar"		{ return CONTAR; }
 "CONST"			{ return CONST; }
 
+"true"      { return BOOLEAN; }
+"false"     { return BOOLEAN; }
+
 
 {ENTERO} {
-	printf("\nEntero: %s\n", yytext);
 	yylval.strVal = strdup(yytext);
 	return ENTERO;
 }
 {TEXTO} {
-	printf("\nString: %s\n", yytext);
 	yylval.strVal = strdup(yytext);
 	return TEXTO;
 }
 {REAL} {
-	printf("\nReal: %s\n", yytext);
 	yylval.strVal = strdup(yytext);
 	return REAL;
 }
 {ID} {
-	printf("\nIdentificador: %s\n", yytext);
 	yylval.strVal = strdup(yytext);
 	return ID;
 }
@@ -106,13 +105,15 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 \*\-(\\.|[^"\\])*\-\* { 
 	char * comentarios;
 	char * segundonivel;
-	comentarios = (strstr(yytext,"-*")); //Busca el fin de comentario en la cadena, si no lo encuentra devuelve puntero a null.
-	printf("Comentario: %s\n", yytext);
+
+	//Busca el fin de comentario en la cadena, si no lo encuentra devuelve puntero a null.
+	comentarios = (strstr(yytext,"-*"));
+
 	segundonivel = strstr(comentarios +2, "-*");
 	if(segundonivel != NULL){
 		if(strstr(segundonivel+2,"-*") != NULL){
 			fprintf(stderr, "ERROR Lexico - No se permite un segundo nivel de comentarios\n");
-			exit (1);
+			exit(1);
 		}
 	}
 }

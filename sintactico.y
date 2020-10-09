@@ -7,61 +7,72 @@
 #include <ctype.h>
 #include "y.tab.h"
 
+#define MIN_INT -32768
+#define MAX_INT 32767
+
+#define MIN_FLOAT -32768
+#define MAX_FLOAT 32767
 
 int yylex();
 FILE  *yyin, *tsout;
+char *yytext;
+
 
 /*-- Estructura para la tabla de simbolos --*/
 typedef struct {
 	char nombre[30];
 	char tipo[10];
 	char valor[30];
-	int longitud;
+	char longitud[30];
+	int es_const;
 } t_ts;
 
 t_ts tablaSimbolos[5000];
+char tipo[10] = { "" };
 
-char *yytext;
+int posicionTabla = 0;
+int cantComparaciones = 0;
 
-int posicionTabla=0;
-int cantComparaciones=0;
-char tipoActual[10]={""};
-int contVariableActual=0;
+int contVariableActual = 0;
 char tiposComparados[5000][10];
-char listaVariables[50][2]={""};
+char listaVariables[50][2] = { "" };
 
-int indiceConstantes = 0;
-char *todasLasConstantes[100];
+void escribirTabla(char *, char *, char *, char *);
+int buscarSimbolo(char *);
+void existeSimbolo(char *);
 
-int validarInt(int entero);
-int validarString(char *str);
-int validarFloat(float flotante);
-int almacenarID(char *str);
-int escribirTabla(int tipoDato, char *yytext, char *valor);
-void escribirArchivo(void);
-int buscarEnTablaSimbolo(char *);
-void existeEnTablaSimbolo(char *);
+void procesarID(char *, char *);
+void procesarINT(int);
+void procesarSTRING(char *);
+void procesarFLOAT(float);
+
 void guardarTipo();
 void guardarConst(char *nombre);
 void validarReasignacion(char *nombre);
-int yyerror();
-
 void validarTipos();
+
+
+void escribirArchivo(void);
+int yyerror();
 
 %}
 
 %union { char *strVal; }
+
 
 %token PUNTOCOMA DOSPUNTOS COMA
 %token P_A P_C
 %token L_A L_C
 %token C_A C_C
 %token OP_SUMA OP_RESTA OP_MUL OP_DIV
-%token OP_ASIGNACION OP_ASIG_ESPECIAL OP_COMPARACION
+%token OP_ASIGNACION 
+%token OP_ASIG_SUMA OP_ASIG_RESTA OP_ASIG_POR OP_ASIG_DIV
 %token OP_MENOR OP_MAYOR
-%token OP_LOGICO OP_NEGACION
+%token OP_COMP_MAY_IGUAL OP_COMP_MEN_IGUAL
+%token OP_COMP_IGUAL OP_COMP_DIST
+%token OP_AND OP_OR OP_NOT
 %token PUT GET
-%token INTEGER FLOAT STRING
+%token INTEGER FLOAT STRING BOOLEAN
 %token IF ELSE
 %token DIM AS CONTAR CONST
 %token WHILE
@@ -78,29 +89,20 @@ inicio:
 
 programa:
 	{printf("Bloque de declaraciones\n\n");}
-	bloque_declaraciones
+	bloque_declaracion
 	{printf("\n\nBloque de sentencias\n");}
 	bloque_sentencias
 ;
 
 // Declaracion de variables---------------------------------------------------------------------------
 
-bloque_declaraciones:
-	declaracion
-	| bloque_declaraciones declaracion
+bloque_declaracion:
+	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
 ;
-
-declaracion:
-  DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
-	| CONST variable OP_ASIGNACION expresion PUNTOCOMA
-;
-
-variable:
-	ID { printf("Variable: %s Tipo: CONST \n", yylval.strVal); almacenarID(yylval.strVal); guardarConst($1);}  {printf("Regla 01: lista_var es ID\n");}
 
 variables:
-	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
-	| variables COMA ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); almacenarID(yylval.strVal); guardarTipo(); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
+	ID                  { procesarID(yylval.strVal, tipo);}  { printf("Regla 01: lista_var es ID\n");}
+	| variables COMA ID { procesarID(yylval.strVal, tipo); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
 ;
 
 tipo_variables:
@@ -109,9 +111,9 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{strcpy(tipoActual,"Float");}			{printf("Regla 03: tipo es FLOAT\n");}
-	| INTEGER 		{strcpy(tipoActual,"Int");}				{printf("Regla 04: tipo es INTEGER\n");}
-	| STRING 			{strcpy(tipoActual,"String");}		{printf("Regla 05: tipo es STRING\n");}
+	FLOAT 				{strcpy(tipo,"FLOAT");}			{printf("Regla 03: tipo es FLOAT\n");}
+	| INTEGER 		{strcpy(tipo,"INT");}				{printf("Regla 04: tipo es INTEGER\n");}
+	| STRING 			{strcpy(tipo,"STRING");}		{printf("Regla 05: tipo es STRING\n");}
 ;
 
 //------------------------------------------------------------------------------------------------------
@@ -127,6 +129,7 @@ sentencia:
 	| operasignacion {printf("Regla 09: sentencia es operacion y asignacion \n");}
 	| salida				 {printf("Regla 10: sentencia es salida\n");}
 	| entrada 			 {printf("Regla 11: sentencia es entrada\n");}
+	| constante      {printf("Regla 12: sentencia es declaracion de constante\n");}
 ;
 
 ciclo:
@@ -141,24 +144,50 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} { validarReasignacion(yylval.strVal); }
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion(yylval.strVal); }    {printf("Regla XX: Asignacion simple.\n");} 
+;
+
+constante:
+	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA
+;
+
+nombre_constante:
+	ID   { procesarID(yylval.strVal, "CONST"); }  {printf("Regla 01: lista_var es ID CONSTANTE \n");}
 ;
 
 operasignacion:
-	ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA   {printf("Regla XX: Asignacion especial.\n");}
+	ID operasigna expresion	PUNTOCOMA
+;
+
+operasigna:
+	OP_ASIG_SUMA      {printf("Regla XX: Asignacion y suma.\n");}
+	| OP_ASIG_RESTA 	{printf("Regla XX: Asignacion y resta.\n");}
+	| OP_ASIG_POR   	{printf("Regla XX: Asignacion y multiplicacion.\n");}
+	| OP_ASIG_DIV     {printf("Regla XX: Asignacion y division.\n");}
 ;
 
 decision:
-  condicion                              {printf("Regla 17: Decision simple.\n");}
-  |condicion OP_LOGICO condicion         {printf("Regla 18: Decision multiple.\n");}
-  |OP_NEGACION condicion                 {printf("Regla 19: Decision negada.\n");}
+  condicion                          {printf("Regla 17: Decision simple.\n");}
+  | condicion logico condicion
+  | OP_NOT condicion                 {printf("Regla 19: Decision negada.\n");}
 ;
 
-// Condicion puede ser solo una variable ?? --> if(VARIABLE) { .. }
+logico:
+	OP_AND      {printf("Regla 18: Decision multiple AND.\n");}
+	| OP_OR     {printf("Regla 18: Decision multiple OR.\n");}
+;
+
 condicion:
-	expresion OP_COMPARACION expresion    {printf("Regla 20: Comparacion.\n");}
-  |expresion OP_MAYOR expresion         {printf("Regla 21: Comparacion.\n");}
-	|expresion OP_MENOR expresion      		{printf("Regla 22: Comparacion.\n");}
+	expresion comparacion expresion
+;
+
+comparacion:
+	OP_COMP_IGUAL                     	{printf("Regla 20: Comparacion IGUAL.\n");}
+	| OP_COMP_DIST											{printf("Regla 20: Comparacion DISTINTO.\n");}
+	| OP_MAYOR													{printf("Regla 20: Comparacion MAYOR.\n");}
+	| OP_MENOR													{printf("Regla 20: Comparacion MENOR.\n");}
+	| OP_COMP_MEN_IGUAL									{printf("Regla 20: Comparacion MENOR O IGUAL.\n");}
+	| OP_COMP_MAY_IGUAL									{printf("Regla 20: Comparacion MAYOR O IGUAL.\n");}
 ;
 
 expresion:
@@ -174,10 +203,11 @@ termino:
 ;
 
 factor:
-	ID 							{existeEnTablaSimbolo($1); strcpy(tiposComparados[cantComparaciones],tablaSimbolos[buscarEnTablaSimbolo($1)].tipo); cantComparaciones++;}
-	| TEXTO 				{validarString(yylval.strVal); strcpy(tiposComparados[cantComparaciones], "String"); cantComparaciones++;}
-	| ENTERO    		{validarInt(atoi(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Int"); cantComparaciones++;}
-	| REAL  				{validarFloat(atof(yylval.strVal)); strcpy(tiposComparados[cantComparaciones], "Float"); cantComparaciones++;}
+	ID 							{existeSimbolo($1);}
+	| TEXTO 				{procesarSTRING(yylval.strVal);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}
+	| REAL  				{procesarFLOAT(atof(yylval.strVal));}
+	| BOOLEAN
 	| P_A expresion P_C
 	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {printf("Regla 29: Funcion Contar\n");}
 ;
@@ -227,41 +257,46 @@ int yyerror(void){
   exit(1);
 }
 
-/*-------------------------------------------------------------FUNCIONES PARA VALIDAR------------------------------------------------------------*/
-//Funcion para validar ID
-int almacenarID(char *str){
-	// Compruebo que ID no exista ya en la tabla de simbolos
-	if(buscarEnTablaSimbolo(str) != -1){
-		printf("\nERROR: ID \"%s\" duplicado\n", str);
+
+// valida y almacena IDs ---------------------------------------------
+void procesarID(char *texto, char *tipo){
+	int pos = buscarSimbolo(texto);
+	
+	if(pos != -1){
+		printf("\nERROR: ID \"%s\" duplicado\n", texto);
 		yyerror();
 	}
 
-	escribirTabla(1, str, str);
+	escribirTabla(texto, "", "", "ID");
 
-	return 1;
+  strcpy(tablaSimbolos[pos].tipo, tipo);
+
+	return;
 }
+//--------------------------------------------------------------------
 
-//Funcion para validar el rango de enteros
-int validarInt(int entero){
-	char var[32];
+// valida y almacena enteros -----------------------------------------
+void procesarINT(int numero){
+	char texto[32];
 
-	if(entero < 0 || entero >= 32767){
+	if(numero < MIN_INT || numero >= MAX_INT){
 		printf("\nERROR: Entero fuera de rango (-32768; 32767)\n");
 		yyerror();
 	}
 
-	sprintf(var, "%d",entero);
+	sprintf(texto, "%d", numero);
 
-	if(buscarEnTablaSimbolo(var) == -1) {
-		escribirTabla(2, var, "");
+	if(buscarSimbolo(texto) == -1) {
+		escribirTabla(texto, texto, "", "INT");
 	}
 
-	return 1;
+	return;
 }
+//--------------------------------------------------------------------
 
-//Funcion para validar string
-int validarString(char *str){
-	int a=0,i;
+// valida y almacena strings -----------------------------------------
+void procesarSTRING(char *str){
+	int a = 0, i;
 	char *aux = str;
   int largo = strlen(aux);
   char cadenaPura[30];
@@ -278,61 +313,38 @@ int validarString(char *str){
 
 	cadenaPura[a--]='\0';
 
-  if(buscarEnTablaSimbolo(cadenaPura) == -1) escribirTabla(3, cadenaPura, "");
+  if(buscarSimbolo(cadenaPura) == -1){
+		escribirTabla(cadenaPura, "", (char*)(strlen(cadenaPura)), "STRING");
+	}
 
-	return 1;
+	return;
 }
+//--------------------------------------------------------------------
 
 
 //Funcion para validar float
-int validarFloat(float nro){
-	char var[32];
+void procesarFLOAT(float numero){
+	char texto[32];
 	double limiteMin = pow(-1.17549,-38);
 	double limiteMax = pow(3.40282,38);
 
-	if(nro < limiteMin || nro > limiteMax){
+	printf("\nDEFINE MIN: %lf \n", limiteMin);
+	printf("\nDEFINE MAX: %lf \n", limiteMax);
+
+	if(numero < limiteMin || numero > limiteMax){
 		printf("\nERROR: Float fuera de rango (-1.17549e-38; 3.40282e38) \n");
 		yyerror();
 	}
 
-	sprintf(var, "%.2f",nro);
+	sprintf(texto, "%.2f", numero);
 
-	if(buscarEnTablaSimbolo(var) == -1) escribirTabla(4, var,"");
-
-	return 1;
-}
-
-//Validar que los tipos de datos sean compatibles
-void validarTipos(){
-	int flgOK=1;
-	int flgNumerico=0;
-	int x;
-	printf("\nComparacion\n");
-	
-	for(x=0; x < cantComparaciones; x++){
-		printf("TIPO: %s\n",tiposComparados[x]);
-
-		if(x == 0){
-			if(strcmp(tiposComparados[x],"String")!=0){
-				flgNumerico=1;
-			}
-		} else {
-			if((flgNumerico == 0 && (strcmp(tiposComparados[x], "Int") == 0 || strcmp(tiposComparados[x], "Float") == 0)) || (flgNumerico == 1 && strcmp(tiposComparados[x],"String") == 0)){
-				//Si (no es numerico pero me vienen enteros o float) ó (si es numerico y me viene un string) = ERROR
-				flgOK = 0;
-				break;
-			}
-		}
+	if(buscarSimbolo(texto) == -1){
+		escribirTabla(texto, "", "", "FLOAT");
 	}
 
-	if(flgOK == 1){
-		printf("Comparacion OK\n");
-	} else{
-		printf("\nERROR: Tipos de dato incompatibles\n");
-		yyerror();
-	}
+	return;
 }
-/*---------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 
 
 void validarReasignacion(char *nombre){
@@ -352,72 +364,27 @@ void validarReasignacion(char *nombre){
 
 /*------------------------------------------------------ FUNCIONES TABLA DE SIMBOLOS ---------------------------------------------------------------*/
 
-//Funcion para guardar en la Tabla de Simbolos
-int escribirTabla(int tipoDato, char *str, char *valor ) {
-	switch(tipoDato){
-		case 1:
-				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				posicionTabla++;
-				break;
-
-		case 2:
-				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				strcpy(tablaSimbolos[posicionTabla].valor,str);
-				strcpy(tablaSimbolos[posicionTabla].tipo,"CteInt");
-				posicionTabla++;
-				break;
-
-		case 3:
-				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				strcpy(tablaSimbolos[posicionTabla].valor,str);
-				tablaSimbolos[posicionTabla].longitud=strlen(str);
-				strcpy(tablaSimbolos[posicionTabla].tipo,"CteStr");
-				posicionTabla++;
-				break;
-
-		case 4:
-				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				strcpy(tablaSimbolos[posicionTabla].valor,str);
-				strcpy(tablaSimbolos[posicionTabla].tipo,"CteFloat");
-				posicionTabla++;
-				break;
-				
-		case 5:
-				strcpy(tablaSimbolos[posicionTabla].nombre,str);
-				strcpy(tablaSimbolos[posicionTabla].valor,str);
-				strcpy(tablaSimbolos[posicionTabla].tipo,"CteConst");
-				posicionTabla++;
-				break;
-
-		default:
-				break;
-	}
-}
-
-//Funcion para actualizar el tipo de una variable en la tabla de simbolos
-void guardarConst(char *nombre){
-  todasLasConstantes[indiceConstantes] = nombre;
-	indiceConstantes++;
-}
-
-void guardarTipo(){
-  int pos = buscarEnTablaSimbolo(listaVariables[contVariableActual]);
-  if(pos != -1) strcpy(tablaSimbolos[pos].tipo, tipoActual);
+void escribirTabla(char *nombre, char *valor, char *longitud, char *tipo){
+	strcpy(tablaSimbolos[posicionTabla].nombre, nombre);
+	strcpy(tablaSimbolos[posicionTabla].valor, valor);
+	strcpy(tablaSimbolos[posicionTabla].longitud, longitud);
+	strcpy(tablaSimbolos[posicionTabla].tipo, tipo);
+	posicionTabla++;
 }
 
 //Funcion para buscar la posicion de un simbolo en la tabla de simbolos
-int buscarEnTablaSimbolo(char *id){
-	int i;
-	for(i=0; i<5000; i++){
-		if(strcmp(id, tablaSimbolos[i].nombre) == 0)
+int buscarSimbolo(char *id){
+	for(int i=0; i<5000; i++){
+		if(strcmp(id, tablaSimbolos[i].nombre) == 0){
 			return i;
+		}
 	}
 	return -1;
 }
 
 //Funcion para comprobar que un simbolo existe en la tabla de simbolos
-void existeEnTablaSimbolo(char *id){
-	if(buscarEnTablaSimbolo(id) == -1){
+void existeSimbolo(char *id){
+	if(buscarSimbolo(id) == -1){
 		printf("\nERROR: ID \"%s\" no declarado\n", id);
 		yyerror();
 	}
@@ -442,7 +409,7 @@ void escribirArchivo(){
 			fprintf(tsout, "%-30s|  %-7s  |                  -               	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].tipo);
 		} else { //Si es cte
 			if(tablaSimbolos[i].longitud > 0){
-				fprintf(tsout, "_%-29s|           |              %-16s	|%03d|\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
+				fprintf(tsout, "_%-29s|           |              %-16s	|%-30s|\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
 			} else {
 				fprintf(tsout, "_%-29s|           |              %-16s	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor);
 			}
