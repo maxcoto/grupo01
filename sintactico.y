@@ -126,11 +126,6 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA				  {printf("Regla 15: Asignacion simple.\n");}
-	| ID OP_ASIG_ESPECIAL expresion	PUNTOCOMA	  	{printf("Regla 16: Asignacion especial.\n");}
-;
-
-asignacion:
   ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");}
 	| CONST asignacion											  {printf("Regla XX: Asignacion CONST.\n"); validarID(yylval.strVal); guardarTipo();}
 ;
