@@ -18,9 +18,6 @@ DIGITO					[0-9]
 LETRA					[a-zA-Z]
 GUIONB					[_]
 
-BINARIO					"0b"[0-1]+
-HEXADECIMAL				"0x"([a-f]|[A-F]|[0-9])+
-
 ENTERO					{DIGITO}+
 REAL					{DIGITO}*"."{DIGITO}*
 TEXTO					\"(.)*\"
@@ -84,16 +81,7 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "contar"				{ return CONTAR; }
 "COSNT"					{ return CONST; }
 
-{HEXADECIMAL} {
-	printf("\nHexa: %s\n", yytext);
-	yylval.strVal = strdup(yytext);
-	return HEXADECIMAL;
-}
-{BINARIO} {
-	printf("\nBinario: %s\n", yytext);
-	yylval.strVal = strdup(yytext);
-	return BINARIO;
-}
+
 {ENTERO} {
 	printf("\nEntero: %s\n", yytext);
 	yylval.strVal = strdup(yytext);
