@@ -27,7 +27,7 @@ FILE  *yyin, *tsout;
 char *yytext;
 
 
-/*-- Estructura para la tabla de simbolos --*/
+// estructura para la tabla de simbolos ----------
 typedef struct {
 	char nombre[30];
 	char tipo[10];
@@ -35,6 +35,7 @@ typedef struct {
 	int longitud;
 	int es_const;
 } t_ts;
+//------------------------------------------------
 
 t_ts tablaSimbolos[5000];
 char tipo[10] = { "" };
@@ -103,8 +104,7 @@ programa:
 	bloque_sentencias
 ;
 
-// Declaracion de variables---------------------------------------------------------------------------
-
+// declaracion de variables ---------------------------------------------------------------------------
 bloque_declaracion:
 	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
 ;
@@ -124,8 +124,9 @@ tipo:
 	| INTEGER 		{strcpy(tipo,"INT");}				{printf("Regla 04: tipo es INTEGER\n");}
 	| STRING 			{strcpy(tipo,"STRING");}		{printf("Regla 05: tipo es STRING\n");}
 ;
-
 //------------------------------------------------------------------------------------------------------
+
+// sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia
 	| bloque_sentencias sentencia
@@ -237,7 +238,9 @@ entrada:
 ;
 
 %%
+// ----------------------------------------------------------------------------------
 
+// funcion principal ----------------------------------------------------------------
 int main(int argc,char *argv[]) {
 	if((yyin = fopen(argv[1], "rt")) == NULL){
 		fprintf(stderr, "\nNo se puede abrir el archivo: %s\n", argv[1]);
@@ -257,7 +260,9 @@ int main(int argc,char *argv[]) {
 
 	return 0;
 }
+//--------------------------------------------------------------------
 
+// ejecucion de error ------------------------------------------------
 int yyerror(void){
   fflush(stdout);
   printf("Error de sintaxis\n\n");
@@ -265,6 +270,7 @@ int yyerror(void){
   fclose(tsout);
   exit(1);
 }
+//--------------------------------------------------------------------
 
 
 // valida y almacena IDs ---------------------------------------------
@@ -333,7 +339,7 @@ void procesarSTRING(char *str){
 
 
 
-//Funcion para validar float
+// valida y almacena floats -----------------------------------------
 void procesarFLOAT(float numero){
 	char texto[32];
 
@@ -350,23 +356,23 @@ void procesarFLOAT(float numero){
 
 	return;
 }
+//--------------------------------------------------------------------
 
 
-
+// valida la reasignacion de constantes ------------------------------
 void validarReasignacion(char *nombre){
 	int pos = buscarSimbolo(nombre);
-	printf("HOLAAAAAAA------ %s  :: %d", nombre, pos);
 	if(pos != -1){
-		if(tablaSimbolos[posicionTabla].es_const){
+		if(tablaSimbolos[pos].es_const){
 			printf("\nERROR: Reasignacion de constante\n");
 			yyerror();
 		}
 	}
 }
+//--------------------------------------------------------------------
 
 
-/*------------------------------------------------------ FUNCIONES TABLA DE SIMBOLOS ---------------------------------------------------------------*/
-
+// escribir en la estructura de la tabla de simbolos -----------------
 void escribirTabla(char *nombre, char *tipo, char *valor, int longitud, int es_const){
 	strcpy(tablaSimbolos[posicionTabla].nombre, nombre);
 	strcpy(tablaSimbolos[posicionTabla].valor, valor);
@@ -375,8 +381,9 @@ void escribirTabla(char *nombre, char *tipo, char *valor, int longitud, int es_c
 	tablaSimbolos[posicionTabla].es_const = es_const;
 	posicionTabla++;
 }
+//--------------------------------------------------------------------
 
-//Funcion para buscar la posicion de un simbolo en la tabla de simbolos
+// busca la posicion de un simbolo en la tabla de simbolos -----------
 int buscarSimbolo(char *id){
 	for(int i=0; i<5000; i++){
 		if(strcmp(id, tablaSimbolos[i].nombre) == 0){
@@ -385,16 +392,18 @@ int buscarSimbolo(char *id){
 	}
 	return -1;
 }
+//--------------------------------------------------------------------
 
-//Funcion para comprobar que un simbolo existe en la tabla de simbolos
+// comprueba que un simbolo existe en la tabla de simbolos -----------
 void existeSimbolo(char *id){
 	if(buscarSimbolo(id) == -1){
 		printf("\nERROR: ID \"%s\" no declarado\n", id);
 		yyerror();
 	}
 }
+//--------------------------------------------------------------------
 
-//Funcion para crear la ts de simbolos en un archivo, en base a la Tabla declarada
+// almacena la tabla de simbolos en un archivo
 void escribirArchivo(){
 	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD\n");
 	fprintf(tsout, "----------------------------------------------------------------------\n");
@@ -404,4 +413,4 @@ void escribirArchivo(){
 		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
 	}
 }
-/*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+//--------------------------------------------------------------------
