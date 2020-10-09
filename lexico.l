@@ -79,7 +79,7 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "STRING"		{ return STRING; }
 
 "contar"		{ return CONTAR; }
-"COSNT"			{ return CONST; }
+"CONST"			{ return CONST; }
 
 
 {ENTERO} {
