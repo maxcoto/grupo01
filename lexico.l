@@ -14,13 +14,13 @@ FILE  *yyin, *tsout;
 %option noyywrap
 %option yylineno
 
-DIGITO					[0-9]
-LETRA					[a-zA-Z]
-GUIONB					[_]
+DIGITO			[0-9]
+LETRA				[a-zA-Z]
+GUIONB			[_]
 
-ENTERO					{DIGITO}+
-REAL					{DIGITO}*"."{DIGITO}*
-TEXTO					\"(.)*\"
+ENTERO			{DIGITO}+
+REAL				{DIGITO}*"."{DIGITO}*
+TEXTO				\"(.)*\"
 ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 %%
@@ -39,47 +39,47 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "*"					{ return OP_MUL; }
 "/"					{ return OP_DIV; }
 
-"+="					{ return OP_ASIG_ESPECIAL; }
-"-="					{ return OP_ASIG_ESPECIAL; }
-"*="					{ return OP_ASIG_ESPECIAL; }
-"/="					{ return OP_ASIG_ESPECIAL; }
+"+="				{ return OP_ASIG_ESPECIAL; }
+"-="				{ return OP_ASIG_ESPECIAL; }
+"*="				{ return OP_ASIG_ESPECIAL; }
+"/="				{ return OP_ASIG_ESPECIAL; }
 
-":="					{ return OP_ASIGNACION; }
+":="				{ return OP_ASIGNACION; }
 
 "<"					{ return OP_MENOR; }
 ">"					{ return OP_MAYOR; }
-">="					{ return OP_COMPARACION; }
-"<="					{ return OP_COMPARACION; }
-"=="					{ return OP_COMPARACION; }
-"!="					{ return OP_COMPARACION; }
-"<>"					{ return OP_COMPARACION; }
+">="				{ return OP_COMPARACION; }
+"<="				{ return OP_COMPARACION; }
+"=="				{ return OP_COMPARACION; }
+"!="				{ return OP_COMPARACION; }
+"<>"				{ return OP_COMPARACION; }
 
-"AND"					{ return OP_LOGICO; }
-"and"					{ return OP_LOGICO; }
-"OR"					{ return OP_LOGICO; }
-"or"					{ return OP_LOGICO; }
-"NOT"					{ return OP_NEGACION; }
-"not"					{ return OP_NEGACION; }
+"AND"				{ return OP_LOGICO; }
+"and"				{ return OP_LOGICO; }
+"OR"				{ return OP_LOGICO; }
+"or"				{ return OP_LOGICO; }
+"NOT"				{ return OP_NEGACION; }
+"not"				{ return OP_NEGACION; }
 
-"DIM"					{ return DIM; }
-"AS"					{ return AS; }
+"DIM"				{ return DIM; }
+"AS"				{ return AS; }
 
-"GET"					{ return GET; }
-"PUT"					{ return PUT; }
+"GET"				{ return GET; }
+"PUT"				{ return PUT; }
 
-"IF"					{ return IF; }
-"if"					{ return IF; }
-"ELSE"					{ return ELSE; }
-"else"					{ return ELSE; }
-"WHILE"					{ return WHILE; }
-"while"					{ return WHILE; }
+"IF"				{ return IF; }
+"if"				{ return IF; }
+"ELSE"			{ return ELSE; }
+"else"			{ return ELSE; }
+"WHILE"			{ return WHILE; }
+"while"			{ return WHILE; }
 
-"Integer"				{ return INTEGER; }
-"Float"					{ return FLOAT; }
-"STRING"				{ return STRING; }
+"Integer"		{ return INTEGER; }
+"Float"			{ return FLOAT; }
+"STRING"		{ return STRING; }
 
-"contar"				{ return CONTAR; }
-"COSNT"					{ return CONST; }
+"contar"		{ return CONTAR; }
+"COSNT"			{ return CONST; }
 
 
 {ENTERO} {
