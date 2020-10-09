@@ -76,7 +76,7 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 "Integer"		{ return INTEGER; }
 "Float"			{ return FLOAT; }
-"STRING"		{ return STRING; }
+"String"		{ return STRING; }
 
 "contar"		{ return CONTAR; }
 "CONST"			{ return CONST; }
