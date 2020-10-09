@@ -59,7 +59,7 @@ void validarTipos();
 %token IF ELSE
 %token DIM AS CONTAR CONST
 %token WHILE
-%token <strVal>TEXTO ENTERO REAL HEXADECIMAL BINARIO
+%token <strVal>TEXTO ENTERO REAL
 %token <strVal>ID
 
 %%
