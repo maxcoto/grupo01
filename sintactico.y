@@ -10,8 +10,8 @@
 #define MIN_INT -32768
 #define MAX_INT 32767
 
-#define MIN_FLOAT -32768
-#define MAX_FLOAT 32767
+#define MIN_FLOAT 0.002146
+#define MAX_FLOAT 162136619726890008576.000000
 
 int yylex();
 FILE  *yyin, *tsout;
@@ -325,13 +325,8 @@ void procesarSTRING(char *str){
 //Funcion para validar float
 void procesarFLOAT(float numero){
 	char texto[32];
-	double limiteMin = pow(-1.17549,-38);
-	double limiteMax = pow(3.40282,38);
 
-	printf("\nDEFINE MIN: %lf \n", limiteMin);
-	printf("\nDEFINE MAX: %lf \n", limiteMax);
-
-	if(numero < limiteMin || numero > limiteMax){
+	if(numero < MIN_FLOAT || numero > MAX_FLOAT){
 		printf("\nERROR: Float fuera de rango (-1.17549e-38; 3.40282e38) \n");
 		yyerror();
 	}
@@ -392,28 +387,12 @@ void existeSimbolo(char *id){
 
 //Funcion para crear la ts de simbolos en un archivo, en base a la Tabla declarada
 void escribirArchivo(){
-	int i;
+	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD\n");
+	fprintf(tsout, "----------------------------------------------------------------------\n");
 	
-	fprintf(tsout, "NOMBRE                        |   TIPO    |                VALOR                | L |\n");
-	fprintf(tsout, "-------------------------------------------------------------------------------------\n");
-	
-	for(i=0; i<posicionTabla; i++){
-		if(
-			strcmp(tablaSimbolos[i].tipo, "") != 0 &&
-			strcmp(tablaSimbolos[i].tipo, "Cte") != 0 &&
-			strcmp(tablaSimbolos[i].tipo, "CteFloat") !=0 &&
-			strcmp(tablaSimbolos[i].tipo, "CteInt") != 0 &&
-			strcmp(tablaSimbolos[i].tipo, "CteStr")!= 0
-		){
-			//si es ID
-			fprintf(tsout, "%-30s|  %-7s  |                  -               	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].tipo);
-		} else { //Si es cte
-			if(tablaSimbolos[i].longitud > 0){
-				fprintf(tsout, "_%-29s|           |              %-16s	|%-30s|\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
-			} else {
-				fprintf(tsout, "_%-29s|           |              %-16s	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor);
-			}
-		}
+	for(int i=0; i<posicionTabla; i++){
+		char *guion = strcmp(tablaSimbolos[i].tipo, "ID") ? "_" : " ";
+		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%-30s\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
 	}
 }
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
