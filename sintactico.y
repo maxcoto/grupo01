@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include "y.tab.h"
 
+
 int yylex();
 FILE  *yyin, *tsout;
 
@@ -16,7 +17,6 @@ typedef struct {
 	char tipo[10];
 	char valor[30];
 	int longitud;
-	int es_const;
 } t_ts;
 
 t_ts tablaSimbolos[5000];
@@ -34,8 +34,8 @@ int validarInt(int entero);
 int validarString(char *str);
 int validarFloat(float flotante);
 int validarID(char *str);
-int guardarEnTablaSimbolo(int num, char *yytext, char *valor);
-void escribirTablaSimbolo(void);
+int escribirTabla(int tipoDato, char *yytext, char *valor);
+void escribirArchivo(void);
 int buscarEnTablaSimbolo(char *);
 void existeEnTablaSimbolo(char *);
 void guardarTipo();
@@ -73,15 +73,25 @@ inicio:
 
 programa:
 	{printf("Bloque de declaraciones\n\n");}
-	bloque_declaracion
+	bloque_declaraciones
 	{printf("\n\nBloque de sentencias\n");}
 	bloque_sentencias
 ;
 
 // Declaracion de variables---------------------------------------------------------------------------
-bloque_declaracion:
-  DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
+
+bloque_declaraciones:
+	declaracion
+	| bloque_declaraciones declaracion
 ;
+
+declaracion:
+  DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
+	| CONST variable OP_ASIGNACION expresion PUNTOCOMA
+;
+
+variable:
+	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
 
 variables:
 	ID { printf("Variable: %s Tipo: %s \n", yylval.strVal, tipoActual); validarID(yylval.strVal); guardarTipo();}  {printf("Regla 01: lista_var es ID\n");}
@@ -102,7 +112,7 @@ tipo:
 //------------------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia
-	|bloque_sentencias sentencia
+	| bloque_sentencias sentencia
 ;
 
 sentencia:
@@ -126,8 +136,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");}
-	| CONST asignacion											  {printf("Regla XX: Asignacion CONST.\n"); validarID(yylval.strVal); guardarTipo();}
+  ID OP_ASIGNACION expresion PUNTOCOMA		  {printf("Regla XX: Asignacion simple.\n");} 
 ;
 
 operasignacion:
@@ -200,7 +209,7 @@ int main(int argc,char *argv[]) {
 		fprintf(tsout, "-------------------------------------------------------------------------------------\n");
 
 		yyparse();
-		escribirTablaSimbolo();
+		escribirArchivo();
 	}
 	fclose(yyin);
 	fclose(tsout);
@@ -218,21 +227,15 @@ int yyerror(void){
 
 /*-------------------------------------------------------------FUNCIONES PARA VALIDAR------------------------------------------------------------*/
 //Funcion para validar ID
-int validarID(char *str){
-	int largo = strlen(str);
-
-	if(largo > 20){
-		printf("\nERROR: ID \"%s\" demasiado largo (<20)\n", str);
-		yyerror();
-	}
-
+int almacenarID(char *str, int es_const){
 	// Compruebo que ID no exista ya en la tabla de simbolos
 	if(buscarEnTablaSimbolo(str) != -1){
 		printf("\nERROR: ID \"%s\" duplicado\n", str);
 		yyerror();
 	}
 
-	guardarEnTablaSimbolo(1, str, str);
+	escribirTabla(1, str, str);
+
 	return 1;
 }
 
@@ -248,7 +251,7 @@ int validarInt(int entero){
 	sprintf(var, "%d",entero);
 
 	if(buscarEnTablaSimbolo(var) == -1) {
-		guardarEnTablaSimbolo(2, var, "");
+		escribirTabla(2, var, "");
 	}
 
 	return 1;
@@ -273,7 +276,7 @@ int validarString(char *str){
 
 	cadenaPura[a--]='\0';
 
-  if(buscarEnTablaSimbolo(cadenaPura) == -1) guardarEnTablaSimbolo(3, cadenaPura, "");
+  if(buscarEnTablaSimbolo(cadenaPura) == -1) escribirTabla(3, cadenaPura, "");
 
 	return 1;
 }
@@ -292,7 +295,7 @@ int validarFloat(float nro){
 
 	sprintf(var, "%.2f",nro);
 
-	if(buscarEnTablaSimbolo(var) == -1) guardarEnTablaSimbolo(4, var,"");
+	if(buscarEnTablaSimbolo(var) == -1) escribirTabla(4, var,"");
 
 	return 1;
 }
@@ -334,21 +337,21 @@ void validarTipos(){
 /*------------------------------------------------------ FUNCIONES TABLA DE SIMBOLOS ---------------------------------------------------------------*/
 
 //Funcion para guardar en la Tabla de Simbolos
-int guardarEnTablaSimbolo(int num, char *str, char *valor ) {
-	switch(num){
-		case 1:  // ID
+int escribirTabla(int tipoDato, char *str, char *valor ) {
+	switch(tipoDato){
+		case 1:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
 				posicionTabla++;
 				break;
 
-		case 2: // INT
+		case 2:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
 				strcpy(tablaSimbolos[posicionTabla].valor,str);
 				strcpy(tablaSimbolos[posicionTabla].tipo,"CteInt");
 				posicionTabla++;
 				break;
 
-		case 3: // STRING
+		case 3:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
 				strcpy(tablaSimbolos[posicionTabla].valor,str);
 				tablaSimbolos[posicionTabla].longitud=strlen(str);
@@ -356,10 +359,17 @@ int guardarEnTablaSimbolo(int num, char *str, char *valor ) {
 				posicionTabla++;
 				break;
 
-		case 4: // FLOAT
+		case 4:
 				strcpy(tablaSimbolos[posicionTabla].nombre,str);
 				strcpy(tablaSimbolos[posicionTabla].valor,str);
 				strcpy(tablaSimbolos[posicionTabla].tipo,"CteFloat");
+				posicionTabla++;
+				break;
+				
+		case 5:
+				strcpy(tablaSimbolos[posicionTabla].nombre,str);
+				strcpy(tablaSimbolos[posicionTabla].valor,str);
+				strcpy(tablaSimbolos[posicionTabla].tipo,"CteConst");
 				posicionTabla++;
 				break;
 
@@ -369,9 +379,9 @@ int guardarEnTablaSimbolo(int num, char *str, char *valor ) {
 }
 
 //Funcion para actualizar el tipo de una variable en la tabla de simbolos
-void guardarTipo(){
+void guardarTipo(int es_const){
   int pos = buscarEnTablaSimbolo(listaVariables[contVariableActual]);
-  if(pos != -1) strcpy(tablaSimbolos[pos].tipo,tipoActual);
+  if(pos != -1) strcpy(tablaSimbolos[pos].tipo, tipoActual);
 }
 
 //Funcion para buscar la posicion de un simbolo en la tabla de simbolos
@@ -393,18 +403,20 @@ void existeEnTablaSimbolo(char *id){
 }
 
 //Funcion para crear la ts de simbolos en un archivo, en base a la Tabla declarada
-void escribirTablaSimbolo(){
+void escribirArchivo(){
 	int i;
 	for(i=0; i<posicionTabla; i++){
-		if(strcmp(tablaSimbolos[i].tipo,"") != 0 &&
-			strcmp(tablaSimbolos[i].tipo,"Cte") != 0 &&
-			strcmp(tablaSimbolos[i].tipo,"CteFloat") !=0 &&
-			strcmp(tablaSimbolos[i].tipo,"CteInt") != 0 &&
-			strcmp(tablaSimbolos[i].tipo,"CteStr")!= 0){
+		if(
+			strcmp(tablaSimbolos[i].tipo, "") != 0 &&
+			strcmp(tablaSimbolos[i].tipo, "Cte") != 0 &&
+			strcmp(tablaSimbolos[i].tipo, "CteFloat") !=0 &&
+			strcmp(tablaSimbolos[i].tipo, "CteInt") != 0 &&
+			strcmp(tablaSimbolos[i].tipo, "CteStr")!= 0
+		){
 			//si es ID
 			fprintf(tsout, "%-30s|  %-7s  |                  -               	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].tipo);
 		} else { //Si es cte
-			if(tablaSimbolos[i].longitud>0){
+			if(tablaSimbolos[i].longitud > 0){
 				fprintf(tsout, "_%-29s|           |              %-16s	|%03d|\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
 			} else {
 				fprintf(tsout, "_%-29s|           |              %-16s	| - |\n", tablaSimbolos[i].nombre, tablaSimbolos[i].valor);
