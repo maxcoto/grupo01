@@ -14,6 +14,8 @@ actual:= (contador/0.342) + (contador* contar (actual*contador ; [256,nombre*sum
 suma:= suma + actual;
 }
 
+*- Así son los comentarios en el 2°Cuat de LyC *- Comentario -* -*
+
 PUT "La suma es: ";
 PUT suma;
 
@@ -23,3 +25,4 @@ IF (actual > 10 and actual <> 0){
 	if (actual < nombre)
   	PUT "no es mayor que 2";
 }
+
