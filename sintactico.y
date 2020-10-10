@@ -156,11 +156,11 @@ if:
 	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {printf("Regla 11: IF.\n");}
 	| IF P_A decision P_C sentencia                           				        {printf("Regla 12: IF sentencia simple.\n");}
 	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    		{printf("Regla 13: IF - ELSE.\n");}
-	| IF P_A decision P_C sentencia ELSE sentencia						        {printf("Regla 14: IF - ELSE simple.\n");} {printf("Regla XX: IF - ELSE simple.\n");}
+	| IF P_A decision P_C sentencia ELSE sentencia						        {printf("Regla 14: IF - ELSE simple.\n");}
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla XX: Asignacion simple.\n");} 
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla 15: Asignacion simple.\n");} 
 ;
 
 constante:
@@ -176,16 +176,16 @@ operasignacion:
 ;
 
 operasigna:
-	OP_ASIG_SUMA      	{printf("Regla XX: Asignacion y suma.\n");}
-	| OP_ASIG_RESTA 	{printf("Regla XX: Asignacion y resta.\n");}
-	| OP_ASIG_POR   	{printf("Regla XX: Asignacion y multiplicacion.\n");}
-	| OP_ASIG_DIV     	{printf("Regla XX: Asignacion y division.\n");}
+	OP_ASIG_SUMA      	{printf("Regla 16: Asignacion y suma.\n");}
+	| OP_ASIG_RESTA 	{printf("Regla 16: Asignacion y resta.\n");}
+	| OP_ASIG_POR   	{printf("Regla 16: Asignacion y multiplicacion.\n");}
+	| OP_ASIG_DIV     	{printf("Regla 16: Asignacion y division.\n");}
 ;
 
 decision:
   condicion                          {printf("Regla 17: Decision simple.\n");}
   | condicion logico condicion
-  | OP_NOT condicion                 {printf("Regla 19: Decision negada.\n");}
+  | OP_NOT condicion                 {printf("Regla 17: Decision negada.\n");}
 ;
 
 logico:
@@ -207,15 +207,15 @@ comparacion:
 ;
 
 expresion:
-  termino                             	{printf("Regla 23: Termino.\n");}
-  | expresion OP_SUMA termino           {printf("Regla 24: Expresion suma Termino.\n");}
-  | expresion OP_RESTA termino          {printf("Regla 25: Expresion resta Termino.\n");}
+  termino                             	{printf("Regla 21: Termino.\n");}
+  | expresion OP_SUMA termino           {printf("Regla 22: Expresion suma Termino.\n");}
+  | expresion OP_RESTA termino          {printf("Regla 23: Expresion resta Termino.\n");}
 ;
 
 termino:
-  factor                                {printf("Regla 26: Factor.\n");}
-  | termino OP_MUL factor               {printf("Regla 27: Termino por Factor.\n");}
-  | termino OP_DIV factor               {printf("Regla 28: Termino dividido Factor.\n");}
+  factor                                {printf("Regla 24: Factor.\n");}
+  | termino OP_MUL factor               {printf("Regla 25: Termino por Factor.\n");}
+  | termino OP_DIV factor               {printf("Regla 26: Termino dividido Factor.\n");}
 ;
 
 factor:
@@ -225,7 +225,7 @@ factor:
 	| REAL  					{procesarFLOAT(atof(yylval.strVal));}
 	| BOOLEAN
 	| P_A expresion P_C
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	{printf("Regla 29: Funcion Contar\n");}
+	| CONTAR P_A expresion PUNTOCOMA lista P_C	{printf("Regla 27: Funcion Contar\n");}
 ;
 
 lista:
