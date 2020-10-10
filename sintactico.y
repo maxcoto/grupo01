@@ -1,6 +1,6 @@
 /*
 TODO
-1) Que se guarde el tipo de variable en la impresion de la tablaSimbolos
+1) Que se guarde el tipo de variable en la impresion de la tablaSimbolos --------------ya--------------
 2) Que se corrobore la correspondencia del tipo de dato
 3) Que se valide que no se repiten las constantes
 4) Aplicar tipos de constantes
@@ -139,13 +139,13 @@ bloque_sentencias:
 ;
 
 sentencia:
-	ciclo						 {printf("Regla 06: sentencia es ciclo\n");}
-	| if  					 {printf("Regla 07: sentencia es if\n");}
-	| asignacion 		 {printf("Regla 08: sentencia es asignacion \n");}
-	| operasignacion {printf("Regla 09: sentencia es operacion y asignacion \n");}
-	| salida				 {printf("Regla 10: sentencia es salida\n");}
-	| entrada 			 {printf("Regla 11: sentencia es entrada\n");}
-	| constante      {printf("Regla 12: sentencia es declaracion de constante\n");}
+	ciclo						{printf("Regla 06: sentencia es ciclo\n");}
+	| if  					 	{printf("Regla 07: sentencia es if\n");}
+	| asignacion 		 			{printf("Regla 08: sentencia es asignacion \n");}
+	| operasignacion 				{printf("Regla 09: sentencia es operacion y asignacion \n");}
+	| salida				 	{printf("Regla 10: sentencia es salida\n");}
+	| entrada 			 		{printf("Regla 11: sentencia es entrada\n");}
+	| constante      				{printf("Regla 12: sentencia es declaracion de constante\n");}
 ;
 
 ciclo:
@@ -154,9 +154,9 @@ ciclo:
 
 if:
 	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {printf("Regla 11: IF.\n");}
-	| IF P_A decision P_C sentencia                           				                  {printf("Regla 12: IF sentencia simple.\n");}
-	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{printf("Regla 13: IF - ELSE.\n");}
-	| IF P_A decision P_C sentencia ELSE sentencia						                          {printf("Regla 14: IF - ELSE simple.\n");} {printf("Regla XX: IF - ELSE simple.\n");}
+	| IF P_A decision P_C sentencia                           				        {printf("Regla 12: IF sentencia simple.\n");}
+	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    		{printf("Regla 13: IF - ELSE.\n");}
+	| IF P_A decision P_C sentencia ELSE sentencia						        {printf("Regla 14: IF - ELSE simple.\n");} {printf("Regla XX: IF - ELSE simple.\n");}
 ;
 
 asignacion:
@@ -176,10 +176,10 @@ operasignacion:
 ;
 
 operasigna:
-	OP_ASIG_SUMA      {printf("Regla XX: Asignacion y suma.\n");}
+	OP_ASIG_SUMA      	{printf("Regla XX: Asignacion y suma.\n");}
 	| OP_ASIG_RESTA 	{printf("Regla XX: Asignacion y resta.\n");}
 	| OP_ASIG_POR   	{printf("Regla XX: Asignacion y multiplicacion.\n");}
-	| OP_ASIG_DIV     {printf("Regla XX: Asignacion y division.\n");}
+	| OP_ASIG_DIV     	{printf("Regla XX: Asignacion y division.\n");}
 ;
 
 decision:
@@ -199,11 +199,11 @@ condicion:
 
 comparacion:
 	OP_COMP_IGUAL                     	{printf("Regla 20: Comparacion IGUAL.\n");}
-	| OP_COMP_DIST											{printf("Regla 20: Comparacion DISTINTO.\n");}
-	| OP_MAYOR													{printf("Regla 20: Comparacion MAYOR.\n");}
-	| OP_MENOR													{printf("Regla 20: Comparacion MENOR.\n");}
-	| OP_COMP_MEN_IGUAL									{printf("Regla 20: Comparacion MENOR O IGUAL.\n");}
-	| OP_COMP_MAY_IGUAL									{printf("Regla 20: Comparacion MAYOR O IGUAL.\n");}
+	| OP_COMP_DIST				{printf("Regla 20: Comparacion DISTINTO.\n");}
+	| OP_MAYOR				{printf("Regla 20: Comparacion MAYOR.\n");}
+	| OP_MENOR				{printf("Regla 20: Comparacion MENOR.\n");}
+	| OP_COMP_MEN_IGUAL			{printf("Regla 20: Comparacion MENOR O IGUAL.\n");}
+	| OP_COMP_MAY_IGUAL			{printf("Regla 20: Comparacion MAYOR O IGUAL.\n");}
 ;
 
 expresion:
@@ -219,13 +219,13 @@ termino:
 ;
 
 factor:
-	ID 							{existeSimbolo($1);}
-	| TEXTO 				{procesarSTRING(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}
-	| REAL  				{procesarFLOAT(atof(yylval.strVal));}
+	ID 						{existeSimbolo($1);}
+	| TEXTO 					{procesarSTRING(yylval.strVal);}
+	| ENTERO    					{procesarINT(atoi(yylval.strVal));}
+	| REAL  					{procesarFLOAT(atof(yylval.strVal));}
 	| BOOLEAN
 	| P_A expresion P_C
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {printf("Regla 29: Funcion Contar\n");}
+	| CONTAR P_A expresion PUNTOCOMA lista P_C	{printf("Regla 29: Funcion Contar\n");}
 ;
 
 lista:
@@ -293,13 +293,17 @@ void procesarID(char *texto, char *tipo, int es_const){
 
 	return;
 }
+//--------------------------------------------------------------------
 
+//----almacena el tipo de dato----------------------------------------
 void procesarT(char *tipo){
 	strcpy(tablaSimbolos[posTipo].tipo, tipo);
 	guardarTipo(tipo,posTipo);
 	return;
 }
+//--------------------------------------------------------------------
 
+//guarda la variable con su tipo de dato-------------------------------
 void guardarId (char *id,int pos){ 
     strcpy(varTipo[0][pos],tipo);
     posId++;
@@ -308,7 +312,8 @@ void guardarTipo (char *tipo,int pos){
     strcpy(varTipo[1][pos],tipo);
     posTipo++;
 }
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------
+
 
 // valida y almacena enteros -----------------------------------------
 void procesarINT(int numero){
