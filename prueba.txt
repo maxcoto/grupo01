@@ -8,8 +8,6 @@ GET actual;
 
 texto := "hola mundo";
 
-
-
 contador := 0;
 suma:= 02.5+nombre;
 
@@ -30,4 +28,3 @@ IF (actual > 10 and actual <> 0){
 	if (actual < nombre)
   	PUT "no es mayor que 2";
 }
-

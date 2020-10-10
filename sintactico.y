@@ -75,7 +75,7 @@ int yyerror();
 %token L_A L_C
 %token C_A C_C
 %token OP_SUMA OP_RESTA OP_MUL OP_DIV
-%token OP_ASIGNACION 
+%token OP_ASIGNACION
 %token OP_ASIG_SUMA OP_ASIG_RESTA OP_ASIG_POR OP_ASIG_DIV
 %token OP_MENOR OP_MAYOR
 %token OP_COMP_MAY_IGUAL OP_COMP_MEN_IGUAL
@@ -147,14 +147,14 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {printf("Regla 11: IF.\n");}
-	| IF P_A decision P_C sentencia                           				                  {printf("Regla 12: IF sentencia simple.\n");}
-	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{printf("Regla 13: IF - ELSE.\n");}
-	| IF P_A decision P_C sentencia ELSE sentencia						                          {printf("Regla 14: IF - ELSE simple.\n");} {printf("Regla XX: IF - ELSE simple.\n");}
+	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {printf("Regla 12: IF.\n");}
+	| IF P_A decision P_C sentencia                           				                  {printf("Regla 13: IF sentencia simple.\n");}
+	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{printf("Regla 14: IF - ELSE.\n");}
+	| IF P_A decision P_C sentencia ELSE sentencia						                          {printf("Regla 15: IF - ELSE simple.\n");}
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla XX: Asignacion simple.\n");} 
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla 16: Asignacion simple.\n");}
 ;
 
 constante:
@@ -162,7 +162,7 @@ constante:
 ;
 
 nombre_constante:
-	ID   { procesarID(yylval.strVal, "CONST", 1); }  {printf("Regla 01: lista_var es ID CONSTANTE \n");}
+	ID   { procesarID(yylval.strVal, "CONST", 1); }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
 ;
 
 operasignacion:
@@ -170,10 +170,10 @@ operasignacion:
 ;
 
 operasigna:
-	OP_ASIG_SUMA      {printf("Regla XX: Asignacion y suma.\n");}
-	| OP_ASIG_RESTA 	{printf("Regla XX: Asignacion y resta.\n");}
-	| OP_ASIG_POR   	{printf("Regla XX: Asignacion y multiplicacion.\n");}
-	| OP_ASIG_DIV     {printf("Regla XX: Asignacion y division.\n");}
+	OP_ASIG_SUMA      {printf("Regla 21: Asignacion y suma.\n");}
+	| OP_ASIG_RESTA 	{printf("Regla 22: Asignacion y resta.\n");}
+	| OP_ASIG_POR   	{printf("Regla 23: Asignacion y multiplicacion.\n");}
+	| OP_ASIG_DIV     {printf("Regla 24: Asignacion y division.\n");}
 ;
 
 decision:
@@ -201,15 +201,15 @@ comparacion:
 ;
 
 expresion:
-  termino                             	{printf("Regla 23: Termino.\n");}
-  | expresion OP_SUMA termino           {printf("Regla 24: Expresion suma Termino.\n");}
-  | expresion OP_RESTA termino          {printf("Regla 25: Expresion resta Termino.\n");}
+  termino                             	{printf("Regla 25: Termino.\n");}
+  | expresion OP_SUMA termino           {printf("Regla 26: Expresion suma Termino.\n");}
+  | expresion OP_RESTA termino          {printf("Regla 27: Expresion resta Termino.\n");}
 ;
 
 termino:
-  factor                                {printf("Regla 26: Factor.\n");}
-  | termino OP_MUL factor               {printf("Regla 27: Termino por Factor.\n");}
-  | termino OP_DIV factor               {printf("Regla 28: Termino dividido Factor.\n");}
+  factor                                {printf("Regla 28: Factor.\n");}
+  | termino OP_MUL factor               {printf("Regla 29: Termino por Factor.\n");}
+  | termino OP_DIV factor               {printf("Regla 30: Termino dividido Factor.\n");}
 ;
 
 factor:
@@ -219,7 +219,7 @@ factor:
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));}
 	| BOOLEAN
 	| P_A expresion P_C
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {printf("Regla 29: Funcion Contar\n");}
+	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {printf("Regla 31: Funcion Contar\n");}
 ;
 
 lista:
@@ -276,7 +276,7 @@ int yyerror(void){
 // valida y almacena IDs ---------------------------------------------
 void procesarID(char *texto, char *tipo, int es_const){
 	int pos = buscarSimbolo(texto);
-	
+
 	if(pos != -1){
 		printf("\nERROR: ID \"%s\" duplicado\n", texto);
 		yyerror();
@@ -313,26 +313,26 @@ void procesarINT(int numero){
 void procesarSTRING(char *str){
 	int a = 0;
 	char *aux = str;
-	
+
   int largo = strlen(aux);
   char cadenaPura[30];
-	
+
 	if(largo > 30){
 		printf("\nERROR: Cadena demasiado larga (<30)\n");
 		yyerror();
 	}
-	
+
 	for(int i=1; i<largo-1; i++){
     cadenaPura[a] = str[i];
     a++;
   }
-	
+
 	cadenaPura[a--]='\0';
-	
+
   if(buscarSimbolo(cadenaPura) == -1){
 		escribirTabla(cadenaPura, "", cadenaPura, largo, 0);
 	}
-	
+
 	return;
 }
 //--------------------------------------------------------------------
@@ -407,7 +407,7 @@ void existeSimbolo(char *id){
 void escribirArchivo(){
 	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD\n");
 	fprintf(tsout, "----------------------------------------------------------------------\n");
-	
+
 	for(int i=0; i<posicionTabla; i++){
 		char *guion = strcmp(tablaSimbolos[i].tipo, "ID") ? "_" : " ";
 		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
