@@ -289,7 +289,8 @@ void escribirTabla(char *nombre, char *valor, int longitud, int es_const){
 
 // busca la posicion de un simbolo en la tabla de simbolos -----------
 int buscarSimbolo(char *id){
-	for(int i=0; i<5000; i++){
+	int i;
+	for(i = 0; i<5000; i++){
 		if(strcmp(id, tablaSimbolos[i].nombre) == 0){
 			return i;
 		}
@@ -363,6 +364,7 @@ void procesarINT(int numero){
 void procesarSTRING(char *str){
 	int a = 0;
 	char *aux = str;
+	int i;
 
   int largo = strlen(aux);
   char cadenaPura[30];
@@ -372,7 +374,7 @@ void procesarSTRING(char *str){
 		yyerror();
 	}
 
-	for(int i=1; i<largo-1; i++){
+	for(i = 1; i<largo-1; i++){
     cadenaPura[a] = str[i];
     a++;
   }
@@ -460,8 +462,9 @@ void validarAsignacion(char *nombre){
 void escribirArchivo(){
 	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD\n");
 	fprintf(tsout, "----------------------------------------------------------------------\n");
+	int i;
 
-	for(int i=0; i<posicionTabla; i++){
+	for(i = 0; i<posicionTabla; i++){
 		char *guion = strcmp(tablaSimbolos[i].tipo, "") ? " " : "_";
 
 		int longi = tablaSimbolos[i].longitud;
