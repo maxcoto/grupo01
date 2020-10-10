@@ -8,7 +8,7 @@ GET actual;
 
 texto := "hola mundo";
 
-nombre := 123;
+
 
 contador := 0;
 suma:= 02.5+nombre;

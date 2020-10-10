@@ -8,7 +8,6 @@ _texto                         |	       |	                |	0
 _nombre                        |	CONST  |	                |	0
 _80                            |	       |	80              |	0
 _hola mundo                    |	       |	hola mundo      |	12
-_123                           |	       |	123             |	0
 _0                             |	       |	0               |	0
 _2.50                          |	       |	2.50            |	0
 _92                            |	       |	92              |	0

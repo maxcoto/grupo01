@@ -154,7 +154,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion(yylval.strVal); }    {printf("Regla XX: Asignacion simple.\n");} 
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla XX: Asignacion simple.\n");} 
 ;
 
 constante:
