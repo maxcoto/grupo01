@@ -45,7 +45,7 @@ void guardarTipo();
 void guardarConst(char *nombre);
 void validarReasignacion(char *nombre);
 int yyerror();
-
+dsad
 void validarTipos();
 
 %}
