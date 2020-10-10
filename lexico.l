@@ -102,7 +102,7 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 	return ID;
 }
 
-\*\-(\\.|[^"\\])*\-\* { 
+\*\-(\\.|[^"\\])*\-\* {
 	char * comentarios;
 	char * segundonivel;
 
