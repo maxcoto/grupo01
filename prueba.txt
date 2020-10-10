@@ -1,4 +1,4 @@
-DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
+DIM <contador,promedio,actual,suma,texto> AS <Integer,Float,Float,Float,String>
 
 CONST nombre := 80;
 
@@ -6,12 +6,17 @@ PUT "Prueba.txt LyC Tema 4!";
 PUT "Ingrese un valor entero para actual: ";
 GET actual;
 
+texto := "hola mundo";
+
+
+
 contador := 0;
 suma:= 02.5+nombre;
+
 while (contador <= 92) {
-contador:= contador + 1;
-actual:= (contador/0.342) + (contador* contar (actual*contador ; [256,nombre*suma,52,4]));
-suma:= suma + actual;
+  contador:= contador + 1;
+  actual:= (contador/0.342) + (contador* contar (actual*contador ; [256,nombre*suma,52,4]));
+  suma:= suma + actual;
 }
 
 *- Así son los comentarios en el 2°Cuat de LyC *- Comentario -* -*
