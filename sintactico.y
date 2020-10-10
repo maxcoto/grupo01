@@ -49,8 +49,8 @@ void procesarSTRING(char *);
 void procesarFLOAT(float);
 
 void agregarTipo(char *);
-void guardarConst(char *nombre);
-void validarAsignacion(char *nombre);
+void guardarConst(char *);
+void validarAsignacion(char *, char *);
 void validarTipos();
 
 void escribirArchivo(void);
@@ -145,7 +145,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }    {printf("Regla 16: Asignacion simple.\n");}
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1, yylval.strVal); }    {printf("Regla 16: Asignacion simple.\n");}
 ;
 
 constante:
@@ -353,7 +353,8 @@ void procesarFLOAT(float numero){
 
 
 // valida la reasignacion de constantes ------------------------------
-void validarAsignacion(char *nombre){
+void validarAsignacion(char *nombre, char *valor){
+	printf("################%s    %s\n", nombre, valor);
 	int pos = buscarSimbolo(nombre);
 	if(pos != -1){
 		if(tablaSimbolos[pos].es_const){
@@ -404,7 +405,7 @@ void escribirArchivo(){
 	fprintf(tsout, "----------------------------------------------------------------------\n");
 
 	for(int i=0; i<posicionTabla; i++){
-		char *guion = strcmp(tablaSimbolos[i].tipo, "ID") ? "_" : " ";
+		char *guion = strcmp(tablaSimbolos[i].tipo, "") ? " " : "_";
 
 		int longi = tablaSimbolos[i].longitud;
 	  char longitud_texto[10];
