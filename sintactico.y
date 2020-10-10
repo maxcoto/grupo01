@@ -1,6 +1,5 @@
 /*
 TODO
-1) Que se guarde el tipo de variable en la impresion de la tablaSimbolos
 2) Que se corrobore la correspondencia del tipo de dato
 4) Aplicar tipos de constantes
 */
@@ -23,7 +22,6 @@ TODO
 int yylex();
 FILE  *yyin, *tsout;
 char *yytext;
-
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -52,9 +50,8 @@ void procesarFLOAT(float);
 
 void agregarTipo(char *);
 void guardarConst(char *nombre);
-void validarReasignacion(char *nombre);
+void validarAsignacion(char *nombre);
 void validarTipos();
-
 
 void escribirArchivo(void);
 int yyerror();
@@ -62,7 +59,6 @@ int yyerror();
 %}
 
 %union { char *strVal; }
-
 
 %token PUNTOCOMA DOSPUNTOS COMA
 %token P_A P_C
@@ -104,8 +100,8 @@ bloque_declaracion:
 ;
 
 variables:
-	ID                  { procesarID(yylval.strVal, 0);} { printf("Regla 01: lista_var es ID\n"); printf(" ########## %s\n", yylval.strVal);}
-	| variables COMA ID { procesarID(yylval.strVal, 0);} { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); printf("############ %s\n", yylval.strVal);}
+	ID                  { procesarID(yylval.strVal, 0);} { printf("Regla 01: lista_var es ID\n");}
+	| variables COMA ID { procesarID(yylval.strVal, 0);} { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n");}
 ;
 
 tipo_variables:
@@ -149,7 +145,7 @@ if:
 ;
 
 asignacion:
-  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarReasignacion($1); }    {printf("Regla 16: Asignacion simple.\n");}
+  ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }    {printf("Regla 16: Asignacion simple.\n");}
 ;
 
 constante:
@@ -157,7 +153,7 @@ constante:
 ;
 
 nombre_constante:
-	ID   { procesarID(yylval.strVal, 1); }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
+	ID   { procesarID(yylval.strVal, 1); agregarTipo("CONST"); }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
 ;
 
 operasignacion:
@@ -357,7 +353,7 @@ void procesarFLOAT(float numero){
 
 
 // valida la reasignacion de constantes ------------------------------
-void validarReasignacion(char *nombre){
+void validarAsignacion(char *nombre){
 	int pos = buscarSimbolo(nombre);
 	if(pos != -1){
 		if(tablaSimbolos[pos].es_const){
