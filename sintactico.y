@@ -2,8 +2,7 @@
 TODO
 1) Que se guarde el tipo de variable en la impresion de la tablaSimbolos
 2) Que se corrobore la correspondencia del tipo de dato
-3) Que se valide que no se repiten las constantes
-4) Aplicar tipos de constantes
+3) Aplicar tipos de constantes
 */
 
 
@@ -410,7 +409,17 @@ void escribirArchivo(){
 
 	for(int i=0; i<posicionTabla; i++){
 		char *guion = strcmp(tablaSimbolos[i].tipo, "ID") ? "_" : " ";
-		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, tablaSimbolos[i].longitud);
+		
+		int longi = tablaSimbolos[i].longitud;
+	  char longitud_texto[10];
+		if(longi > 0) {
+			sprintf(longitud_texto, "%d", longi);
+		} else {
+			longitud_texto[0] = '\0';
+		}
+	  
+		
+		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%s\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto);
 	}
 }
 //--------------------------------------------------------------------
