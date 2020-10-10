@@ -1,8 +1,3 @@
-/*
-TODO
-Aplicar tipos de constantes
-*/
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
