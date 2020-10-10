@@ -2,10 +2,8 @@
 TODO
 1) Que se guarde el tipo de variable en la impresion de la tablaSimbolos
 2) Que se corrobore la correspondencia del tipo de dato
-3) Que se valide que no se repiten las constantes
 4) Aplicar tipos de constantes
 */
-
 
 %{
 #include <stdio.h>
@@ -41,22 +39,18 @@ t_ts tablaSimbolos[5000];
 char tipo[10] = { "" };
 
 int posicionTabla = 0;
-int cantComparaciones = 0;
+int posicionTipo = 0;
 
-int contVariableActual = 0;
-char tiposComparados[5000][10];
-char listaVariables[50][2] = { "" };
-
-void escribirTabla(char *, char *, char *, int, int);
+void escribirTabla(char *, char *, int, int);
 int buscarSimbolo(char *);
 void existeSimbolo(char *);
 
-void procesarID(char *, char *, int);
+void procesarID(char *, int);
 void procesarINT(int);
 void procesarSTRING(char *);
 void procesarFLOAT(float);
 
-void guardarTipo();
+void agregarTipo(char *);
 void guardarConst(char *nombre);
 void validarReasignacion(char *nombre);
 void validarTipos();
@@ -110,8 +104,8 @@ bloque_declaracion:
 ;
 
 variables:
-	ID                  { procesarID(yylval.strVal, tipo, 0);}  { printf("Regla 01: lista_var es ID\n");}
-	| variables COMA ID { procesarID(yylval.strVal, tipo, 0); } { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); }
+	ID                  { procesarID(yylval.strVal, 0);} { printf("Regla 01: lista_var es ID\n"); printf(" ########## %s\n", yylval.strVal);}
+	| variables COMA ID { procesarID(yylval.strVal, 0);} { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n"); printf("############ %s\n", yylval.strVal);}
 ;
 
 tipo_variables:
@@ -120,9 +114,10 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{strcpy(tipo,"FLOAT");}			{printf("Regla 03: tipo es FLOAT\n");}
-	| INTEGER 		{strcpy(tipo,"INT");}				{printf("Regla 04: tipo es INTEGER\n");}
-	| STRING 			{strcpy(tipo,"STRING");}		{printf("Regla 05: tipo es STRING\n");}
+	FLOAT 				{agregarTipo("FLOAT");}			{printf("Regla 03: tipo es FLOAT\n");}
+	| INTEGER 		{agregarTipo("INT");}				{printf("Regla 04: tipo es INTEGER\n");}
+	| STRING 			{agregarTipo("STRING");}		{printf("Regla 05: tipo es STRING\n");}
+	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{printf("Regla 05: tipo es BOOLEAN\n");}
 ;
 //------------------------------------------------------------------------------------------------------
 
@@ -162,7 +157,7 @@ constante:
 ;
 
 nombre_constante:
-	ID   { procesarID(yylval.strVal, "CONST", 1); }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
+	ID   { procesarID(yylval.strVal, 1); }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
 ;
 
 operasignacion:
@@ -274,7 +269,7 @@ int yyerror(void){
 
 
 // valida y almacena IDs ---------------------------------------------
-void procesarID(char *texto, char *tipo, int es_const){
+void procesarID(char *texto, int es_const){
 	int pos = buscarSimbolo(texto);
 
 	if(pos != -1){
@@ -282,14 +277,16 @@ void procesarID(char *texto, char *tipo, int es_const){
 		yyerror();
 	}
 
-	escribirTabla(texto, tipo, "", 0, es_const);
-
-  strcpy(tablaSimbolos[pos].tipo, tipo);
+	escribirTabla(texto, "", 0, es_const);
 
 	return;
 }
 //--------------------------------------------------------------------
 
+void agregarTipo(char *tipo){
+	strcpy(tablaSimbolos[posicionTipo].tipo, tipo);
+	posicionTipo++;
+}
 // valida y almacena enteros -----------------------------------------
 void procesarINT(int numero){
 	char texto[32];
@@ -302,7 +299,7 @@ void procesarINT(int numero){
 	sprintf(texto, "%d", numero);
 
 	if(buscarSimbolo(texto) == -1) {
-		escribirTabla(texto, "", texto, 0, 0);
+		escribirTabla(texto, texto, 0, 0);
 	}
 
 	return;
@@ -330,7 +327,7 @@ void procesarSTRING(char *str){
 	cadenaPura[a--]='\0';
 
   if(buscarSimbolo(cadenaPura) == -1){
-		escribirTabla(cadenaPura, "", cadenaPura, largo, 0);
+		escribirTabla(cadenaPura, cadenaPura, largo, 0);
 	}
 
 	return;
@@ -351,7 +348,7 @@ void procesarFLOAT(float numero){
 	sprintf(texto, "%.2f", numero);
 
 	if(buscarSimbolo(texto) == -1){
-		escribirTabla(texto, "", texto, 0, 0);
+		escribirTabla(texto, texto, 0, 0);
 	}
 
 	return;
@@ -373,13 +370,15 @@ void validarReasignacion(char *nombre){
 
 
 // escribir en la estructura de la tabla de simbolos -----------------
-void escribirTabla(char *nombre, char *tipo, char *valor, int longitud, int es_const){
+void escribirTabla(char *nombre, char *valor, int longitud, int es_const){
 	strcpy(tablaSimbolos[posicionTabla].nombre, nombre);
 	strcpy(tablaSimbolos[posicionTabla].valor, valor);
 	tablaSimbolos[posicionTabla].longitud = longitud;
-	strcpy(tablaSimbolos[posicionTabla].tipo, tipo);
 	tablaSimbolos[posicionTabla].es_const = es_const;
 	posicionTabla++;
+
+	if(strcmp(valor, "") != 0)
+		posicionTipo++;
 }
 //--------------------------------------------------------------------
 
