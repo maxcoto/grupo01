@@ -36,6 +36,7 @@ int validaTipo = 0;
 int posicionTabla = 0;
 int posicionTipo = 0;
 int asignacionConst = 0;
+int global = 0;
 
 void validarTipo(int);
 
@@ -281,8 +282,7 @@ void escribirTabla(char *nombre, char *valor, int longitud, int es_const){
 	tablaSimbolos[posicionTabla].es_const = es_const;
 	posicionTabla++;
 
-	if(strcmp(valor, "") != 0)
-		posicionTipo++;
+	if(es_const){ posicionTipo = posicionTabla - 1; }
 }
 
 //--------------------------------------------------------------------
@@ -459,8 +459,8 @@ void validarAsignacion(char *nombre){
 
 // almacena la tabla de simbolos en un archivo
 void escribirArchivo(){
-	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD\n");
-	fprintf(tsout, "----------------------------------------------------------------------\n");
+	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD | es_const\n");
+	fprintf(tsout, "---------------------------------------------------------------------------------\n");
 	int i;
 
 	for(i = 0; i<posicionTabla; i++){
@@ -475,7 +475,7 @@ void escribirArchivo(){
 		}
 
 
-		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%s\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto);
+		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%s\t|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto, tablaSimbolos[i].es_const);
 	}
 }
 //--------------------------------------------------------------------
