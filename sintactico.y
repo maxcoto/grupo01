@@ -463,23 +463,21 @@ void validarAsignacion(char *nombre){
 
 // almacena la tabla de simbolos en un archivo
 void escribirArchivo(){
-	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD  | CONST\n");
-	fprintf(tsout, "---------------------------------------------------------------------------------\n");
+	fprintf(tsout, "NOMBRE                         |   TIPO         | VALOR           | LONGITUD \n");
+	fprintf(tsout, "----------------------------------------------------------------------------\n");
 	int i;
 
 	for(i = 0; i<posicionTabla; i++){
 		char *guion = strcmp(tablaSimbolos[i].tipo, "") ? " " : "_";
+		char tipo_str[14] = {""};
+		strcpy(tipo_str, tablaSimbolos[i].tipo);
+		if(tablaSimbolos[i].es_const) { strcat(tipo_str, " CONST"); }
 
 		int longi = tablaSimbolos[i].longitud;
-	  char longitud_texto[10];
-		if(longi > 0) {
-			sprintf(longitud_texto, "%d", longi - 2);
-		} else {
-			longitud_texto[0] = '\0';
-		}
+	  char longitud_texto[10] = {""};
+		if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
 
-
-		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%-8s\t|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto, tablaSimbolos[i].es_const);
+		fprintf(tsout, "%s%-30s|\t%-14s|\t%-16s|\t%-8s\t\n", guion, tablaSimbolos[i].nombre, tipo_str, tablaSimbolos[i].valor, longitud_texto);
 	}
 }
 //--------------------------------------------------------------------
