@@ -38,8 +38,6 @@ int validaTipo = 0;
 int posicionTabla = 0;
 int posicionTipo = 0;
 int asignacionConst = 0;
-int global = 0;
-int colores=0;
 int cantVariables = 0;
 int cantTipos = 0;
 
@@ -500,8 +498,7 @@ void debug(char* texto){
 
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
-	if(COLOR) { printf("\033[0;31m"); }
-	system("color 0C");
+	COLOR ? printf("\033[0;31m") : system("color 0C");
 	printf("\n\n[ERROR]: %s %s", texto, valor);
 	yyerror();
 }
@@ -509,15 +506,9 @@ void error(char *texto, char *valor){
 
 // function para imprimir mensajes en verde  --------------------------
 void exito(char *texto){
-	if(COLOR) { printf("\033[0;32m"); }
-	if(colores ==0){
-		system("color 09");
-		colores++;
-	}else{
-		system("color 0A");
-	}
+	COLOR ? printf("\033[0;32m") : system("color 02");
 	printf("\n%s\n", texto);
-	if(COLOR) { printf("\033[0;0m"); }
+	COLOR ? printf("\033[0;0m") : system("color 07");
 }
 // --------------------------------------------------------------------
 

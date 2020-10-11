@@ -129,9 +129,9 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 // ejecucion de error ------------------------------------------------
 int yyerror(void){
   fflush(stdout);
-	if(COLOR) { printf("\033[0;33m"); }
+	COLOR ? printf("\033[0;33m") : system("color 06");
 	printf("\n[LINEA]: %d", yylineno);
-	if(COLOR) { printf("\033[0;31m"); }
+	COLOR ? printf("\033[0;31m") : system("color 0C");
 	printf("\nError de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
