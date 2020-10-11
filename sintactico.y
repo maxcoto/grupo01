@@ -336,6 +336,8 @@ void procesarID(char *simbolo){
 // valida y almacena enteros -----------------------------------------
 void procesarINT(int numero){
 	char texto[32];
+	sprintf(texto, "%d", numero);
+
 	int pos = buscarSimbolo(texto);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
@@ -343,13 +345,10 @@ void procesarINT(int numero){
 		yyerror();
 	}
 
-	sprintf(texto, "%d", numero);
-
 	if(pos == -1) {
 		escribirTabla(texto, texto, 0, 0);
 	}
 
-	//printf("############## %s\n", tablaSimbolos[pos].nombre);
 	if(asignacionConst == 1){
 		agregarTipo("INT");
 		asignacionConst = 0;
@@ -404,7 +403,7 @@ void procesarFLOAT(float numero){
 		yyerror();
 	}
 
-	sprintf(texto, "%.2f", numero);
+	sprintf(texto, "%f", numero);
 
 	if(buscarSimbolo(texto) == -1){
 		escribirTabla(texto, texto, 0, 0);
