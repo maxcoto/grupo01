@@ -1,0 +1,6 @@
+*- Error en tamaño de cadena -*
+DIM < contador,promedio,actual,suma,texto> AS < Integer,Float,Float,Float,String >
+
+CONST nombre := 80;
+texto := "Las constantes pueden definirse en cualquier parte dentro del cuerpo del programa....";
+contador := 12 + nombre;

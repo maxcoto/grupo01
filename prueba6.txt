@@ -1,0 +1,24 @@
+*- Varias asignaciones -*
+DIM <contador> AS <Integer>
+DIM <promedio> AS <Float>
+DIM <actual, anterior> AS <Float, Float>
+DIM <suma> AS <Float>
+DIM <texto, segundotexto> AS <String, String>
+
+CONST nombre := 80;
+
+texto := "meiameeee";
+
+CONST nombre2 := 123;
+
+contador := 0;
+
+CONST nombre3 := "este es string";
+
+actual := 2.3543432423;
+
+CONST max := "texto123";
+
+suma := 1 + 1 * ((312 - nombre) / nombre2);
+
+CONST nombre4 := .432;

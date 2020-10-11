@@ -1,9 +1,8 @@
-*- Prueba asignacion erronea -*
+*- Comparacion erronea -*
 DIM < contador,promedio,actual,suma,texto> AS < Integer,Float,Float,Float,String >
 
 CONST nombre := 80;
 texto := "meiameeee";
-contador := 12 + nombre;
-
-CONST max := "texto123";
-texto := max + 3;
+if(nombre > texto){
+  suma := nombre * 126;
+}

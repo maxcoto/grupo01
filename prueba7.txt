@@ -1,0 +1,6 @@
+*- Error en parametros de asignacion -*
+DIM <contador,promedio,actual,suma,texto> AS < Integer >
+
+CONST nombre := 80;
+texto := "meiameeee";
+contador := 12 + suma;

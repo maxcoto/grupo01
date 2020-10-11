@@ -1,0 +1,6 @@
+DIM <contador,promedio,actual,suma,texto> AS <Integer,Float,Float,Float,String >
+
+
+*- !@#$%^&*()(*&^%$#@#$%^&*(JHGFDSAERTYUIJHBVCXZ))  -*
+
+CONST nombre := 80;
