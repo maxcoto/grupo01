@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <float.h>
 #include <ctype.h>
 #include "y.tab.h"
@@ -67,6 +66,8 @@ void exito(char *);
 %}
 
 %union { char *strVal; }
+
+%locations
 
 %token PUNTOCOMA DOSPUNTOS COMA
 %token P_A P_C
@@ -266,15 +267,18 @@ int main(int argc,char *argv[]) {
 }
 //--------------------------------------------------------------------
 
-// ejecucion de error ------------------------------------------------
-int yyerror(void){
-  fflush(stdout);
-	printf("\nError de sintaxis\n");
-  fclose(yyin);
-  fclose(tsout);
-  exit(1);
-}
-//--------------------------------------------------------------------
+// // ejecucion de error ------------------------------------------------
+// int yyerror(void){
+//   fflush(stdout);
+// 	printf("\033[0;31m");
+// 	printf("\nError de sintaxis\n");
+// 	printf("\033[0;33m");
+// 	printf("\n[LINE]: %d\n", yylineno);
+//   fclose(yyin);
+//   fclose(tsout);
+//   exit(1);
+// }
+// //--------------------------------------------------------------------
 // Validar tipo en las asignaciones ---------------------------------------------------------
 
 void validarTipo(int tipoDato){
@@ -505,7 +509,7 @@ void debug(char* texto){
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
 	printf("\033[0;31m");
-	printf("\n[ERROR]: %s %s\n", texto, valor);
+	printf("\n\n[ERROR]: %s %s", texto, valor);
 	yyerror();
 }
 // --------------------------------------------------------------------

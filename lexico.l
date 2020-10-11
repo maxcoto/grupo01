@@ -11,6 +11,8 @@
 FILE  *yyin, *tsout;
 %}
 
+int yyerror(void);
+
 %option noyywrap
 %option yylineno
 
@@ -121,3 +123,17 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 "\n"
 "\t"
 %%
+
+// ejecucion de error ------------------------------------------------
+int yyerror(void){
+  fflush(stdout);
+	printf("\033[0;33m");
+	printf("\n[LINE]: %d", yylineno);
+	printf("\033[0;31m");
+	printf("\nError de sintaxis (~_~;)\n\n");
+  fclose(yyin);
+  fclose(tsout);
+  exit(1);
+}
+//--------------------------------------------------------------------
+
