@@ -93,7 +93,7 @@ void exito(char *);
 inicio:
   {exito("Iniciando compilacion ...");}
 	programa
-	{exito("Compilacion exitosa !!!");}
+	{exito("\nCompilacion exitosa !!!\n");}
 ;
 
 programa:
@@ -138,13 +138,15 @@ bloque_sentencias:
 ;
 
 sentencia:
-	ciclo						 {debug("Regla 07: sentencia es ciclo");}
-	| if  					 {debug("Regla 08: sentencia es if");}
-	| asignacion 		 {debug("Regla 09: sentencia es asignacion ");}
-	| operasignacion {debug("Regla 10: sentencia es operacion y asignacion ");}
-	| salida				 {debug("Regla 11: sentencia es salida");}
-	| entrada 			 {debug("Regla 12: sentencia es entrada");}
-	| constante      {debug("Regla 13: sentencia es declaracion de constante");}
+	ciclo						 			{debug("Regla 07: sentencia es ciclo");}
+	| if  					 			{debug("Regla 08: sentencia es if");}
+	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}
+	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}
+	| salida				 			{debug("Regla 11: sentencia es salida");}
+	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
+	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}
+	| bloque_declaracion 	{error("Solo se puede declarar variables al inicio", ""); }
+	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
 
 ciclo:
@@ -473,7 +475,6 @@ void validarVariables(){
 		cantVariables = 0;
 	}
 }
-
 //--------------------------------------------------------------------
 
 // almacena la tabla de simbolos en un archivo

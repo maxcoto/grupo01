@@ -13,6 +13,8 @@ CONST nombre2 := 123;
 
 contador := 0;
 
+DIM <asd, asddd> AS <String, String>
+
 CONST nombre3 := "este es string";
 
 actual := 2.3543432423;

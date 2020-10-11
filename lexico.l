@@ -128,9 +128,9 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 int yyerror(void){
   fflush(stdout);
 	printf("\033[0;33m");
-	printf("\n[LINE]: %d", yylineno);
+	printf("\n[LINEA]: %d", yylineno);
 	printf("\033[0;31m");
-	printf("\nError de sintaxis (~_~;)\n\n");
+	printf("\nError de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
   exit(1);

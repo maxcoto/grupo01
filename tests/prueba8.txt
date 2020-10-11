@@ -3,4 +3,4 @@ DIM <contador> AS < Integer >
 
 CONST nombre := 80;
 
-contador := contar (nombre ;[2,2,3]);
+contador := contar (nombre ;[]);
