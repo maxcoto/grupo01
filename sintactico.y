@@ -7,6 +7,7 @@
 #include "y.tab.h"
 
 #define VERBOSE 1
+#define COLOR 0
 
 #define MIN_INT -32768
 #define MAX_INT 32767
@@ -269,20 +270,7 @@ int main(int argc,char *argv[]) {
 }
 //--------------------------------------------------------------------
 
-// // ejecucion de error ------------------------------------------------
-// int yyerror(void){
-//   fflush(stdout);
-// 	printf("\033[0;31m");
-// 	printf("\nError de sintaxis\n");
-// 	printf("\033[0;33m");
-// 	printf("\n[LINE]: %d\n", yylineno);
-//   fclose(yyin);
-//   fclose(tsout);
-//   exit(1);
-// }
-// //--------------------------------------------------------------------
 // Validar tipo en las asignaciones ---------------------------------------------------------
-
 void validarTipo(int tipoDato){
 	if(validaTipo == TIPO_NULL){
 		validaTipo = tipoDato;
@@ -335,6 +323,7 @@ void procesarSimbolo(char *texto, int es_const){
 //--------------------------------------------------------------------
 void procesarID(char *simbolo){
 	int pos = buscarSimbolo(simbolo);
+
 	if(pos == -1){
 		error("ID no declarado:", simbolo);
 	}
@@ -447,6 +436,8 @@ void validarAsignacion(char *nombre){
 		if(tablaSimbolos[pos].es_const){
 			error("Reasignacion de constante", "");
 		}
+	} else {
+		error("Variable no declarada", "");
 	}
 
 	if(
@@ -509,7 +500,7 @@ void debug(char* texto){
 
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
-	printf("\033[0;31m");
+	if(COLOR) { printf("\033[0;31m"); }
 	printf("\n\n[ERROR]: %s %s", texto, valor);
 	yyerror();
 }
@@ -517,9 +508,9 @@ void error(char *texto, char *valor){
 
 // function para imprimir mensajes en verde  --------------------------
 void exito(char *texto){
-	printf("\033[0;32m");
+	if(COLOR) { printf("\033[0;32m"); }
 	printf("\n%s\n", texto);
-	printf("\033[0;0m");
+	if(COLOR) { printf("\033[0;0m"); }
 }
 // --------------------------------------------------------------------
 

@@ -8,6 +8,8 @@
 #include <math.h>
 #include "y.tab.h"
 
+#define COLOR 0
+
 FILE  *yyin, *tsout;
 %}
 
@@ -127,9 +129,9 @@ ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 // ejecucion de error ------------------------------------------------
 int yyerror(void){
   fflush(stdout);
-	printf("\033[0;33m");
+	if(COLOR) { printf("\033[0;33m"); }
 	printf("\n[LINEA]: %d", yylineno);
-	printf("\033[0;31m");
+	if(COLOR) { printf("\033[0;31m"); }
 	printf("\nError de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
