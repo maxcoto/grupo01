@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include "y.tab.h"
 
+#define VERBOSE 1
+
 #define MIN_INT -32768
 #define MAX_INT 32767
 
@@ -54,11 +56,13 @@ void procesarFLOAT(float);
 
 void agregarTipo(char *);
 void validarAsignacion(char *);
-
-void checkAsignacion();
+void validarVariables();
 
 void escribirArchivo(void);
 int yyerror();
+void debug(char *);
+void error(char *, char *);
+void exito(char *);
 
 %}
 
@@ -86,15 +90,15 @@ int yyerror();
 %%
 
 inicio:
-  {printf("\n\nINICIA COMPILACION\n\n");}
+  {exito("Iniciando compilacion ...");}
 	programa
-	{printf("\n\nCOMPILACION EXITOSA!\n\n\n");}
+	{exito("Compilacion exitosa !!!");}
 ;
 
 programa:
-	{printf("Bloque de declaraciones\n\n");}
+	{debug("Bloque de declaraciones");}
 	bloque_declaracion
-	{printf("\n\nBloque de sentencias\n");}
+	{debug("Bloque de sentencias");}
 	bloque_sentencias
 ;
 
@@ -105,12 +109,12 @@ bloque_declaracion:
 ;
 
 declaracion:
-	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR {checkAsignacion();}
+	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR {validarVariables();}
 ;
 
 variables:
-	ID                  { procesarSimbolo(yylval.strVal, 0);} { printf("Regla 01: lista_var es ID\n");}
-	| variables COMA ID { procesarSimbolo(yylval.strVal, 0);} { printf("Regla 02: lista_var es lista_var PUNTOCOMA ID\n");}
+	ID                  { procesarSimbolo(yylval.strVal, 0);} { debug("Regla 01: variables es ID");}
+	| variables COMA ID { procesarSimbolo(yylval.strVal, 0);} { debug("Regla 02: variables es variables puntocoma id");}
 ;
 
 tipo_variables:
@@ -119,10 +123,10 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{agregarTipo("FLOAT");}			{printf("Regla 03: tipo es FLOAT\n");}
-	| INTEGER 		{agregarTipo("INT");}				{printf("Regla 04: tipo es INTEGER\n");}
-	| STRING 			{agregarTipo("STRING");}		{printf("Regla 05: tipo es STRING\n");}
-	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{printf("Regla 05: tipo es BOOLEAN\n");}
+	FLOAT 				{agregarTipo("FLOAT");}			{debug("Regla 03: tipo es float");}
+	| INTEGER 		{agregarTipo("INT");}				{debug("Regla 04: tipo es int");}
+	| STRING 			{agregarTipo("STRING");}		{debug("Regla 05: tipo es string");}
+	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{debug("Regla 06: tipo es boolean");}
 ;
 //------------------------------------------------------------------------------------------------------
 
@@ -133,13 +137,13 @@ bloque_sentencias:
 ;
 
 sentencia:
-	ciclo						 {printf("Regla 06: sentencia es ciclo\n");}
-	| if  					 {printf("Regla 07: sentencia es if\n");}
-	| asignacion 		 {printf("Regla 08: sentencia es asignacion \n");}
-	| operasignacion {printf("Regla 09: sentencia es operacion y asignacion \n");}
-	| salida				 {printf("Regla 10: sentencia es salida\n");}
-	| entrada 			 {printf("Regla 11: sentencia es entrada\n");}
-	| constante      {printf("Regla 12: sentencia es declaracion de constante\n");}
+	ciclo						 {debug("Regla 07: sentencia es ciclo");}
+	| if  					 {debug("Regla 08: sentencia es if");}
+	| asignacion 		 {debug("Regla 09: sentencia es asignacion ");}
+	| operasignacion {debug("Regla 10: sentencia es operacion y asignacion ");}
+	| salida				 {debug("Regla 11: sentencia es salida");}
+	| entrada 			 {debug("Regla 12: sentencia es entrada");}
+	| constante      {debug("Regla 13: sentencia es declaracion de constante");}
 ;
 
 ciclo:
@@ -147,22 +151,22 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {printf("Regla 12: IF.\n");}
-	| IF P_A decision P_C sentencia                           				                  {printf("Regla 13: IF sentencia simple.\n");}
-	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{printf("Regla 14: IF - ELSE.\n");}
-	| IF P_A decision P_C sentencia ELSE sentencia						                          {printf("Regla 15: IF - ELSE simple.\n");}
+	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {debug("Regla 14: if");}
+	| IF P_A decision P_C sentencia                           				                  {debug("Regla 15: if simple");}
+	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{debug("Regla 16: if/else");}
+	| IF P_A decision P_C sentencia ELSE sentencia						                          {debug("Regla 17: if/else simple");}
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }    {printf("Regla 16: Asignacion simple.\n");}
+	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}
 ;
 
 constante:
-	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA
+	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA           		{debug("Regla 19: Declaracion de constante");}
 ;
 
 nombre_constante:
-	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  {printf("Regla 17: lista_var es ID CONSTANTE \n");}
+	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}
 ;
 
 operasignacion:
@@ -170,21 +174,21 @@ operasignacion:
 ;
 
 operasigna:
-	OP_ASIG_SUMA      {printf("Regla 21: Asignacion y suma.\n");}
-	| OP_ASIG_RESTA 	{printf("Regla 22: Asignacion y resta.\n");}
-	| OP_ASIG_POR   	{printf("Regla 23: Asignacion y multiplicacion.\n");}
-	| OP_ASIG_DIV     {printf("Regla 24: Asignacion y division.\n");}
+	OP_ASIG_SUMA      {debug("Regla 21: Asignacion y suma");}
+	| OP_ASIG_RESTA 	{debug("Regla 22: Asignacion y resta");}
+	| OP_ASIG_POR   	{debug("Regla 23: Asignacion y multiplicacion");}
+	| OP_ASIG_DIV     {debug("Regla 24: Asignacion y division");}
 ;
 
 decision:
-  condicion                          {printf("Regla 17: Decision simple.\n");}
+  condicion                          	{debug("Regla 25: Decision simple");}
   | condicion logico condicion
-  | OP_NOT condicion                 {printf("Regla 19: Decision negada.\n");}
+  | OP_NOT condicion                 	{debug("Regla 26: Decision negada");}
 ;
 
 logico:
-	OP_AND      {printf("Regla 18: Decision multiple AND.\n");}
-	| OP_OR     {printf("Regla 18: Decision multiple OR.\n");}
+	OP_AND      												{debug("Regla 27: Decision multiple and");}
+	| OP_OR     												{debug("Regla 28: Decision multiple or");}
 ;
 
 condicion:
@@ -192,24 +196,24 @@ condicion:
 ;
 
 comparacion:
-	OP_COMP_IGUAL                     	{printf("Regla 20: Comparacion IGUAL.\n");}
-	| OP_COMP_DIST											{printf("Regla 20: Comparacion DISTINTO.\n");}
-	| OP_MAYOR													{printf("Regla 20: Comparacion MAYOR.\n");}
-	| OP_MENOR													{printf("Regla 20: Comparacion MENOR.\n");}
-	| OP_COMP_MEN_IGUAL									{printf("Regla 20: Comparacion MENOR O IGUAL.\n");}
-	| OP_COMP_MAY_IGUAL									{printf("Regla 20: Comparacion MAYOR O IGUAL.\n");}
+	OP_COMP_IGUAL                     		{debug("Regla 29: Comparacion igual");}
+	| OP_COMP_DIST												{debug("Regla 30: Comparacion distinto");}
+	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}
+	| OP_MENOR														{debug("Regla 32: Comparacion menor");}
+	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}
+	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}
 ;
 
 expresion:
-  termino                             	{printf("Regla 25: Termino.\n");}
-  | expresion OP_SUMA termino           {printf("Regla 26: Expresion suma Termino.\n");}
-  | expresion OP_RESTA termino          {printf("Regla 27: Expresion resta Termino.\n");}
+  termino                             	{debug("Regla 35: termino");}
+  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}
+  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}
 ;
 
 termino:
-  factor                                {printf("Regla 28: Factor.\n");}
-  | termino OP_MUL factor               {printf("Regla 29: Termino por Factor.\n");}
-  | termino OP_DIV factor               {printf("Regla 30: Termino dividido Factor.\n");}
+  factor                                {debug("Regla 38: factor");}
+  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}
+  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}
 ;
 
 factor:
@@ -219,7 +223,7 @@ factor:
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));}
 	| BOOLEAN
 	| P_A expresion P_C
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {printf("Regla 31: Funcion Contar\n");}
+	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {debug("Regla 41: funcion contar");}
 ;
 
 lista:
@@ -247,7 +251,7 @@ int main(int argc,char *argv[]) {
 		return 1;
   } else {
 		if((tsout = fopen("ts.txt", "wt")) == NULL){
-			fprintf(stderr,"\nERROR: No se puede abrir o crear el archivo: %s\n", "ts.txt");
+			fprintf(stderr, "\nNo se puede abrir o crear el archivo: ts.txt\n");
 			fclose(yyin);
 			return 1;
 		}
@@ -265,7 +269,7 @@ int main(int argc,char *argv[]) {
 // ejecucion de error ------------------------------------------------
 int yyerror(void){
   fflush(stdout);
-	printf("\n\nError de sintaxis\n\n");
+	printf("\nError de sintaxis\n");
   fclose(yyin);
   fclose(tsout);
   exit(1);
@@ -278,8 +282,7 @@ void validarTipo(int tipoDato){
 		validaTipo = tipoDato;
 	} else {
 		if(validaTipo != tipoDato) {
-			printf("\nERROR: tipos incorrectos -------------------------------------\n");
-			yyerror();
+			error("Tipos de datos incorrectos", "");
 		}
 	}
 }
@@ -314,8 +317,7 @@ void procesarSimbolo(char *texto, int es_const){
 	int pos = buscarSimbolo(texto);
 
 	if(pos != -1){
-		printf("\nERROR: ID \"%s\" duplicado ---------------------------\n", texto);
-		yyerror();
+		error("ID duplicado:", texto);
 	}
 
 	escribirTabla(texto, "", 0, es_const);
@@ -328,8 +330,7 @@ void procesarSimbolo(char *texto, int es_const){
 void procesarID(char *simbolo){
 	int pos = buscarSimbolo(simbolo);
 	if(pos == -1){
-		printf("\nERROR: ID \"%s\" no declarado -----------------\n", simbolo);
-		yyerror();
+		error("ID no declarado:", simbolo);
 	}
 
 	if(strcmp(tablaSimbolos[pos].tipo, "INT") == 0){
@@ -353,8 +354,7 @@ void procesarINT(int numero){
 	int pos = buscarSimbolo(texto);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
-		printf("\nERROR: Entero fuera de rango (-32768; 32767) ---------------------\n");
-		yyerror();
+		error("Entero fuera de rango:", "(-32768; 32767)");
 	}
 
 	if(pos == -1) {
@@ -381,8 +381,7 @@ void procesarSTRING(char *str){
   char cadenaPura[30];
 
 	if(largo > 30){
-		printf("\nERROR: Cadena demasiado larga (<30) ------------------------\n");
-		yyerror();
+		error("Cadena demasiado larga:", "(<30)");
 	}
 
 	for(i = 1; i<largo-1; i++){
@@ -411,8 +410,7 @@ void procesarFLOAT(float numero){
 	char texto[32];
 
 	if(numero < MIN_FLOAT || numero > MAX_FLOAT){
-		printf("\nERROR: Float fuera de rango (-1.17549e-38; 3.40282e38) ------------------------------\n");
-		yyerror();
+		error("Float fuera de rango", "(-1.17549e-38; 3.40282e38)");
 	}
 
 	sprintf(texto, "%f", numero);
@@ -441,8 +439,7 @@ void validarAsignacion(char *nombre){
 	int pos = buscarSimbolo(nombre);
 	if(pos != -1){
 		if(tablaSimbolos[pos].es_const){
-			printf("\nERROR: Reasignacion de constante -----------------------------\n");
-			yyerror();
+			error("Reasignacion de constante", "");
 		}
 	}
 
@@ -450,8 +447,7 @@ void validarAsignacion(char *nombre){
 		strcmp(tablaSimbolos[pos].tipo, "STRING") == 0 &&
 		validaTipo != TIPO_STRING
 	){
-		printf("\nERROR: Asignacion de tipo de dato erronea ----------------------\n");
-		yyerror();
+		error("Asignacion de tipo de dato erronea", "");
 	}
 
 	if(
@@ -459,17 +455,15 @@ void validarAsignacion(char *nombre){
 		 strcmp(tablaSimbolos[pos].tipo, "FLOAT") == 0) &&
 		validaTipo != TIPO_NUMERO
 	){
-		printf("\nERROR: Asignacion de tipo de dato erronea ---------------------\n");
-		yyerror();
+		error("Asignacion de tipo de dato erronea", "");
 	}
 
 	validaTipo = TIPO_NULL;
 }
 //--------------------------------------------------------------------
-void checkAsignacion(){
+void validarVariables(){
 	if(cantTipos != cantVariables){
-		printf("\nERROR: Declaracion de variables erroneas | No coinciden la cantidad de elementos -------\n");
-		yyerror();
+		error("Declaracion de variables erroneas.", "No coincide la cantidad de elementos");
 	} else {
 		cantTipos = 0;
 		cantVariables = 0;
@@ -498,3 +492,30 @@ void escribirArchivo(){
 	}
 }
 //--------------------------------------------------------------------
+
+// function para imprimir en modo explicito las reglas ---------------
+void debug(char* texto){
+	if(VERBOSE){
+		printf("\n%s", texto);
+		fflush(stdout);
+	}
+}
+// ----------------------------------------------------------------------
+
+// function para imprimir errores en color rojo -----------------------
+void error(char *texto, char *valor){
+	printf("\033[0;31m");
+	printf("\n[ERROR]: %s %s\n", texto, valor);
+	yyerror();
+}
+// --------------------------------------------------------------------
+
+// function para imprimir mensajes en verde  --------------------------
+void exito(char *texto){
+	printf("\033[0;32m");
+	printf("\n%s\n", texto);
+	printf("\033[0;0m");
+}
+// --------------------------------------------------------------------
+
+
