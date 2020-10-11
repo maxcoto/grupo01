@@ -1,3 +1,7 @@
+// TODO
+// 1) guardar valores con _ para no duplicar entradas en la tabla
+// 2) validar que no se hagan operaciones con strings
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -459,7 +463,7 @@ void validarAsignacion(char *nombre){
 
 // almacena la tabla de simbolos en un archivo
 void escribirArchivo(){
-	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD | es_const\n");
+	fprintf(tsout, "NOMBRE                         |   TIPO  | VALOR            | LONGITUD  | CONST\n");
 	fprintf(tsout, "---------------------------------------------------------------------------------\n");
 	int i;
 
@@ -475,7 +479,7 @@ void escribirArchivo(){
 		}
 
 
-		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%s\t|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto, tablaSimbolos[i].es_const);
+		fprintf(tsout, "%s%-30s|\t%-7s|\t%-16s|\t%-8s\t|\t%d\n", guion, tablaSimbolos[i].nombre, tablaSimbolos[i].tipo, tablaSimbolos[i].valor, longitud_texto, tablaSimbolos[i].es_const);
 	}
 }
 //--------------------------------------------------------------------
