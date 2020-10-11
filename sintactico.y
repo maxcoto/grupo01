@@ -1,7 +1,3 @@
-// TODO
-// 1) guardar valores con _ para no duplicar entradas en la tabla
-// 2) validar que no se hagan operaciones con strings
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +38,9 @@ int posicionTipo = 0;
 int asignacionConst = 0;
 int global = 0;
 
+int cantVariables = 0;
+int cantTipos = 0;
+
 void validarTipo(int);
 
 void escribirTabla(char *, char *, int, int);
@@ -55,6 +54,8 @@ void procesarFLOAT(float);
 
 void agregarTipo(char *);
 void validarAsignacion(char *);
+
+void checkAsignacion();
 
 void escribirArchivo(void);
 int yyerror();
@@ -99,7 +100,12 @@ programa:
 
 // declaracion de variables ---------------------------------------------------------------------------
 bloque_declaracion:
-	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR
+	declaracion
+	| bloque_declaracion declaracion
+;
+
+declaracion:
+	DIM OP_MENOR variables OP_MAYOR AS OP_MENOR tipo_variables OP_MAYOR {checkAsignacion();}
 ;
 
 variables:
@@ -259,7 +265,7 @@ int main(int argc,char *argv[]) {
 // ejecucion de error ------------------------------------------------
 int yyerror(void){
   fflush(stdout);
-  printf("Error de sintaxis\n\n");
+	printf("\n\nError de sintaxis\n\n");
   fclose(yyin);
   fclose(tsout);
   exit(1);
@@ -272,7 +278,7 @@ void validarTipo(int tipoDato){
 		validaTipo = tipoDato;
 	} else {
 		if(validaTipo != tipoDato) {
-			printf("\nERROR: tipos incorrectos -------------------------------------");
+			printf("\nERROR: tipos incorrectos -------------------------------------\n");
 			yyerror();
 		}
 	}
@@ -308,11 +314,13 @@ void procesarSimbolo(char *texto, int es_const){
 	int pos = buscarSimbolo(texto);
 
 	if(pos != -1){
-		printf("\nERROR: ID \"%s\" duplicado\n", texto);
+		printf("\nERROR: ID \"%s\" duplicado ---------------------------\n", texto);
 		yyerror();
 	}
 
 	escribirTabla(texto, "", 0, es_const);
+
+	cantVariables++;
 
 	return;
 }
@@ -320,7 +328,7 @@ void procesarSimbolo(char *texto, int es_const){
 void procesarID(char *simbolo){
 	int pos = buscarSimbolo(simbolo);
 	if(pos == -1){
-		printf("\nERROR: ID \"%s\" no declarado\n", simbolo);
+		printf("\nERROR: ID \"%s\" no declarado -----------------\n", simbolo);
 		yyerror();
 	}
 
@@ -345,7 +353,7 @@ void procesarINT(int numero){
 	int pos = buscarSimbolo(texto);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
-		printf("\nERROR: Entero fuera de rango (-32768; 32767)\n");
+		printf("\nERROR: Entero fuera de rango (-32768; 32767) ---------------------\n");
 		yyerror();
 	}
 
@@ -373,7 +381,7 @@ void procesarSTRING(char *str){
   char cadenaPura[30];
 
 	if(largo > 30){
-		printf("\nERROR: Cadena demasiado larga (<30)\n");
+		printf("\nERROR: Cadena demasiado larga (<30) ------------------------\n");
 		yyerror();
 	}
 
@@ -403,7 +411,7 @@ void procesarFLOAT(float numero){
 	char texto[32];
 
 	if(numero < MIN_FLOAT || numero > MAX_FLOAT){
-		printf("\nERROR: Float fuera de rango (-1.17549e-38; 3.40282e38) \n");
+		printf("\nERROR: Float fuera de rango (-1.17549e-38; 3.40282e38) ------------------------------\n");
 		yyerror();
 	}
 
@@ -426,13 +434,14 @@ void procesarFLOAT(float numero){
 void agregarTipo(char *tipo){
 	strcpy(tablaSimbolos[posicionTipo].tipo, tipo);
 	posicionTipo++;
+	cantTipos++;
 }
 // valida la reasignacion de constantes ------------------------------
 void validarAsignacion(char *nombre){
 	int pos = buscarSimbolo(nombre);
 	if(pos != -1){
 		if(tablaSimbolos[pos].es_const){
-			printf("\nERROR: Reasignacion de constante\n");
+			printf("\nERROR: Reasignacion de constante -----------------------------\n");
 			yyerror();
 		}
 	}
@@ -441,7 +450,7 @@ void validarAsignacion(char *nombre){
 		strcmp(tablaSimbolos[pos].tipo, "STRING") == 0 &&
 		validaTipo != TIPO_STRING
 	){
-		printf("\nERROR: Asignacion de tipo de dato erronea -------\n");
+		printf("\nERROR: Asignacion de tipo de dato erronea ----------------------\n");
 		yyerror();
 	}
 
@@ -450,14 +459,22 @@ void validarAsignacion(char *nombre){
 		 strcmp(tablaSimbolos[pos].tipo, "FLOAT") == 0) &&
 		validaTipo != TIPO_NUMERO
 	){
-		printf("\nERROR: Asignacion de tipo de dato erronea -------\n");
+		printf("\nERROR: Asignacion de tipo de dato erronea ---------------------\n");
 		yyerror();
 	}
 
 	validaTipo = TIPO_NULL;
 }
 //--------------------------------------------------------------------
-
+void checkAsignacion(){
+	if(cantTipos != cantVariables){
+		printf("\nERROR: Declaracion de variables erroneas | No coinciden la cantidad de elementos -------\n");
+		yyerror();
+	} else {
+		cantTipos = 0;
+		cantVariables = 0;
+	}
+}
 
 //--------------------------------------------------------------------
 

@@ -1,0 +1,6 @@
+*- Error en parametros de funcion contar -*
+DIM <contador> AS < Integer >
+
+CONST nombre := 80;
+
+contador := contar (nombre ;[2,2,3]);
