@@ -498,7 +498,7 @@ void debug(char* texto){
 
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
-	COLOR ? printf("\033[0;31m") : system("color 0C");
+	if(COLOR) printf("\033[0;31m");
 	printf("\n\n[ERROR]: %s %s", texto, valor);
 	yyerror();
 }
@@ -506,9 +506,9 @@ void error(char *texto, char *valor){
 
 // function para imprimir mensajes en verde  --------------------------
 void exito(char *texto){
-	COLOR ? printf("\033[0;32m") : system("color 02");
+	if(COLOR) printf("\033[0;32m");
 	printf("\n%s\n", texto);
-	COLOR ? printf("\033[0;0m") : system("color 07");
+	if(COLOR) printf("\033[0;0m");
 }
 // --------------------------------------------------------------------
 
