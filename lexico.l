@@ -21,8 +21,9 @@ int yyerror(void);
 DIGITO			[0-9]
 LETRA				[a-zA-Z]
 GUIONB			[_]
+GUION				[-]
 
-ENTERO			{DIGITO}+
+ENTERO			{GUION}?{DIGITO}+
 REAL				{DIGITO}*"."{DIGITO}*
 TEXTO				\"(.)*\"
 ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
@@ -138,4 +139,3 @@ int yyerror(void){
   exit(1);
 }
 //--------------------------------------------------------------------
-
