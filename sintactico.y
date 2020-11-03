@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "y.tab.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define COLOR 0
 
 #define MIN_INT -32768
@@ -18,6 +18,9 @@
 #define TIPO_NULL 0
 #define TIPO_NUMERO 1
 #define TIPO_STRING 2
+
+#define TREESIZE 20
+#define TREEWIDTH 255
 
 int yylex();
 FILE  *yyin, *tsout;
@@ -41,7 +44,9 @@ struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
 
 void print_t(struct node *);
-int _print_t(struct node *, int, int, int, char s[20][255]);
+int _print_t(struct node *, int, int, int, char s[TREESIZE][TREEWIDTH]);
+
+void print_tx(struct node *);
 
 //------------------------------------------------
 
@@ -286,12 +291,13 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 }
 
 
-int _print_t(struct node *tree, int is_left, int offset, int depth, char s[20][255]){
-    char b[20];
+int _print_t(struct node *tree, int is_left, int offset, int depth, char s[TREESIZE][TREEWIDTH]){
+    char b[TREESIZE];
     int width = 5;
 
     if (!tree) return 0;
 
+		printf("(%s)", tree->value);
     sprintf(b, "(%s)", tree->value);
 
     int left  = _print_t(tree->left,  1, offset,                depth + 1, s);
@@ -321,17 +327,23 @@ int _print_t(struct node *tree, int is_left, int offset, int depth, char s[20][2
 }
 
 void print_t(struct node *tree){
-    char s[20][255];
-    for (int i = 0; i < 20; i++)
+    char s[TREESIZE][TREEWIDTH];
+    for (int i = 0; i < TREESIZE; i++)
         sprintf(s[i], "%80s", " ");
 
     _print_t(tree, 0, 0, 0, s);
 
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < TREESIZE; i++)
         printf("%s\n", s[i]);
 }
 
 
+void print_tx(struct node *tree){
+		if (!tree || !tree->left) return;
+    printf("(%s): %s | %s \n", tree->value, tree->left->value, tree->right->value);
+    print_tx(tree->left);
+    print_tx(tree->right);
+}
 
 
 // funcion principal ----------------------------------------------------------------
@@ -350,13 +362,8 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 	
-	// struct node *leaf;
-	// leaf = (struct node *) malloc( sizeof( struct node ) );
-	// (leaf)->value = "jorgeeeeeeee";
-	// (leaf)->left = NULL;
-	// (leaf)->right = NULL;
 	
-	print_t(Ap);
+	print_tx(Ap);
 
 	fclose(yyin);
 	fclose(tsout);

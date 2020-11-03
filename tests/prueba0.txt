@@ -2,5 +2,5 @@ DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
 contador := 2;
 promedio := 4;
-suma := contador + promedio;
+suma := 54 * contador + promedio;
 
