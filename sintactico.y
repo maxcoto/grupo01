@@ -36,9 +36,16 @@ struct node {
 
 struct node *root = NULL;
 struct node *Ap = NULL;
+struct node *Cp = NULL;
 struct node *Ep = NULL;
 struct node *Tp = NULL;
 struct node *Fp = NULL;
+
+
+struct node *IFp = NULL;
+struct node *COp = NULL;
+struct node *ACp = NULL;
+
 
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
@@ -126,7 +133,7 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias
+	bloque_sentencias                    { root = Ap; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -180,14 +187,14 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                           		        {debug("Regla 14: if");}
-	| IF P_A decision P_C sentencia                           				                  {debug("Regla 15: if simple");}
+	IF P_A decision P_C L_A bloque_sentencias L_C { IFp = crearNodo("if", COp, Ap); }  {debug("Regla 14: if");}
+	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}
 	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{debug("Regla 16: if/else");}
 	| IF P_A decision P_C sentencia ELSE sentencia						                          {debug("Regla 17: if/else simple");}
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			{ Ap = crearNodo(":=", crearHoja($1), Ep); }
+	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			     { Ap = crearNodo(":=", crearHoja($1), Ep); }
 ;
 
 constante:
@@ -195,7 +202,7 @@ constante:
 ;
 
 nombre_constante:
-	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}
+	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}    { Cp = crearNodo(":=", crearHoja($1), Ep); }
 ;
 
 operasignacion:
@@ -221,7 +228,7 @@ logico:
 ;
 
 condicion:
-	expresion comparacion expresion
+	expresion comparacion expresion      { COp = crearNodo ("<", Ep, Fp); }
 ;
 
 comparacion:
@@ -360,7 +367,7 @@ int main(int argc,char *argv[]) {
 	}
 	
 	
-	print_tx(Ap);
+	print_tx(IFp);
 
 	fclose(yyin);
 	fclose(tsout);
