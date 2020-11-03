@@ -279,15 +279,12 @@ struct node *crearHoja(char *nombre){
 }
 
 struct node *crearNodo(char *nombre, struct node *left, struct node *right){
-	//return NULL;
-
-	struct node *leaf;
-	leaf = (struct node *) malloc( sizeof( struct node ) );
-	(leaf)->value = nombre;
-	(leaf)->left = left;
-	(leaf)->right = right;
-	
-	return leaf;
+	struct node *hoja;
+	hoja = (struct node *) malloc(sizeof(struct node));
+	(hoja)->value = nombre;
+	(hoja)->left = left;
+	(hoja)->right = right;
+	return hoja;
 }
 
 
