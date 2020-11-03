@@ -23,6 +23,28 @@ int yylex();
 FILE  *yyin, *tsout;
 char *yytext;
 
+// estructura de nodos para arbol sintactico -----
+
+struct node {
+  char *value;
+  struct node *left;
+  struct node *right;
+};
+
+struct node *root = NULL;
+struct node *Ap = NULL;
+struct node *Ep = NULL;
+struct node *Tp = NULL;
+struct node *Fp = NULL;
+
+struct node *crearHoja(char *);
+struct node *crearNodo(char *, struct node *, struct node *);
+
+void print_t(struct node *);
+int _print_t(struct node *, int, int, int, char s[20][255]);
+
+//------------------------------------------------
+
 // estructura para la tabla de simbolos ----------
 typedef struct {
 	char nombre[30];
@@ -160,7 +182,7 @@ if:
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}
+	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			{ Ap = crearNodo(":=", crearHoja($1), Ep); }
 ;
 
 constante:
@@ -207,25 +229,25 @@ comparacion:
 ;
 
 expresion:
-  termino                             	{debug("Regla 35: termino");}
-  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}
-  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}
+  termino                             	{debug("Regla 35: termino");}										 	{Ep = Tp;}
+  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}			{Ep = crearNodo("+", Ep, Tp);}
+  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}			{Ep = crearNodo("-", Ep, Tp);}
 ;
 
 termino:
-  factor                                {debug("Regla 38: factor");}
-  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}
-  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}
+  factor                                {debug("Regla 38: factor");}											{Tp = Fp;}
+  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}					{Tp = crearNodo("*", Tp, Fp);}
+  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}			{Tp = crearNodo("/", Tp, Fp);}
 ;
 
 factor:
-	ID 							{procesarID($1);}
-	| TEXTO 				{procesarSTRING(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}
-	| REAL  				{procesarFLOAT(atof(yylval.strVal));}
+	ID 							{procesarID($1);}											{Fp = crearHoja($1);}
+	| TEXTO 				{procesarSTRING(yylval.strVal);}			{Fp = crearHoja(yylval.strVal);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{Fp = crearHoja(yylval.strVal);}
+	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {Fp = crearHoja(yylval.strVal);}
 	| BOOLEAN
 	| P_A expresion P_C
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	 {debug("Regla 41: funcion contar");}
+	| CONTAR P_A expresion PUNTOCOMA lista P_C	          {debug("Regla 41: funcion contar");}
 ;
 
 lista:
@@ -246,6 +268,72 @@ entrada:
 %%
 // ----------------------------------------------------------------------------------
 
+
+struct node *crearHoja(char *nombre){
+	return crearNodo(nombre, NULL, NULL);
+}
+
+struct node *crearNodo(char *nombre, struct node *left, struct node *right){
+	//return NULL;
+
+	struct node *leaf;
+	leaf = (struct node *) malloc( sizeof( struct node ) );
+	(leaf)->value = nombre;
+	(leaf)->left = left;
+	(leaf)->right = right;
+	
+	return leaf;
+}
+
+
+int _print_t(struct node *tree, int is_left, int offset, int depth, char s[20][255]){
+    char b[20];
+    int width = 5;
+
+    if (!tree) return 0;
+
+    sprintf(b, "(%s)", tree->value);
+
+    int left  = _print_t(tree->left,  1, offset,                depth + 1, s);
+    int right = _print_t(tree->right, 0, offset + left + width, depth + 1, s);
+
+    for (int i = 0; i < width; i++)
+        s[2 * depth][offset + left + i] = b[i];
+
+    if (depth && is_left) {
+
+        for (int i = 0; i < width + right; i++)
+            s[2 * depth - 1][offset + left + width/2 + i] = '-';
+
+        s[2 * depth - 1][offset + left + width/2] = '+';
+        s[2 * depth - 1][offset + left + width + right + width/2] = '+';
+
+    } else if (depth && !is_left) {
+
+        for (int i = 0; i < left + width; i++)
+            s[2 * depth - 1][offset - width/2 + i] = '-';
+
+        s[2 * depth - 1][offset + left + width/2] = '+';
+        s[2 * depth - 1][offset - width/2 - 1] = '+';
+    }
+
+    return left + width + right;
+}
+
+void print_t(struct node *tree){
+    char s[20][255];
+    for (int i = 0; i < 20; i++)
+        sprintf(s[i], "%80s", " ");
+
+    _print_t(tree, 0, 0, 0, s);
+
+    for (int i = 0; i < 20; i++)
+        printf("%s\n", s[i]);
+}
+
+
+
+
 // funcion principal ----------------------------------------------------------------
 int main(int argc,char *argv[]) {
 	if((yyin = fopen(argv[1], "rt")) == NULL){
@@ -261,6 +349,15 @@ int main(int argc,char *argv[]) {
 		yyparse();
 		escribirArchivo();
 	}
+	
+	// struct node *leaf;
+	// leaf = (struct node *) malloc( sizeof( struct node ) );
+	// (leaf)->value = "jorgeeeeeeee";
+	// (leaf)->left = NULL;
+	// (leaf)->right = NULL;
+	
+	print_t(Ap);
+
 	fclose(yyin);
 	fclose(tsout);
 
