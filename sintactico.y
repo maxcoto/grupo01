@@ -48,6 +48,7 @@ struct node *COp = NULL;
 struct node *ACp = NULL;
 struct node *OPp = NULL;
 
+struct node *Lp = NULL;
 struct node *BSp = NULL;
 struct node *Sp = NULL;
 struct node *Wp = NULL;
@@ -145,7 +146,7 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias             { root = BSp; }
+	bloque_sentencias                        { root = BSp; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -179,14 +180,14 @@ tipo:
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia { BSp = Sp; }
-	| bloque_sentencias sentencia { BSp = crearNodo("BS", BSp, Sp); }
+	| bloque_sentencias { AUXp = BSp; } sentencia {BSp = crearNodo("BS", BSp, Sp);}
 ;
 
 sentencia:
-	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      { Sp = Wp; }
-	| if  					 			{debug("Regla 08: sentencia es if");}                         { Sp = IFp; }
-	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                { Sp = Ap; }
-	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    { Sp = OPp; }
+	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {Sp = Wp;}
+	| if  					 			{debug("Regla 08: sentencia es if");}                         {Sp = IFp;}
+	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                {Sp = Ap;}
+	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {Sp = OPp;}
 	| salida				 			{debug("Regla 11: sentencia es salida");}
 	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
 	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}
@@ -198,13 +199,13 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             { IFp = crearNodo("if", COp, BSp); }
-	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      { IFp = crearNodo("if", COp, BSp); }
-	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BSp; } ELSE L_A bloque_sentencias L_C { BSi = BSp; } 	{debug("Regla 16: if/else");}    { IFp = crearNodo("if", COp, crearNodo("cuerpo", BSd, BSi)); }
+	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             {IFp = crearNodo("if", COp, BSp);}
+	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", COp, BSp);}
+	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BSp; } ELSE L_A bloque_sentencias L_C { BSi = BSp; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", COp, crearNodo("cuerpo", BSd, BSi));}
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			     { Ap = crearNodo(":=", crearHoja($1), Ep); }
+	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			     {Ap = crearNodo(":=", crearHoja($1), Ep);}
 ;
 
 constante:
@@ -212,11 +213,11 @@ constante:
 ;
 
 nombre_constante:
-	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}    { Cp = crearNodo(":=", crearHoja($1), Ep); }
+	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}    {Cp = crearNodo(":=", crearHoja($1), Ep);}
 ;
 
 operasignacion:
-	ID { AUXp = Fp; } operasigna expresion	PUNTOCOMA   {OPp = crearNodo (_string, AUXp, Ep);}
+	ID {AUXp = crearHoja(yylval.strVal);} operasigna expresion	PUNTOCOMA   {OPp = crearNodo (_string, AUXp, Ep);}
 ;
 
 operasigna:
@@ -238,7 +239,7 @@ logico:
 ;
 
 condicion:
-  expresion { AUXp = Ep; } comparacion expresion         {COp = crearNodo (_string, AUXp, Ep);}
+  expresion {AUXp = Ep;} comparacion expresion         {COp = crearNodo (_string, AUXp, Ep);}
 ;
 
 comparacion:
@@ -263,7 +264,7 @@ termino:
 ;
 
 factor:
-	ID 							{procesarID($1);}											{Fp = crearHoja($1);}
+	ID 							{procesarID(yylval.strVal);}					{Fp = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{Fp = crearHoja(yylval.strVal);}
 	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{Fp = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {Fp = crearHoja(yylval.strVal);}
@@ -377,7 +378,7 @@ int main(int argc,char *argv[]) {
 	}
 
 
-	print_tx(IFp);
+	print_tx(root);
 
 	fclose(yyin);
 	fclose(tsout);
