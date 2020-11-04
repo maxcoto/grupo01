@@ -3,7 +3,4 @@ DIM <a,b,c,d> AS <Integer,Float,Float,Float>
 a := 3;
 b := 7;
 
-GET a;
-PUT "tu ma";
-
-*-contar(a * b; [256, c * d, 52, 4])-*
+a := contar(a * b; [c * d]);

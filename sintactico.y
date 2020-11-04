@@ -39,6 +39,7 @@ struct node *ConstanteP = NULL;
 struct node *AuxConstanteP = NULL;
 struct node *ExpresionP = NULL;
 struct node *AuxExpresionP = NULL;
+struct node *AuxExpresion2P = NULL;
 struct node *TerminoP = NULL;
 struct node *FactorP = NULL;
 
@@ -60,6 +61,9 @@ struct node *CicloP = NULL;
 
 struct node *EntradaP = NULL;
 struct node *SalidaP = NULL;
+
+struct node *ListaP = NULL;
+struct node *ContarP = NULL;
 
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
@@ -272,13 +276,13 @@ factor:
 	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
-	| P_A expresion P_C                                   {FactorP = ExpresionP;}
-	| CONTAR P_A expresion PUNTOCOMA lista P_C	          {debug("Regla 41: funcion contar");}
+	| P_A expresion P_C  {FactorP = ExpresionP;}
+	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C	 {debug("Regla 41: funcion contar");}   { FactorP = crearNodo("contar", crearNodo("init", crearNodo(":=", crearHoja("@aux"), AuxExpresion2P), crearNodo(":=", crearHoja("@cont"), crearHoja("0"))), ListaP); }
 ;
 
 lista:
-	expresion
-	| lista COMA expresion
+	expresion { ListaP = crearNodo("if", crearNodo("==", crearHoja("@aux"), ExpresionP), crearNodo("+=", crearHoja("@cont"), crearHoja("1"))); }
+	| lista COMA expresion 
 	| C_A lista C_C
 ;
 
