@@ -19,8 +19,7 @@
 #define TIPO_NUMERO 1
 #define TIPO_STRING 2
 
-#define TREESIZE 20
-#define TREEWIDTH 255
+#define COUNT 10
 
 int yylex();
 FILE  *yyin, *tsout;
@@ -63,9 +62,9 @@ struct node *CicloP = NULL;
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
 
-void print_t(struct node *);
-int _print_t(struct node *, int, int, int, char s[TREESIZE][TREEWIDTH]);
 
+void _print_h(struct node *, int);
+void print_h(struct node *);
 void print_tx(struct node *);
 
 char* _string;
@@ -308,53 +307,20 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	return hoja;
 }
 
+void _print_h(struct node *root, int space) {
+    if (root == NULL) return; 
+    space += COUNT; 
+    _print_h(root->right, space); 
+    printf("\n"); 
+    for (int i = COUNT; i < space; i++) printf(" ");
+    printf("%s\n", root->value); 
+    _print_h(root->left, space); 
+} 
 
-int _print_t(struct node *tree, int is_left, int offset, int depth, char s[TREESIZE][TREEWIDTH]){
-    char b[TREESIZE];
-    int width = 5;
-
-    if (!tree) return 0;
-
-		printf("(%s)", tree->value);
-    sprintf(b, "(%s)", tree->value);
-
-    int left  = _print_t(tree->left,  1, offset,                depth + 1, s);
-    int right = _print_t(tree->right, 0, offset + left + width, depth + 1, s);
-
-    for (int i = 0; i < width; i++)
-        s[2 * depth][offset + left + i] = b[i];
-
-    if (depth && is_left) {
-
-        for (int i = 0; i < width + right; i++)
-            s[2 * depth - 1][offset + left + width/2 + i] = '-';
-
-        s[2 * depth - 1][offset + left + width/2] = '+';
-        s[2 * depth - 1][offset + left + width + right + width/2] = '+';
-
-    } else if (depth && !is_left) {
-
-        for (int i = 0; i < left + width; i++)
-            s[2 * depth - 1][offset - width/2 + i] = '-';
-
-        s[2 * depth - 1][offset + left + width/2] = '+';
-        s[2 * depth - 1][offset - width/2 - 1] = '+';
-    }
-
-    return left + width + right;
+void print_h(struct node *root){ 
+   _print_h(root, 0);
+   printf("\n\n");
 }
-
-void print_t(struct node *tree){
-    char s[TREESIZE][TREEWIDTH];
-    for (int i = 0; i < TREESIZE; i++)
-        sprintf(s[i], "%80s", " ");
-
-    _print_t(tree, 0, 0, 0, s);
-
-    for (int i = 0; i < TREESIZE; i++)
-        printf("%s\n", s[i]);
-}
-
 
 void print_tx(struct node *tree){
 		if (!tree || !tree->left) return;
@@ -362,7 +328,6 @@ void print_tx(struct node *tree){
     print_tx(tree->left);
     print_tx(tree->right);
 }
-
 
 // funcion principal ----------------------------------------------------------------
 int main(int argc,char *argv[]) {
@@ -380,8 +345,9 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 
-
 	print_tx(root);
+  printf("\n");
+  print_h(root);
 
 	fclose(yyin);
 	fclose(tsout);
