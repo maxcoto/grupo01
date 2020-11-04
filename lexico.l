@@ -26,7 +26,7 @@ GUION				[-]
 ENTERO			{GUION}?{DIGITO}+
 REAL				{DIGITO}*"."{DIGITO}*
 TEXTO				\"(.)*\"
-ID					{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
+ID					{LETRA}|{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 %%
 ";"					{ return PUNTOCOMA; }

@@ -65,7 +65,6 @@ struct node *crearNodo(char *, struct node *, struct node *);
 
 void _print_h(struct node *, int);
 void print_h(struct node *);
-void print_tx(struct node *);
 
 char* _string;
 char* _string1;
@@ -182,7 +181,7 @@ tipo:
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia { BloqueSentenciaP = SentenciaP; }
-	| bloque_sentencias sentencia {BloqueSentenciaP = crearNodo("BS", BloqueSentenciaP, SentenciaP);}
+	| bloque_sentencias { AuxBloqueSentenciaP = BloqueSentenciaP; } sentencia {BloqueSentenciaP = crearNodo("BS", AuxBloqueSentenciaP, SentenciaP);}
 ;
 
 sentencia:
@@ -201,9 +200,9 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
+	IF P_A decision P_C L_A bloque_sentencias L_C     {debug("Regla 14: if");}   {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	//| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	//| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
 asignacion:
@@ -309,24 +308,17 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 
 void _print_h(struct node *root, int space) {
     if (root == NULL) return; 
-    space += COUNT; 
+    space += COUNT;
     _print_h(root->right, space); 
     printf("\n"); 
     for (int i = COUNT; i < space; i++) printf(" ");
     printf("%s\n", root->value); 
-    _print_h(root->left, space); 
+    _print_h(root->left, space);
 } 
 
 void print_h(struct node *root){ 
    _print_h(root, 0);
    printf("\n\n");
-}
-
-void print_tx(struct node *tree){
-		if (!tree || !tree->left) return;
-    printf("(%s): %s | %s \n", tree->value, tree->left->value, tree->right->value);
-    print_tx(tree->left);
-    print_tx(tree->right);
 }
 
 // funcion principal ----------------------------------------------------------------
@@ -345,8 +337,6 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 
-	print_tx(root);
-  printf("\n");
   print_h(root);
 
 	fclose(yyin);

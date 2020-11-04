@@ -1,8 +1,8 @@
-DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
+DIM <a,b,c,d> AS <Integer,Float,Float,Float>
 
+a := 3;
+b := 7;
 
-if(contador > 2 AND suma < 4) {
-  contador := 2;
+if(a > 2 AND b < 4) {
+  c := 2;
 }
-
-*-suma := 54 * contador + promedio;-*

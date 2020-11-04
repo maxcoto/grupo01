@@ -1,8 +1,10 @@
 NOMBRE                         |   TIPO         | VALOR           | LONGITUD 
 ----------------------------------------------------------------------------
- contador                      |	INT           |	                |	        	
- promedio                      |	FLOAT         |	                |	        	
- actual                        |	FLOAT         |	                |	        	
- suma                          |	FLOAT         |	                |	        	
+ a                             |	INT           |	                |	        	
+ b                             |	FLOAT         |	                |	        	
+ c                             |	FLOAT         |	                |	        	
+ d                             |	FLOAT         |	                |	        	
+_3                             |	              |	3               |	        	
+_7                             |	              |	7               |	        	
 _2                             |	              |	2               |	        	
 _4                             |	              |	4               |	        	

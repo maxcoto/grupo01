@@ -49,3 +49,11 @@ void print_t(struct node *tree){
     for (int i = 0; i < TREESIZE; i++)
         printf("%s\n", s[i]);
 }
+
+void print_tx(struct node *);
+void print_tx(struct node *tree){
+		if (!tree || !tree->left) return;
+    printf("(%s): %s | %s \n", tree->value, tree->left->value, tree->right->value);
+    print_tx(tree->left);
+    print_tx(tree->right);
+}
