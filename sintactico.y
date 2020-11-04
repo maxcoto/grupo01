@@ -41,10 +41,13 @@ struct node *Ep = NULL;
 struct node *Tp = NULL;
 struct node *Fp = NULL;
 
-
 struct node *IFp = NULL;
 struct node *COp = NULL;
 struct node *ACp = NULL;
+
+struct node *BSp = NULL;
+struct node *Sp = NULL;
+struct node *Wp = NULL;
 
 
 struct node *crearHoja(char *);
@@ -54,6 +57,8 @@ void print_t(struct node *);
 int _print_t(struct node *, int, int, int, char s[TREESIZE][TREEWIDTH]);
 
 void print_tx(struct node *);
+
+char* _string;
 
 //------------------------------------------------
 
@@ -133,7 +138,7 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias                    { root = Ap; }
+	bloque_sentencias             { root = BSp; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -167,18 +172,17 @@ tipo:
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia
-	| bloque_sentencias sentencia
+	| bloque_sentencias { BSp = crearNodo("BS", BSp, Sp); } sentencia
 ;
 
 sentencia:
-	ciclo						 			{debug("Regla 07: sentencia es ciclo");}
-	| if  					 			{debug("Regla 08: sentencia es if");}
-	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}
-	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}
+	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      { Sp = Wp; }
+	| if  					 			{debug("Regla 08: sentencia es if");}                         { Sp = IFp; }
+	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                { Sp = Ap; }
+	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    //{ Sp = OPp }
 	| salida				 			{debug("Regla 11: sentencia es salida");}
 	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
 	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}
-	| bloque_declaracion 	{error("Solo se puede declarar variables al inicio", ""); }
 	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
 
@@ -187,10 +191,10 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C { IFp = crearNodo("if", COp, Ap); }  {debug("Regla 14: if");}
-	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}
-	| IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{debug("Regla 16: if/else");}
-	| IF P_A decision P_C sentencia ELSE sentencia						                          {debug("Regla 17: if/else simple");}
+	IF P_A decision P_C L_A bloque_sentencias L_C { IFp = crearNodo("if", COp, BSp); }  {debug("Regla 14: if");}
+	// | IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}
+	// | IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{debug("Regla 16: if/else");}
+	// | IF P_A decision P_C sentencia ELSE sentencia						                          {debug("Regla 17: if/else simple");}
 ;
 
 asignacion:
@@ -228,16 +232,16 @@ logico:
 ;
 
 condicion:
-	expresion comparacion expresion      { COp = crearNodo ("<", Ep, Fp); }
+  expresion comparacion termino         { COp = crearNodo (_string, Ep, Tp); }
 ;
 
 comparacion:
-	OP_COMP_IGUAL                     		{debug("Regla 29: Comparacion igual");}
-	| OP_COMP_DIST												{debug("Regla 30: Comparacion distinto");}
-	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}
-	| OP_MENOR														{debug("Regla 32: Comparacion menor");}
-	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}
-	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}
+	OP_COMP_IGUAL                     		{debug("Regla 29: Comparacion igual");}          { _string = "=="; }
+	| OP_COMP_DIST												{debug("Regla 30: Comparacion distinto");}       { _string = "<>"; }
+	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}          { _string = ">"; }
+	| OP_MENOR														{debug("Regla 32: Comparacion menor");}          { _string = "<"; }
+	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}  { _string = "<="; }
+	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}  { _string = ">="; }
 ;
 
 expresion:
@@ -365,8 +369,8 @@ int main(int argc,char *argv[]) {
 		yyparse();
 		escribirArchivo();
 	}
-	
-	
+
+
 	print_tx(IFp);
 
 	fclose(yyin);
@@ -619,5 +623,3 @@ void exito(char *texto){
 	if(COLOR) printf("\033[0;0m");
 }
 // --------------------------------------------------------------------
-
-
