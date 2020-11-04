@@ -190,7 +190,7 @@ sentencia:
 	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {Sp = OPp;}
 	| salida				 			{debug("Regla 11: sentencia es salida");}
 	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
-	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}
+	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}   {Sp = Cp;}
 	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
 
@@ -209,11 +209,11 @@ asignacion:
 ;
 
 constante:
-	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA           		{debug("Regla 19: Declaracion de constante");}
+	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA           		{debug("Regla 19: Declaracion de constante");}      {Cp = crearNodo("CONST", AUXp, Ep);}
 ;
 
 nombre_constante:
-	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; }  			{debug("Regla 20: lista_var es id constante");}    {Cp = crearNodo(":=", crearHoja($1), Ep);}
+	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; } {AUXp = crearHoja(yylval.strVal);} 			{debug("Regla 20: lista_var es id constante");}
 ;
 
 operasignacion:
