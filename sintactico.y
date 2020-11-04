@@ -196,7 +196,7 @@ sentencia:
 ;
 
 ciclo:
-  WHILE P_A decision P_C L_A bloque_sentencias L_C
+  WHILE P_A decision P_C L_A bloque_sentencias L_C  {CicloP = crearNodo("while", DecisionP, BloqueSentenciaP);}
 ;
 
 if:
@@ -249,7 +249,7 @@ comparacion:
 	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}          {_string = ">";}
 	| OP_MENOR														{debug("Regla 32: Comparacion menor");}          {_string = "<";}
 	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}  {_string = "<=";}
-	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}  {_string = ">=";}
+	| OP_COMP_MAY_IGUAL										{debug("Regla 34: Comparacion mayor o igual");}  {_string = ">=";}
 ;
 
 expresion:
