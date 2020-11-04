@@ -200,9 +200,9 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C     {debug("Regla 14: if");}   {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	//| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	//| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
+	IF P_A decision P_C L_A bloque_sentencias L_C      {debug("Regla 14: if");}              {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	| IF P_A decision P_C sentencia                    {debug("Regla 15: if simple");}       {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
 asignacion:
