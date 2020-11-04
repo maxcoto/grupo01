@@ -6,4 +6,9 @@ promedio := 4;
 *-suma := 54 * contador + promedio;-*
 
 
-if(suma <> contador){ promedio := 4; }
+if(suma <> contador){
+  promedio := 4;
+  suma := 2;
+} else {
+  promedio := 3;
+}

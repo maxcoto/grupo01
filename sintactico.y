@@ -49,6 +49,9 @@ struct node *BSp = NULL;
 struct node *Sp = NULL;
 struct node *Wp = NULL;
 
+struct node *BSi = NULL;
+struct node *BSd = NULL;
+
 
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
@@ -171,8 +174,8 @@ tipo:
 
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
-	sentencia
-	| bloque_sentencias { BSp = crearNodo("BS", BSp, Sp); } sentencia
+	sentencia { BSp = Sp; }
+	| bloque_sentencias sentencia { BSp = crearNodo("BS", BSp, Sp); }
 ;
 
 sentencia:
@@ -191,10 +194,9 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C { IFp = crearNodo("if", COp, BSp); }  {debug("Regla 14: if");}
-	// | IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}
-	// | IF P_A decision P_C L_A bloque_sentencias L_C ELSE L_A bloque_sentencias L_C    	{debug("Regla 16: if/else");}
-	// | IF P_A decision P_C sentencia ELSE sentencia						                          {debug("Regla 17: if/else simple");}
+	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             { IFp = crearNodo("if", COp, BSp); }
+	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      { IFp = crearNodo("if", COp, BSp); }
+	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BSp; } ELSE L_A bloque_sentencias L_C { BSi = BSp; } 	{debug("Regla 16: if/else");}    { IFp = crearNodo("if", COp, crearNodo("cuerpo", BSd, BSi)); }
 ;
 
 asignacion:

@@ -6,3 +6,4 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
  suma                          |	FLOAT         |	                |	        	
 _2                             |	              |	2               |	        	
 _4                             |	              |	4               |	        	
+_3                             |	              |	3               |	        	
