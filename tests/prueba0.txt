@@ -3,7 +3,7 @@ DIM <a,b,c,d> AS <Integer,Float,Float,Float>
 a := 3;
 b := 7;
 
-while(a > 2 AND b < 4) {
-  c := 2;
-  b := 42;
-}
+GET a;
+PUT "tu ma";
+
+*-contar(a * b; [256, c * d, 52, 4])-*

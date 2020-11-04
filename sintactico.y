@@ -49,7 +49,6 @@ struct node *AuxCondicionP = NULL;
 struct node *OperasignaP = NULL;
 struct node *AuxOperasignaP = NULL;
 
-
 //struct node *Lp = NULL;
 struct node *BloqueSentenciaP = NULL;
 //Auxiliares para bloque de sentencia - Izq y Der
@@ -58,6 +57,9 @@ struct node *BSi = NULL;
 struct node *BSd = NULL;
 struct node *SentenciaP = NULL;
 struct node *CicloP = NULL;
+
+struct node *EntradaP = NULL;
+struct node *SalidaP = NULL;
 
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
@@ -189,8 +191,8 @@ sentencia:
 	| if  					 			{debug("Regla 08: sentencia es if");}                         {SentenciaP = IFp;}
 	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                {SentenciaP = AsignacionP;}
 	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {SentenciaP = OperasignaP;}
-	| salida				 			{debug("Regla 11: sentencia es salida");}
-	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
+	| salida				 			{debug("Regla 11: sentencia es salida");}                     {SentenciaP = SalidaP;}
+	| entrada 			 			{debug("Regla 12: sentencia es entrada");}                    {SentenciaP = EntradaP;}
 	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}   {SentenciaP = ConstanteP;}
 	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
@@ -218,7 +220,7 @@ nombre_constante:
 ;
 
 operasignacion:
-	ID {AuxOperasignaP = crearHoja(yylval.strVal);} operasigna expresion	PUNTOCOMA   {OperasignaP = crearNodo (_string, AuxOperasignaP, ExpresionP);}
+	ID {AuxOperasignaP = crearHoja(yylval.strVal);} operasigna expresion	PUNTOCOMA   {OperasignaP = crearNodo(_string, AuxOperasignaP, ExpresionP);}
 ;
 
 operasigna:
@@ -230,8 +232,8 @@ operasigna:
 
 decision:
   condicion                          	{debug("Regla 25: Decision simple");}     {DecisionP = CondicionP;}
-  | condicion {AuxCondicionP = CondicionP;} logico condicion                                     {DecisionP = crearNodo (_string1, AuxCondicionP, CondicionP);}
-  | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion {DecisionP = crearNodo ("NOT", AuxExpresionP, ExpresionP);}	{debug("Regla 26: Decision negada");}
+  | condicion {AuxCondicionP = CondicionP;} logico condicion                                     {DecisionP = crearNodo(_string1, AuxCondicionP, CondicionP);}
+  | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion {DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);}	{debug("Regla 26: Decision negada");}
 ;
 
 logico:
@@ -240,7 +242,7 @@ logico:
 ;
 
 condicion:
-  expresion {AuxExpresionP = ExpresionP;} comparacion expresion         {CondicionP = crearNodo (_string, AuxExpresionP, ExpresionP);}
+  expresion {AuxExpresionP = ExpresionP;} comparacion expresion {CondicionP = crearNodo(_string, AuxExpresionP, ExpresionP);}
 ;
 
 comparacion:
@@ -281,12 +283,12 @@ lista:
 ;
 
 salida:
-  PUT TEXTO PUNTOCOMA
-  | PUT ID PUNTOCOMA
+  PUT TEXTO PUNTOCOMA {SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));}
+  | PUT ID PUNTOCOMA  {SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));}
 ;
 
 entrada:
-  GET ID PUNTOCOMA
+  GET ID PUNTOCOMA    {EntradaP = crearNodo("IO", crearHoja("in"), crearHoja(yylval.strVal));}
 ;
 
 %%
