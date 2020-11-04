@@ -35,28 +35,30 @@ struct node {
 };
 
 struct node *root = NULL;
-struct node *Ap = NULL;
-struct node *Cp = NULL;
-struct node *Ep = NULL;
-struct node *Tp = NULL;
-struct node *Fp = NULL;
-
-struct node *AUXp = NULL;
+struct node *AsignacionP = NULL;
+struct node *ConstanteP = NULL;
+struct node *AuxConstanteP = NULL;
+struct node *ExpresionP = NULL;
+struct node *AuxExpresionP = NULL;
+struct node *TerminoP = NULL;
+struct node *FactorP = NULL;
 
 struct node *IFp = NULL;
-struct node *COp = NULL;
-struct node *ACp = NULL;
-struct node *OPp = NULL;
+struct node *DecisionP = NULL;
+struct node *CondicionP = NULL;
+struct node *AuxCondicionP = NULL;
+struct node *OperasignaP = NULL;
+struct node *AuxOperasignaP = NULL;
 
-struct node *Lp = NULL;
-struct node *BSp = NULL;
-struct node *Sp = NULL;
-struct node *Wp = NULL;
 
+//struct node *Lp = NULL;
+struct node *BloqueSentenciaP = NULL;
+//Auxiliares para bloque de sentencia - Izq y Der
+struct node *AuxBloqueSentenciaP = NULL;
 struct node *BSi = NULL;
 struct node *BSd = NULL;
-
-
+struct node *SentenciaP = NULL;
+struct node *CicloP = NULL;
 
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
@@ -67,6 +69,7 @@ int _print_t(struct node *, int, int, int, char s[TREESIZE][TREEWIDTH]);
 void print_tx(struct node *);
 
 char* _string;
+char* _string1;
 
 //------------------------------------------------
 
@@ -146,7 +149,7 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias                        { root = BSp; }
+	bloque_sentencias                        { root = BloqueSentenciaP; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -179,18 +182,18 @@ tipo:
 
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
-	sentencia { BSp = Sp; }
-	| bloque_sentencias { AUXp = BSp; } sentencia {BSp = crearNodo("BS", BSp, Sp);}
+	sentencia { BloqueSentenciaP = SentenciaP; }
+	| bloque_sentencias sentencia {BloqueSentenciaP = crearNodo("BS", BloqueSentenciaP, SentenciaP);}
 ;
 
 sentencia:
-	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {Sp = Wp;}
-	| if  					 			{debug("Regla 08: sentencia es if");}                         {Sp = IFp;}
-	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                {Sp = Ap;}
-	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {Sp = OPp;}
+	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {SentenciaP = CicloP;}
+	| if  					 			{debug("Regla 08: sentencia es if");}                         {SentenciaP = IFp;}
+	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                {SentenciaP = AsignacionP;}
+	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {SentenciaP = OperasignaP;}
 	| salida				 			{debug("Regla 11: sentencia es salida");}
 	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
-	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}   {Sp = Cp;}
+	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}   {SentenciaP = ConstanteP;}
 	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
 
@@ -199,25 +202,25 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             {IFp = crearNodo("if", COp, BSp);}
-	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", COp, BSp);}
-	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BSp; } ELSE L_A bloque_sentencias L_C { BSi = BSp; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", COp, crearNodo("cuerpo", BSd, BSi));}
+	IF P_A decision P_C L_A bloque_sentencias L_C                                       {debug("Regla 14: if");}             {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	| IF P_A decision P_C sentencia                                                     {debug("Regla 15: if simple");}      {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
+	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			     {Ap = crearNodo(":=", crearHoja($1), Ep);}
+	ID OP_ASIGNACION expresion PUNTOCOMA		 { validarAsignacion($1); }   {debug("Regla 18: Asignacion simple");}  			     {AsignacionP = crearNodo(":=", crearHoja($1), ExpresionP);}
 ;
 
 constante:
-	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA           		{debug("Regla 19: Declaracion de constante");}      {Cp = crearNodo("CONST", AUXp, Ep);}
+	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA           		{debug("Regla 19: Declaracion de constante");}      {ConstanteP = crearNodo("CONST", AuxConstanteP, ExpresionP);}
 ;
 
 nombre_constante:
-	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; } {AUXp = crearHoja(yylval.strVal);} 			{debug("Regla 20: lista_var es id constante");}
+	ID   { procesarSimbolo(yylval.strVal, 1); asignacionConst=1; } {AuxConstanteP = crearHoja(yylval.strVal);} 			{debug("Regla 20: lista_var es id constante");}
 ;
 
 operasignacion:
-	ID {AUXp = crearHoja(yylval.strVal);} operasigna expresion	PUNTOCOMA   {OPp = crearNodo (_string, AUXp, Ep);}
+	ID {AuxOperasignaP = crearHoja(yylval.strVal);} operasigna expresion	PUNTOCOMA   {OperasignaP = crearNodo (_string, AuxOperasignaP, ExpresionP);}
 ;
 
 operasigna:
@@ -228,18 +231,18 @@ operasigna:
 ;
 
 decision:
-  condicion                          	{debug("Regla 25: Decision simple");}
-  | condicion logico condicion
-  | OP_NOT condicion                 	{debug("Regla 26: Decision negada");}
+  condicion                          	{debug("Regla 25: Decision simple");}     {DecisionP = CondicionP;}
+  | condicion {AuxCondicionP = CondicionP;} logico condicion                                     {DecisionP = crearNodo (_string1, AuxCondicionP, CondicionP);}
+  | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion {DecisionP = crearNodo ("NOT", AuxExpresionP, ExpresionP);}	{debug("Regla 26: Decision negada");}
 ;
 
 logico:
-	OP_AND      												{debug("Regla 27: Decision multiple and");}
-	| OP_OR     												{debug("Regla 28: Decision multiple or");}
+	OP_AND      												{debug("Regla 27: Decision multiple and");}    {_string1 = "AND";}
+	| OP_OR     												{debug("Regla 28: Decision multiple or");}     {_string1 = "OR";}
 ;
 
 condicion:
-  expresion {AUXp = Ep;} comparacion expresion         {COp = crearNodo (_string, AUXp, Ep);}
+  expresion {AuxExpresionP = ExpresionP;} comparacion expresion         {CondicionP = crearNodo (_string, AuxExpresionP, ExpresionP);}
 ;
 
 comparacion:
@@ -252,24 +255,24 @@ comparacion:
 ;
 
 expresion:
-  termino                             	{debug("Regla 35: termino");}										 	{Ep = Tp;}
-  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}			{Ep = crearNodo("+", Ep, Tp);}
-  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}			{Ep = crearNodo("-", Ep, Tp);}
+  termino                             	{debug("Regla 35: termino");}										 	{ExpresionP = TerminoP;}
+  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}			{ExpresionP = crearNodo("+", ExpresionP, TerminoP);}
+  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}			{ExpresionP = crearNodo("-", ExpresionP, TerminoP);}
 ;
 
 termino:
-  factor                                {debug("Regla 38: factor");}											{Tp = Fp;}
-  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}					{Tp = crearNodo("*", Tp, Fp);}
-  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}			{Tp = crearNodo("/", Tp, Fp);}
+  factor                                {debug("Regla 38: factor");}											{TerminoP = FactorP;}
+  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}					{TerminoP = crearNodo("*", TerminoP, FactorP);}
+  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}			{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
 
 factor:
-	ID 							{procesarID(yylval.strVal);}					{Fp = crearHoja(yylval.strVal);}
-	| TEXTO 				{procesarSTRING(yylval.strVal);}			{Fp = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{Fp = crearHoja(yylval.strVal);}
-	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {Fp = crearHoja(yylval.strVal);}
+	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
+	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
+	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
-	| P_A expresion P_C                                   {Fp = Ep;}
+	| P_A expresion P_C                                   {FactorP = ExpresionP;}
 	| CONTAR P_A expresion PUNTOCOMA lista P_C	          {debug("Regla 41: funcion contar");}
 ;
 

@@ -1,10 +1,8 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
-contador := 2;
-actual := 4;
-suma += 3;
-promedio := suma /2 + 1;
 
-CONST pepe := "texto";
+if(contador > 2 AND suma < 4) {
+  contador := 2;
+}
 
 *-suma := 54 * contador + promedio;-*

@@ -6,7 +6,3 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
  suma                          |	FLOAT         |	                |	        	
 _2                             |	              |	2               |	        	
 _4                             |	              |	4               |	        	
-_3                             |	              |	3               |	        	
-_1                             |	              |	1               |	        	
- pepe                          |	STRING CONST  |	                |	        	
-_texto                         |	              |	texto           |	5       	
