@@ -63,6 +63,7 @@ struct node *EntradaP = NULL;
 struct node *SalidaP = NULL;
 
 struct node *ListaP = NULL;
+struct node *AuxListaP = NULL;
 struct node *ContarP = NULL;
 
 struct node *crearHoja(char *);
@@ -282,7 +283,7 @@ factor:
 
 lista:
 	expresion { ListaP = crearNodo("if", crearNodo("==", crearHoja("@aux"), ExpresionP), crearNodo("+=", crearHoja("@cont"), crearHoja("1"))); }
-	| lista COMA expresion 
+	| lista { AuxListaP = ListaP; } COMA expresion {ListaP = crearNodo("Lista", AuxListaP, crearNodo("if", crearNodo("==", crearHoja("@aux"), ExpresionP), crearNodo("+=", crearHoja("@cont"), crearHoja("1"))));}
 	| C_A lista C_C
 ;
 

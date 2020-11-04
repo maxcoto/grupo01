@@ -4,5 +4,6 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
  b                             |	FLOAT         |	                |	        	
  c                             |	FLOAT         |	                |	        	
  d                             |	FLOAT         |	                |	        	
+_2                             |	              |	2               |	        	
 _3                             |	              |	3               |	        	
-_7                             |	              |	7               |	        	
+_10                            |	              |	10              |	        	
