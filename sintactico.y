@@ -41,9 +41,12 @@ struct node *Ep = NULL;
 struct node *Tp = NULL;
 struct node *Fp = NULL;
 
+struct node *AUXp = NULL;
+
 struct node *IFp = NULL;
 struct node *COp = NULL;
 struct node *ACp = NULL;
+struct node *OPp = NULL;
 
 struct node *BSp = NULL;
 struct node *Sp = NULL;
@@ -51,6 +54,7 @@ struct node *Wp = NULL;
 
 struct node *BSi = NULL;
 struct node *BSd = NULL;
+
 
 
 struct node *crearHoja(char *);
@@ -182,7 +186,7 @@ sentencia:
 	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      { Sp = Wp; }
 	| if  					 			{debug("Regla 08: sentencia es if");}                         { Sp = IFp; }
 	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                { Sp = Ap; }
-	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    //{ Sp = OPp }
+	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    { Sp = OPp; }
 	| salida				 			{debug("Regla 11: sentencia es salida");}
 	| entrada 			 			{debug("Regla 12: sentencia es entrada");}
 	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}
@@ -212,14 +216,14 @@ nombre_constante:
 ;
 
 operasignacion:
-	ID operasigna expresion	PUNTOCOMA
+	ID { AUXp = Fp; } operasigna expresion	PUNTOCOMA   {OPp = crearNodo (_string, AUXp, Ep);}
 ;
 
 operasigna:
-	OP_ASIG_SUMA      {debug("Regla 21: Asignacion y suma");}
-	| OP_ASIG_RESTA 	{debug("Regla 22: Asignacion y resta");}
-	| OP_ASIG_POR   	{debug("Regla 23: Asignacion y multiplicacion");}
-	| OP_ASIG_DIV     {debug("Regla 24: Asignacion y division");}
+	OP_ASIG_SUMA      {debug("Regla 21: Asignacion y suma");}                    {_string = "+=";}
+	| OP_ASIG_RESTA 	{debug("Regla 22: Asignacion y resta");}                   {_string = "-=";}
+	| OP_ASIG_POR   	{debug("Regla 23: Asignacion y multiplicacion");}          {_string = "*=";}
+	| OP_ASIG_DIV     {debug("Regla 24: Asignacion y division");}                {_string = "/=";}
 ;
 
 decision:
@@ -234,16 +238,16 @@ logico:
 ;
 
 condicion:
-  expresion comparacion termino         { COp = crearNodo (_string, Ep, Tp); }
+  expresion { AUXp = Ep; } comparacion expresion         {COp = crearNodo (_string, AUXp, Ep);}
 ;
 
 comparacion:
-	OP_COMP_IGUAL                     		{debug("Regla 29: Comparacion igual");}          { _string = "=="; }
-	| OP_COMP_DIST												{debug("Regla 30: Comparacion distinto");}       { _string = "<>"; }
-	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}          { _string = ">"; }
-	| OP_MENOR														{debug("Regla 32: Comparacion menor");}          { _string = "<"; }
-	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}  { _string = "<="; }
-	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}  { _string = ">="; }
+	OP_COMP_IGUAL                     		{debug("Regla 29: Comparacion igual");}          {_string = "==";}
+	| OP_COMP_DIST												{debug("Regla 30: Comparacion distinto");}       {_string = "<>";}
+	| OP_MAYOR														{debug("Regla 31: Comparacion mayor");}          {_string = ">";}
+	| OP_MENOR														{debug("Regla 32: Comparacion menor");}          {_string = "<";}
+	| OP_COMP_MEN_IGUAL										{debug("Regla 33: Comparacion menor o igual");}  {_string = "<=";}
+	| OP_COMP_MAY_IGUAL										{debug("Regla 34: comparacion mayor o igual");}  {_string = ">=";}
 ;
 
 expresion:
@@ -264,7 +268,7 @@ factor:
 	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{Fp = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {Fp = crearHoja(yylval.strVal);}
 	| BOOLEAN
-	| P_A expresion P_C
+	| P_A expresion P_C                                   {Fp = Ep;}
 	| CONTAR P_A expresion PUNTOCOMA lista P_C	          {debug("Regla 41: funcion contar");}
 ;
 
