@@ -1,17 +1,23 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
 
+actual:= (contador/0.342) + (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
+
+*-
 suma := 2.5;
 
 if (contador <= 92) {
   contador:= contador + 1;
   promedio := promedio + promedio;
-  
+
+  actual:= (contador/0.342) + (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
+
   if (contador == 111) {
     suma := 4;
     suma := 7;
   }
-  
+
 } else {
   suma:=3;
 }
+-*

@@ -40,6 +40,7 @@ struct node *AuxConstanteP = NULL;
 struct node *ExpresionP = NULL;
 struct node *AuxExpresionP = NULL;
 struct node *AuxExpresion2P = NULL;
+struct node *AuxExpresion3P = NULL;
 struct node *TerminoP = NULL;
 struct node *FactorP = NULL;
 
@@ -79,6 +80,12 @@ char* _string;
 char* _string1;
 
 //------------------------------------------------
+
+struct Stack {
+    int top;
+    unsigned capacity;
+    struct node** array;
+};
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -214,7 +221,7 @@ ciclo:
 
 if:
 	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if");}                 {IFp = crearNodo("if", DecisionP, BloqueInternoP);}
-	| IF P_A decision P_C sentencia                    {debug("Regla 15: if simple");}       {IFp = crearNodo("if", DecisionP, SentenciaP);}
+	| IF P_A decision P_C sentencia                 {debug("Regla 15: if simple");}          {IFp = crearNodo("if", DecisionP, SentenciaP);}
 	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
@@ -266,9 +273,11 @@ comparacion:
 ;
 
 expresion:
-  termino                             	{debug("Regla 35: termino");}										 	{ExpresionP = TerminoP;}
-  | expresion OP_SUMA termino           {debug("Regla 36: expresion suma termino");}			{ExpresionP = crearNodo("+", ExpresionP, TerminoP);}
-  | expresion OP_RESTA termino          {debug("Regla 37: expresion resta termino");}			{ExpresionP = crearNodo("-", ExpresionP, TerminoP);}
+  termino                             	       {debug("Regla 35: termino");}										{ExpresionP = TerminoP;}
+  | expresion {AuxExpresion3P = ExpresionP;} OP_SUMA termino                  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
+  | P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
+  | expresion {AuxExpresion3P = ExpresionP;} OP_RESTA termino                 {debug("Regla 37: expresion resta termino");} 	{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
+  | P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_RESTA P_A termino P_C {debug("Regla 37: expresion resta termino");}		{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
 ;
 
 termino:
@@ -283,8 +292,8 @@ factor:
 	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
-	| P_A expresion P_C  {FactorP = ExpresionP;}
-	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C	 {debug("Regla 41: funcion contar");}   { FactorP = crearNodo("contar", crearNodo("init", crearNodo(":=", crearHoja("@aux"), AuxExpresion2P), crearNodo(":=", crearHoja("@cont"), crearHoja("0"))), ListaP); }
+	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C {debug("Regla 41: funcion contar");}
+  { FactorP = crearNodo("contar", crearNodo("init", crearNodo(":=", crearHoja("@aux"), AuxExpresion2P), crearNodo(":=", crearHoja("@cont"), crearHoja("0"))), ListaP); }
 ;
 
 lista:
@@ -320,16 +329,16 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 }
 
 void _print_h(struct node *root, int space) {
-    if (root == NULL) return; 
+    if (root == NULL) return;
     space += COUNT;
-    _print_h(root->right, space); 
-    printf("\n"); 
+    _print_h(root->right, space);
+    printf("\n");
     for (int i = COUNT; i < space; i++) printf(" ");
-    printf("%s\n", root->value); 
+    printf("%s\n", root->value);
     _print_h(root->left, space);
-} 
+}
 
-void print_h(struct node *root){ 
+void print_h(struct node *root){
    _print_h(root, 0);
    printf("\n\n");
 }
