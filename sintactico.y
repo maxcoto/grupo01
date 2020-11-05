@@ -54,6 +54,8 @@ struct node *AuxOperasignaP = NULL;
 struct node *BloqueSentenciaP = NULL;
 //Auxiliares para bloque de sentencia - Izq y Der
 struct node *AuxBloqueSentenciaP = NULL;
+struct node *BloqueInternoP = NULL;
+struct node *AuxBloqueInternoP = NULL;
 struct node *BSi = NULL;
 struct node *BSd = NULL;
 struct node *SentenciaP = NULL;
@@ -191,6 +193,10 @@ bloque_sentencias:
 	| bloque_sentencias { AuxBloqueSentenciaP = BloqueSentenciaP; } sentencia {BloqueSentenciaP = crearNodo("BS", AuxBloqueSentenciaP, SentenciaP);}
 ;
 
+bloque_interno:
+  sentencia { BloqueInternoP = SentenciaP; }
+  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia {BloqueInternoP = crearNodo("BS", AuxBloqueInternoP, SentenciaP);}
+
 sentencia:
 	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {SentenciaP = CicloP;}
 	| if  					 			{debug("Regla 08: sentencia es if");}                         {SentenciaP = IFp;}
@@ -203,13 +209,13 @@ sentencia:
 ;
 
 ciclo:
-  WHILE P_A decision P_C L_A bloque_sentencias L_C  {CicloP = crearNodo("while", DecisionP, BloqueSentenciaP);}
+  WHILE P_A decision P_C L_A bloque_interno L_C  {CicloP = crearNodo("while", DecisionP, BloqueInternoP);}
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_sentencias L_C      {debug("Regla 14: if");}              {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	| IF P_A decision P_C sentencia                    {debug("Regla 15: if simple");}       {IFp = crearNodo("if", DecisionP, BloqueSentenciaP);}
-	| IF P_A decision P_C L_A bloque_sentencias L_C { BSd = BloqueSentenciaP; } ELSE L_A bloque_sentencias L_C { BSi = BloqueSentenciaP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
+	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if");}              {IFp = crearNodo("if", DecisionP, BloqueInternoP);}
+	| IF P_A decision P_C sentencia                    {debug("Regla 15: if simple");}       {IFp = crearNodo("if", DecisionP, SentenciaP);}
+	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
 asignacion:

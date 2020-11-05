@@ -1,3 +1,17 @@
-DIM <a,b,c,d> AS <Integer,Float,Float,Float>
+DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
-a := contar(a * b; [c * d, 2, 3 * 10]);
+
+suma := 2.5;
+
+if (contador <= 92) {
+  contador:= contador + 1;
+  promedio := promedio + promedio;
+  
+  if (contador == 111) {
+    suma := 4;
+    suma := 7;
+  }
+  
+} else {
+  suma:=3;
+}
