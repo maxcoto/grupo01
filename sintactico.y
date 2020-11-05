@@ -195,7 +195,7 @@ bloque_sentencias:
 
 bloque_interno:
   sentencia { BloqueInternoP = SentenciaP; }
-  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia {BloqueInternoP = crearNodo("BS", AuxBloqueInternoP, SentenciaP);}
+  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia {BloqueInternoP = crearNodo("BI", AuxBloqueInternoP, SentenciaP);}
 
 sentencia:
 	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {SentenciaP = CicloP;}
@@ -213,7 +213,7 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if");}              {IFp = crearNodo("if", DecisionP, BloqueInternoP);}
+	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if");}                 {IFp = crearNodo("if", DecisionP, BloqueInternoP);}
 	| IF P_A decision P_C sentencia                    {debug("Regla 15: if simple");}       {IFp = crearNodo("if", DecisionP, SentenciaP);}
 	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
