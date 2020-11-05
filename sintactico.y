@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "y.tab.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #define COLOR 0
 
 #define MIN_INT -32768
@@ -42,6 +42,7 @@ struct node *AuxExpresionP = NULL;
 struct node *AuxExpresion2P = NULL;
 struct node *AuxExpresion3P = NULL;
 struct node *TerminoP = NULL;
+struct node *AuxTerminoP = NULL;
 struct node *FactorP = NULL;
 
 struct node *IFp = NULL;
@@ -72,7 +73,6 @@ struct node *ContarP = NULL;
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
 
-
 void _print_h(struct node *, int);
 void print_h(struct node *);
 
@@ -87,7 +87,14 @@ struct Stack {
     struct node** array;
 };
 
-Stack stack;
+struct Stack *stack;
+
+struct Stack* createStack(unsigned capacity);
+int isFull(struct Stack* stack);
+int isEmpty(struct Stack* stack);
+void push(struct Stack* stack, struct node *item);
+struct node* pop(struct Stack* stack);
+struct node *desapilaO(struct node* fp);
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -275,17 +282,17 @@ comparacion:
 ;
 
 expresion:
-  termino                             	       {debug("Regla 35: termino");}										{ExpresionP = TerminoP;}
+  termino                             	                                      {debug("Regla 35: termino");}										{ExpresionP = TerminoP;}
   | expresion {AuxExpresion3P = ExpresionP;} OP_SUMA termino                  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
-  | P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
+  //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
   | expresion {AuxExpresion3P = ExpresionP;} OP_RESTA termino                 {debug("Regla 37: expresion resta termino");} 	{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
-  | P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_RESTA P_A termino P_C {debug("Regla 37: expresion resta termino");}		{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
+  //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_RESTA P_A termino P_C {debug("Regla 37: expresion resta termino");}		{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
 ;
 
 termino:
-  factor                                {debug("Regla 38: factor");}											{TerminoP = FactorP;}
-  | termino OP_MUL factor               {debug("Regla 39: termino por Factor");}					{TerminoP = crearNodo("*", TerminoP, FactorP);}
-  | termino OP_DIV factor               {debug("Regla 40: termino dividido factor");}			{TerminoP = crearNodo("/", TerminoP, FactorP);}
+  factor                        {debug("Regla 38: factor");}	              {TerminoP = FactorP;}
+  | termino OP_MUL factor  {debug("Regla 39: termino por Factor");}	        {TerminoP = crearNodo("*", TerminoP, FactorP);}
+  | termino OP_DIV factor  {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
 
 factor:
@@ -294,9 +301,13 @@ factor:
 	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
+  | P_A expresion P_C { FactorP = TerminoP; push(stack, ExpresionP); }  {debug("Regla XX: P_A P_C"); debug(yylval.strVal);}
 	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C {debug("Regla 41: funcion contar");}
   { FactorP = crearNodo("contar", crearNodo("init", crearNodo(":=", crearHoja("@aux"), AuxExpresion2P), crearNodo(":=", crearHoja("@cont"), crearHoja("0"))), ListaP); }
 ;
+
+// FactorP = crearNodo("()", ExpresionP, crearHoja("NULL"));
+
 
 lista:
 	expresion { ListaP = crearNodo("if", crearNodo("==", crearHoja("@aux"), ExpresionP), crearNodo("+=", crearHoja("@cont"), crearHoja("1"))); }
@@ -316,6 +327,11 @@ entrada:
 %%
 // ----------------------------------------------------------------------------------
 
+struct node *desapilaO(struct node* fp){
+  struct node *n = pop(stack);
+  if(n) return n;
+  return fp;
+}
 
 struct node *crearHoja(char *nombre){
 	return crearNodo(nombre, NULL, NULL);
@@ -364,6 +380,16 @@ int main(int argc,char *argv[]) {
 	}
 
   print_h(root);
+
+  printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
+
+  struct node *n = pop(stack);
+  
+  while(n){
+    print_h(n);
+    printf("----------------------------------------------------------------------------");
+    n = pop(stack);
+  }
 
 	fclose(yyin);
 	fclose(tsout);
@@ -621,7 +647,7 @@ struct Stack* createStack(unsigned capacity) {
     struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
     stack->capacity = capacity;
     stack->top = -1;
-    stack->array = (struct node*)malloc(stack->capacity * sizeof(struct node));
+    stack->array = (struct node**)malloc(stack->capacity * sizeof(struct node));
     return stack;
 }
 // Stack is full when top is equal to the last index
@@ -633,7 +659,7 @@ int isEmpty(struct Stack* stack) {
     return stack->top == -1;
 }
 // Function to add an item to stack.  It increases top by 1
-void push(struct Stack* stack, int item) {
+void push(struct Stack* stack, struct node *item) {
     if (isFull(stack))
         return;
     stack->array[++stack->top] = item;
@@ -641,6 +667,6 @@ void push(struct Stack* stack, int item) {
 // Function to remove an item from stack.  It decreases top by 1
 struct node* pop(struct Stack* stack) {
     if (isEmpty(stack))
-        return INT_MIN;
+        return NULL;
     return stack->array[stack->top--];
 }
