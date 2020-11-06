@@ -11,9 +11,9 @@
 #define COLOR 0
 
 FILE  *yyin, *tsout;
+int yylex();
+int yyerror(char *);
 %}
-
-int yyerror(char *mensaje);
 
 %option noyywrap
 %option yylineno
@@ -127,25 +127,25 @@ ESPACIO     " "
 "\n"
 "\t"
 {ESPACIO}
-.						{	
+.						{
 							char msg[300];
 							sprintf(msg, "ERROR Lexico");
-							yyerror(msg);	
+							yyerror(msg);
 						}
 %%
 
 // ejecucion de error ------------------------------------------------
-
 int yyerror(char *mensaje){
   fflush(stdout);
+	if(COLOR) printf("\033[0;31m");
   if(strcmp(mensaje, "syntax error") == 0)
-  	printf("\n\n[LINEA]: %d ---> sintaxis incorrecta\n\n", yylineno);
+  	printf("\n\n[LINEA]: %d ---> sintaxis incorrecta.\n\n", yylineno);
   else{
 		if(strcmp(mensaje, "ERROR Lexico") == 0)
-			printf("\n\nERROR Lexico - [LINEA]: %d ---> Caracter \'%s\' invalido\n\n",yylineno, yytext, mensaje);
+			printf("\n\nERROR Lexico - [LINEA]: %d ---> Caracter \'%s\' invalido.\n\n",yylineno, yytext);
 		else
-			printf("\n\nError - [LINEA]: %d ---> %s\n\n", yylineno, mensaje);
-	}	
+			printf("\n\nError - [LINEA]: %d ---> %s.\n\n", yylineno, mensaje);
+	}
   fclose(yyin);
   fclose(tsout);
   exit(1);

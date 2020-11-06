@@ -130,7 +130,7 @@ void validarAsignacion(char *);
 void validarVariables();
 
 void escribirArchivo(void);
-int yyerror(char *mensaje);
+int yyerror(char *);
 void debug(char *);
 void error(char *, char *);
 void exito(char *);
@@ -343,22 +343,22 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	struct node *izq=NULL;
 	struct node *der=NULL;
 	if(left!=NULL){
-		izq = (struct node *) malloc(sizeof(struct node));		
+		izq = (struct node *) malloc(sizeof(struct node));
 		izq->value=left->value;
 		izq->left=left->left;
 		izq->right=left->right;
 	}
-	if(right != NULL ){	
-		der = (struct node *) malloc(sizeof(struct node));	
+	if(right != NULL ){
+		der = (struct node *) malloc(sizeof(struct node));
 		der->value= right->value;
 		der->right=right->right;
 		der->left=right->left;
 	}
-	
+
 	(hoja)->value = nombre;
 	(hoja)->right=der;
 	(hoja)->left=izq;
-	
+
 	return hoja;
 }
 
@@ -401,7 +401,7 @@ int main(int argc,char *argv[]) {
   printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
 
   struct node *n = pop(stack);
-  
+
   while(n){
     print_h(n);
     printf("----------------------------------------------------------------------------");
@@ -646,7 +646,6 @@ void debug(char* texto){
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
 	if(COLOR) printf("\033[0;31m");
-	//printf("\n\n[ERROR]: %s %s", texto, valor);
 	char mensaje[1000];
 	sprintf(mensaje,texto,valor);
 	yyerror(mensaje);
