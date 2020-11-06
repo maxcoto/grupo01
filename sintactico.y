@@ -23,6 +23,8 @@
 
 int yylex();
 FILE  *yyin, *tsout;
+FILE * fp = NULL; /*graph*/
+
 char *yytext;
 
 // estructura de nodos para arbol sintactico -----
@@ -135,7 +137,12 @@ void debug(char *);
 void error(char *, char *);
 void exito(char *);
 
+/*graph */
+void _add_dot (struct node *root);
+void crearArchivoDot(struct node * root);
+
 %}
+
 
 %union { char *strVal; }
 
@@ -378,6 +385,33 @@ void print_h(struct node *root){
    printf("\n\n");
 }
 
+void crearArchivoDot(struct node * root){
+	fp = fopen("intermedia.dot","w");
+	fprintf(fp, " ");
+	fp = fopen("intermedia.dot", "a");
+	fprintf(fp, " digraph G { \n");
+
+	_add_dot (root);
+	fprintf(fp,"}");
+    fclose(fp); 
+	const char * cmd1 = " dot intermedia.dot -Tpng -o intermedia.png "; 
+	system(cmd1); 
+}
+
+/*Agrega nodo a .dot*/
+void _add_dot (struct node *root) {
+
+    if (root == NULL) return;
+	if (root -> left != NULL){
+		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,root->left->value);
+    	_add_dot(root->left);
+	}
+	if (root -> right != NULL){
+		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->right,root->right->value);
+		_add_dot(root->right);
+	}
+}
+
 // funcion principal ----------------------------------------------------------------
 int main(int argc,char *argv[]) {
 	if((yyin = fopen(argv[1], "rt")) == NULL){
@@ -397,7 +431,9 @@ int main(int argc,char *argv[]) {
 	}
 
   print_h(root);
-
+  
+  crearArchivoDot(root);
+  
   printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
 
   struct node *n = pop(stack);
@@ -410,7 +446,6 @@ int main(int argc,char *argv[]) {
 
 	fclose(yyin);
 	fclose(tsout);
-
 	return 0;
 }
 //--------------------------------------------------------------------
