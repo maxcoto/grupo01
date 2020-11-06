@@ -97,6 +97,7 @@ int isFull(struct Stack* stack);
 int isEmpty(struct Stack* stack);
 void push(struct Stack* stack, struct node *item);
 struct node* pop(struct Stack* stack);
+struct node* peek(struct Stack* stack);
 struct node *desapilar(struct Stack* stack, struct node* fp);
 
 // estructura para la tabla de simbolos ----------
@@ -267,6 +268,7 @@ if:
 	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; }
   {
     debug("Regla 16: if/else");
+    DecisionP = desapilar(stackDecision, DecisionP);
     struct node *cuerpo = crearNodo("cuerpo", BSd, BSi);
     IFp = crearNodo("if", DecisionP, cuerpo);
   }
@@ -354,7 +356,7 @@ comparacion:
 ;
 
 expresion:
-  termino                             	                                      {debug("Regla 35: termino");}										{ExpresionP = TerminoP;}
+  termino                             	                                      {debug("expresion = termino");}									{ExpresionP = TerminoP;}
   | expresion {AuxExpresion3P = ExpresionP;} OP_SUMA termino                  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
   //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
   | expresion {AuxExpresion3P = ExpresionP;} OP_RESTA termino                 {debug("Regla 37: expresion resta termino");} 	{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
@@ -362,23 +364,43 @@ expresion:
 ;
 
 termino:
-  factor                        {debug("Regla 38: termino es factor");}	        {TerminoP = FactorP;}
-  | termino OP_MUL factor       {debug("Regla 39: termino por Factor");}	      {TerminoP = crearNodo("*", TerminoP, FactorP);}
+  factor
+  {
+    debug("\ntermino = factor");
+    printf("\nfactor: %p %s", FactorP, FactorP->value);
+    TerminoP = FactorP;
+    push(stackParentesis, FactorP);
+  }
+  | termino /* {if(TerminoP == FactorP){ TerminoP = desapilar(stackParentesis, FactorP); }} {AuxTerminoP = TerminoP;}*/ OP_MUL factor
+  {
+    debug("\ntermino * factor");
+    //if(TerminoP == FactorP){
+      FactorP = desapilar(stackParentesis, FactorP);
+      //TerminoP = peek(stackParentesis);
+      //push(stackParentesis, FactorP);
+      //TerminoP = AuxTerminoP;
+      //FactorP  = peek(stackParentesis);
+    //}
+    //FactorP = desapilar(stackParentesis, FactorP);
+    printf("\nfactor: %p %s", FactorP, FactorP->value);
+    printf("\ntermin: %p %s", TerminoP, TerminoP->value);
+    TerminoP = crearNodo("*", TerminoP, FactorP);
+  }
   | termino OP_DIV factor       {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
 
 factor:
 	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal); /*push(stackParentesis, FactorP);*/}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
   | P_A expresion P_C
   {
-    debug("Regla XX: P_A P_C");
-    debug(yylval.strVal);
-    FactorP = TerminoP;
-    push(stackParentesis, ExpresionP);
+    debug("\n( exp )");
+    printf("\nfactor: %p %s", ExpresionP, ExpresionP->value);
+    FactorP = ExpresionP;
+    push(stackParentesis, FactorP);
   }
 	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C
   {
@@ -813,4 +835,9 @@ struct node* pop(struct Stack* stack) {
   if (isEmpty(stack)) return NULL;
   return stack->array[stack->top--];
 }
+
+struct node* peek(struct Stack* stack) { 
+    if (isEmpty(stack)) return NULL; 
+    return stack->array[stack->top];
+} 
 // --------------------------------------------------------------------
