@@ -27,6 +27,7 @@ ENTERO			{GUION}?{DIGITO}+
 REAL				{DIGITO}*"."{DIGITO}*
 TEXTO				\"(.)*\"
 ID					{LETRA}|{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
+ESPACIO     " "
 
 %%
 ";"					{ return PUNTOCOMA; }
@@ -125,15 +126,26 @@ ID					{LETRA}|{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 
 "\n"
 "\t"
+{ESPACIO}
+.						{	
+							char msg[300];
+							sprintf(msg, "ERROR Lexico");
+							yyerror(msg);	
+						}
 %%
 
 // ejecucion de error ------------------------------------------------
+
 int yyerror(char *mensaje){
   fflush(stdout);
   if(strcmp(mensaje, "syntax error") == 0)
   	printf("\n\n[LINEA]: %d ---> sintaxis incorrecta\n\n", yylineno);
-  else
-	printf("\n\nError: [LINEA]: %d ---> %s\n\n", yylineno, mensaje);	
+  else{
+		if(strcmp(mensaje, "ERROR Lexico") == 0)
+			printf("\n\nERROR Lexico - [LINEA]: %d ---> Caracter \'%s\' invalido\n\n",yylineno, yytext, mensaje);
+		else
+			printf("\n\nError - [LINEA]: %d ---> %s\n\n", yylineno, mensaje);
+	}	
   fclose(yyin);
   fclose(tsout);
   exit(1);
