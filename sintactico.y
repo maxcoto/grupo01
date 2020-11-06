@@ -97,7 +97,7 @@ int isFull(struct Stack* stack);
 int isEmpty(struct Stack* stack);
 void push(struct Stack* stack, struct node *item);
 struct node* pop(struct Stack* stack);
-struct node *desapilar(struct node* fp);
+struct node *desapilar(struct Stack* stack, struct node* fp);
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -255,19 +255,19 @@ if:
 	IF P_A decision P_C L_A bloque_interno L_C
   {
     debug("Regla 14: if");
-    DecisionP = desapilar(DecisionP);
+    DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, BloqueInternoP);
   }
 	| IF P_A decision P_C sentencia
   {
     debug("Regla 15: if simple");
-    DecisionP = desapilar(DecisionP);
+    DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, SentenciaP);
   }
 	| IF P_A decision P_C L_A bloque_interno { BSd = BloqueInternoP; } L_C ELSE L_A bloque_interno { BSi = BloqueInternoP; } L_C
   {
     debug("Regla 16: if/else");
-    struct node *cuerpo = crearNodo("cuerpo", BSd, BSi)
+    struct node *cuerpo = crearNodo("cuerpo", BSd, BSi);
     IFp = crearNodo("if", DecisionP, cuerpo);
   }
 ;
@@ -404,8 +404,8 @@ lista:
   {
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
     struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
-    struct node *if = crearNodo("if", compara, aumenta);
-    ListaP = crearNodo("Lista", AuxListaP, if);
+    struct node *condicion = crearNodo("if", compara, aumenta);
+    ListaP = crearNodo("Lista", AuxListaP, condicion);
   }
 	| C_A lista C_C
 ;
@@ -422,7 +422,7 @@ entrada:
 %%
 // ----------------------------------------------------------------------------------
 
-struct node *desapilar(struct node* fp){
+struct node *desapilar(struct Stack* stack, struct node* fp){
   struct node *n = pop(stack);
   if(n) return n;
   return fp;
