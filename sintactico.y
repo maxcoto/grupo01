@@ -384,10 +384,10 @@ termino:
   | termino {AuxTerminoP = TerminoP;} OP_MUL factor
   {
     debug("\ntermino * factor");
-    if(TerminoP == FactorP){
-      FactorP = desapilar(stackParentesis, FactorP);
-      TerminoP = desapilar(stackParentesis, TerminoP);
-    }
+    // if(TerminoP == FactorP){
+    //   FactorP = desapilar(stackParentesis, FactorP);
+    //   TerminoP = desapilar(stackParentesis, TerminoP);
+    // }
 
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     printf("\ntermin: %p %s", TerminoP, TerminoP->value);
@@ -401,7 +401,7 @@ termino:
 factor:
 	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);} //push(stackParentesis, FactorP);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
   | P_A expresion P_C
