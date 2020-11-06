@@ -7,6 +7,8 @@ if(actual > 1){
 			actual := 2;
 		} else {
 			promedio := 3;
+			actual := 4;
+			contador := 2*1;
 		}
 	} else {
 		promedio := 4;

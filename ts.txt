@@ -5,7 +5,7 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
  actual                        |	FLOAT         |	                |	        	
  suma                          |	FLOAT         |	                |	        	
 _1                             |	              |	1               |	        	
-_5                             |	              |	5               |	        	
 _3                             |	              |	3               |	        	
 _2                             |	              |	2               |	        	
 _4                             |	              |	4               |	        	
+_5                             |	              |	5               |	        	

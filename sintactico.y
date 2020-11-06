@@ -356,7 +356,11 @@ comparacion:
 ;
 
 expresion:
-  termino                             	                                      {debug("expresion = termino");}									{ExpresionP = TerminoP;}
+  termino
+  {
+    debug("expresion = termino");
+    ExpresionP = TerminoP;
+  }
   | expresion {AuxExpresion3P = ExpresionP;} OP_SUMA termino                  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
   //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
   | expresion {AuxExpresion3P = ExpresionP;} OP_RESTA termino                 {debug("Regla 37: expresion resta termino");} 	{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
@@ -369,21 +373,23 @@ termino:
     debug("\ntermino = factor");
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     TerminoP = FactorP;
-    push(stackParentesis, FactorP);
+    //push(stackParentesis, FactorP);
   }
-  | termino /* {if(TerminoP == FactorP){ TerminoP = desapilar(stackParentesis, FactorP); }} {AuxTerminoP = TerminoP;}*/ OP_MUL factor
+  | termino /* {if(TerminoP == FactorP){ TerminoP = desapilar(stackParentesis, FactorP); }}*/ {AuxTerminoP = TerminoP;} OP_MUL factor
   {
     debug("\ntermino * factor");
     //if(TerminoP == FactorP){
-      FactorP = desapilar(stackParentesis, FactorP);
+    // TerminoP = desapilar(stackParentesis, TerminoP);
       //TerminoP = peek(stackParentesis);
       //push(stackParentesis, FactorP);
       //TerminoP = AuxTerminoP;
       //FactorP  = peek(stackParentesis);
     //}
     //FactorP = desapilar(stackParentesis, FactorP);
+    //TerminoP = desapilar(stackParentesis, TerminoP);
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     printf("\ntermin: %p %s", TerminoP, TerminoP->value);
+    printf("\nauxili: %p %s", AuxTerminoP, AuxTerminoP->value);
     TerminoP = crearNodo("*", TerminoP, FactorP);
   }
   | termino OP_DIV factor       {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
@@ -392,7 +398,7 @@ termino:
 factor:
 	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal); /*push(stackParentesis, FactorP);*/}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal); push(stackParentesis, FactorP);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
   | P_A expresion P_C
