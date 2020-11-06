@@ -4,8 +4,7 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
  promedio                      |	FLOAT         |	                |	        	
  actual                        |	FLOAT         |	                |	        	
  suma                          |	FLOAT         |	                |	        	
-_1                             |	              |	1               |	        	
-_3                             |	              |	3               |	        	
-_2                             |	              |	2               |	        	
+_0.342000                      |	              |	0.342000        |	        	
+_256                           |	              |	256             |	        	
+_52                            |	              |	52              |	        	
 _4                             |	              |	4               |	        	
-_5                             |	              |	5               |	        	

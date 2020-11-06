@@ -143,6 +143,9 @@ void exito(char *);
 void _add_dot (struct node *root);
 void crearArchivoDot(struct node * root);
 
+
+char* str_replace(char* search, char* replace, char* subject);
+
 %}
 
 
@@ -215,7 +218,7 @@ tipo:
 // sentencias ------------------------------------------------------------------------------------------
 bloque_sentencias:
 	sentencia
-  { 
+  {
     debug("Regla 01 bloque de sentencia simple");
     BloqueSentenciaP = SentenciaP; }
 	| bloque_sentencias { AuxBloqueSentenciaP = BloqueSentenciaP; } sentencia
@@ -275,7 +278,7 @@ if:
 ;
 
 asignacion:
-	ID OP_ASIGNACION expresion PUNTOCOMA 
+	ID OP_ASIGNACION expresion PUNTOCOMA
   {
     debug("Regla 18: Asignacion simple");
     validarAsignacion($1);
@@ -293,7 +296,7 @@ constante:
 
 nombre_constante:
 	ID
-  { 
+  {
     debug("Regla 20: lista_var es id constante");
     procesarSimbolo(yylval.strVal, 1);
     asignacionConst = 1;
@@ -373,6 +376,7 @@ termino:
     debug("\ntermino = factor");
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     TerminoP = FactorP;
+    // TerminoP = desapilar(stackParentesis, FactorP);
     //push(stackParentesis, FactorP);
   }
   | termino /* {if(TerminoP == FactorP){ TerminoP = desapilar(stackParentesis, FactorP); }}*/ {AuxTerminoP = TerminoP;} OP_MUL factor
@@ -390,7 +394,8 @@ termino:
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     printf("\ntermin: %p %s", TerminoP, TerminoP->value);
     printf("\nauxili: %p %s", AuxTerminoP, AuxTerminoP->value);
-    TerminoP = crearNodo("*", TerminoP, FactorP);
+    //desapilar(stackParentesis, AuxTerminoP)
+    TerminoP = crearNodo("*", AuxTerminoP, FactorP);
   }
   | termino OP_DIV factor       {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
@@ -398,7 +403,7 @@ termino:
 factor:
 	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal); push(stackParentesis, FactorP);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);} //push(stackParentesis, FactorP);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
   | P_A expresion P_C
@@ -466,7 +471,7 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 
   struct node *izq = NULL;
 	struct node *der = NULL;
-	
+
   if(left!=NULL){
 		izq = (struct node *) malloc(sizeof(struct node));
 		izq->value = left->value;
@@ -512,20 +517,23 @@ void crearArchivoDot(struct node * root){
 
 	_add_dot (root);
 	fprintf(fp,"}");
-    fclose(fp); 
-	const char * cmd1 = " dot intermedia.dot -Tpng -o intermedia.png "; 
-	system(cmd1); 
+    fclose(fp);
+	const char * cmd1 = " dot intermedia.dot -Tpng -o intermedia.png ";
+	system(cmd1);
 }
 
 /*Agrega nodo a .dot*/
 void _add_dot (struct node *root) {
   if (root == NULL) return;
+  char* value;
 	if (root -> left != NULL){
-		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,root->left->value);
+    value = str_replace("\"", "'", root->left->value);
+		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,value);
     	_add_dot(root->left);
 	}
 	if (root -> right != NULL){
-		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->right,root->right->value);
+    value = str_replace("\"", "'", root->right->value);
+		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->right,value);
 		_add_dot(root->right);
 	}
 }
@@ -842,8 +850,61 @@ struct node* pop(struct Stack* stack) {
   return stack->array[stack->top--];
 }
 
-struct node* peek(struct Stack* stack) { 
-    if (isEmpty(stack)) return NULL; 
+struct node* peek(struct Stack* stack) {
+    if (isEmpty(stack)) return NULL;
     return stack->array[stack->top];
-} 
+}
 // --------------------------------------------------------------------
+
+char* str_replace(char* search, char* replace, char* subject) {
+	int i, j, k;
+
+	int searchSize = strlen(search);
+	int replaceSize = strlen(replace);
+	int size = strlen(subject);
+
+	char* ret;
+
+	if (!searchSize) {
+		ret = malloc(size + 1);
+		for (i = 0; i <= size; i++) {
+			ret[i] = subject[i];
+		}
+		return ret;
+	}
+
+	int retAllocSize = (strlen(subject) + 1) * 2;
+	ret = malloc(retAllocSize);
+
+	int bufferSize = 0;
+	char* foundBuffer = malloc(searchSize);
+
+	for (i = 0, j = 0; i <= size; i++) {
+		if (retAllocSize <= j + replaceSize) {
+			retAllocSize *= 2;
+			ret = (char*) realloc(ret, retAllocSize);
+		}
+		else if (subject[i] == search[bufferSize]) {
+			foundBuffer[bufferSize] = subject[i];
+			bufferSize++;
+
+			if (bufferSize == searchSize) {
+				bufferSize = 0;
+				for (k = 0; k < replaceSize; k++) {
+					ret[j++] = replace[k];
+				}
+			}
+		}
+		else {
+			for (k = 0; k < bufferSize; k++) {
+				ret[j++] = foundBuffer[k];
+			}
+			bufferSize = 0;
+
+			ret[j++] = subject[i];
+		}
+	}
+
+	free(foundBuffer);
+	return ret;
+}
