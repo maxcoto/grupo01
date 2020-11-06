@@ -264,7 +264,7 @@ if:
     DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, SentenciaP);
   }
-	| IF P_A decision P_C L_A bloque_interno { BSd = BloqueInternoP; } L_C ELSE L_A bloque_interno { BSi = BloqueInternoP; } L_C
+	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; }
   {
     debug("Regla 16: if/else");
     struct node *cuerpo = crearNodo("cuerpo", BSd, BSi);
