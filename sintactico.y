@@ -491,8 +491,7 @@ void crearArchivoDot(struct node * root){
 
 /*Agrega nodo a .dot*/
 void _add_dot (struct node *root) {
-
-    if (root == NULL) return;
+  if (root == NULL) return;
 	if (root -> left != NULL){
 		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,root->left->value);
     	_add_dot(root->left);
@@ -523,17 +522,19 @@ int main(int argc,char *argv[]) {
 	}
 
   print_h(root);
-  
   crearArchivoDot(root);
-  
+
   printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
 
+
+  // codigo temporal para ver la pila que estoy usando -------------
   struct node *n = pop(stackParentesis);
   while(n){
     print_h(n);
     printf("----------------------------------------------------------------------------");
     n = pop(stackParentesis);
   }
+  // ---------------------------------------------------------------
 
 	fclose(yyin);
 	fclose(tsout);
@@ -786,31 +787,30 @@ void exito(char *texto){
 }
 // --------------------------------------------------------------------
 
-// Pila de punteros auxiliares ----------------------------------------
+// Funciones de pila de punteros  ----------------------------------------
 struct Stack* createStack(unsigned capacity) {
-    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
-    stack->capacity = capacity;
-    stack->top = -1;
-    stack->array = (struct node**)malloc(stack->capacity * sizeof(struct node));
-    return stack;
+  struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+  stack->capacity = capacity;
+  stack->top = -1;
+  stack->array = (struct node**)malloc(stack->capacity * sizeof(struct node));
+  return stack;
 }
-// Stack is full when top is equal to the last index
+
 int isFull(struct Stack* stack) {
-    return stack->top == stack->capacity - 1;
+  return stack->top == stack->capacity - 1;
 }
-// Stack is empty when top is equal to -1
+
 int isEmpty(struct Stack* stack) {
-    return stack->top == -1;
+  return stack->top == -1;
 }
-// Function to add an item to stack.  It increases top by 1
+
 void push(struct Stack* stack, struct node *item) {
-    if (isFull(stack))
-        return;
-    stack->array[++stack->top] = item;
+  if (isFull(stack)) return;
+  stack->array[++stack->top] = item;
 }
-// Function to remove an item from stack.  It decreases top by 1
+
 struct node* pop(struct Stack* stack) {
-    if (isEmpty(stack))
-        return NULL;
-    return stack->array[stack->top--];
+  if (isEmpty(stack)) return NULL;
+  return stack->array[stack->top--];
 }
+// --------------------------------------------------------------------
