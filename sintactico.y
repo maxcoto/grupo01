@@ -130,7 +130,7 @@ void validarAsignacion(char *);
 void validarVariables();
 
 void escribirArchivo(void);
-int yyerror();
+int yyerror(char *mensaje);
 void debug(char *);
 void error(char *, char *);
 void exito(char *);
@@ -646,8 +646,10 @@ void debug(char* texto){
 // function para imprimir errores en color rojo -----------------------
 void error(char *texto, char *valor){
 	if(COLOR) printf("\033[0;31m");
-	printf("\n\n[ERROR]: %s %s", texto, valor);
-	yyerror();
+	//printf("\n\n[ERROR]: %s %s", texto, valor);
+	char mensaje[1000];
+	sprintf(mensaje,texto,valor);
+	yyerror(mensaje);
 }
 // --------------------------------------------------------------------
 
