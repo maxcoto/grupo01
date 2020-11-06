@@ -13,7 +13,7 @@
 FILE  *yyin, *tsout;
 %}
 
-int yyerror(void);
+int yyerror(char *mensaje);
 
 %option noyywrap
 %option yylineno
@@ -128,12 +128,12 @@ ID					{LETRA}|{LETRA}({LETRA}|{DIGITO}|{GUIONB})*({LETRA}|{DIGITO})
 %%
 
 // ejecucion de error ------------------------------------------------
-int yyerror(void){
+int yyerror(char *mensaje){
   fflush(stdout);
-	if(COLOR) printf("\033[0;33m");
-	printf("\n[LINEA]: %d", yylineno);
-	if(COLOR) printf("\033[0;31m");
-	printf("\nError de sintaxis\n\n");
+  if(strcmp(mensaje, "syntax error") == 0)
+  	printf("\n\n[LINEA]: %d ---> sintaxis incorrecta\n\n", yylineno);
+  else
+	printf("\n\nError: [LINEA]: %d ---> %s\n\n", yylineno, mensaje);	
   fclose(yyin);
   fclose(tsout);
   exit(1);
