@@ -1,0 +1,10 @@
+DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
+
+if (actual > 2 ){ 
+	if(actual<5){
+		if(actual<3)
+			actual:=2;
+			actual:=3;
+		}
+
+	}

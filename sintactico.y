@@ -94,7 +94,7 @@ int isFull(struct Stack* stack);
 int isEmpty(struct Stack* stack);
 void push(struct Stack* stack, struct node *item);
 struct node* pop(struct Stack* stack);
-struct node *desapilaO(struct node* fp);
+struct node *desapilar(struct node* fp);
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -196,10 +196,10 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{agregarTipo("FLOAT");}			{debug("Regla 03: tipo es float");}
-	| INTEGER 		{agregarTipo("INT");}				{debug("Regla 04: tipo es int");}
-	| STRING 			{agregarTipo("STRING");}		{debug("Regla 05: tipo es string");}
-	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{debug("Regla 06: tipo es boolean");}
+	FLOAT 				{agregarTipo("FLOAT");}			{}
+	| INTEGER 		{agregarTipo("INT");}				{}
+	| STRING 			{agregarTipo("STRING");}		{}
+	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{}
 ;
 //------------------------------------------------------------------------------------------------------
 
@@ -210,8 +210,8 @@ bloque_sentencias:
 ;
 
 bloque_interno:
-  sentencia { BloqueInternoP = SentenciaP; }
-  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia {BloqueInternoP = crearNodo("BI", AuxBloqueInternoP, SentenciaP);}
+  sentencia { debug("Regla 05 bloque interno simple");BloqueInternoP = SentenciaP; }
+  | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia{debug("Regla 06 bloque interno");BloqueInternoP = crearNodo("BI", AuxBloqueInternoP, SentenciaP);}
 
 sentencia:
 	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {SentenciaP = CicloP;}
@@ -229,8 +229,8 @@ ciclo:
 ;
 
 if:
-	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if");}                 {IFp = crearNodo("if", DecisionP, BloqueInternoP);}
-	| IF P_A decision P_C sentencia                 {debug("Regla 15: if simple");}          {IFp = crearNodo("if", DecisionP, SentenciaP);}
+	IF P_A decision P_C L_A bloque_interno L_C      {debug("Regla 14: if")  ;DecisionP=desapilar(DecisionP);IFp = crearNodo("if", DecisionP, BloqueInternoP);}
+	| IF P_A decision P_C sentencia                 {debug("Regla 15: if simple");DecisionP=desapilar(DecisionP);IFp = crearNodo("if", DecisionP, SentenciaP);}
 	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; } 	{debug("Regla 16: if/else");} {IFp = crearNodo("if", DecisionP, crearNodo("cuerpo", BSd, BSi));}
 ;
 
@@ -258,7 +258,7 @@ operasigna:
 ;
 
 decision:
-  condicion                          	{debug("Regla 25: Decision simple");}     {DecisionP = CondicionP;}
+  condicion                          	{debug("Regla 25: Decision simple");DecisionP = CondicionP ; push(stack,DecisionP);}
   | condicion {AuxCondicionP = CondicionP;} logico condicion                                     {DecisionP = crearNodo(_string1, AuxCondicionP, CondicionP);}
   | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion {DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);}	{debug("Regla 26: Decision negada");}
 ;
@@ -290,7 +290,7 @@ expresion:
 ;
 
 termino:
-  factor                        {debug("Regla 38: factor");}	              {TerminoP = FactorP;}
+  factor                        {debug("Regla 38: termino es factor");}	              {TerminoP = FactorP;}
   | termino OP_MUL factor  {debug("Regla 39: termino por Factor");}	        {TerminoP = crearNodo("*", TerminoP, FactorP);}
   | termino OP_DIV factor  {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
@@ -327,7 +327,7 @@ entrada:
 %%
 // ----------------------------------------------------------------------------------
 
-struct node *desapilaO(struct node* fp){
+struct node *desapilar(struct node* fp){
   struct node *n = pop(stack);
   if(n) return n;
   return fp;
@@ -340,19 +340,36 @@ struct node *crearHoja(char *nombre){
 struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	struct node *hoja;
 	hoja = (struct node *) malloc(sizeof(struct node));
+	struct node *izq=NULL;
+	struct node *der=NULL;
+	if(left!=NULL){
+		izq = (struct node *) malloc(sizeof(struct node));		
+		izq->value=left->value;
+		izq->left=left->left;
+		izq->right=left->right;
+	}
+	if(right != NULL ){	
+		der = (struct node *) malloc(sizeof(struct node));	
+		der->value= right->value;
+		der->right=right->right;
+		der->left=right->left;
+	}
+	
 	(hoja)->value = nombre;
-	(hoja)->left = left;
-	(hoja)->right = right;
+	(hoja)->right=der;
+	(hoja)->left=izq;
+	
 	return hoja;
 }
 
 void _print_h(struct node *root, int space) {
+	int i;
     if (root == NULL) return;
     space += COUNT;
     _print_h(root->right, space);
     printf("\n");
-    for (int i = COUNT; i < space; i++) printf(" ");
-    printf("%s\n", root->value);
+    for (i = COUNT; i < space; i++) printf(" ");
+    printf("%p %s \n", root,root->value);
     _print_h(root->left, space);
 }
 
