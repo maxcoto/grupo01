@@ -252,7 +252,11 @@ sentencia:
 ;
 
 ciclo:
-  WHILE P_A decision P_C L_A bloque_interno L_C  {CicloP = crearNodo("while", DecisionP, BloqueInternoP);}
+  WHILE P_A decision P_C L_A bloque_interno L_C
+  {
+    DecisionP = desapilar(stackDecision, DecisionP);
+    CicloP = crearNodo("while", DecisionP, BloqueInternoP);
+  }
 ;
 
 if:
@@ -376,26 +380,20 @@ termino:
     debug("\ntermino = factor");
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     TerminoP = FactorP;
-    // TerminoP = desapilar(stackParentesis, FactorP);
-    //push(stackParentesis, FactorP);
   }
-  | termino /* {if(TerminoP == FactorP){ TerminoP = desapilar(stackParentesis, FactorP); }}*/ {AuxTerminoP = TerminoP;} OP_MUL factor
+  | termino {AuxTerminoP = TerminoP;} OP_MUL factor
   {
     debug("\ntermino * factor");
-    //if(TerminoP == FactorP){
-    // TerminoP = desapilar(stackParentesis, TerminoP);
-      //TerminoP = peek(stackParentesis);
-      //push(stackParentesis, FactorP);
-      //TerminoP = AuxTerminoP;
-      //FactorP  = peek(stackParentesis);
-    //}
-    //FactorP = desapilar(stackParentesis, FactorP);
-    //TerminoP = desapilar(stackParentesis, TerminoP);
+    if(TerminoP == FactorP){
+      FactorP = desapilar(stackParentesis, FactorP);
+      TerminoP = desapilar(stackParentesis, TerminoP);
+    }
+
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     printf("\ntermin: %p %s", TerminoP, TerminoP->value);
     printf("\nauxili: %p %s", AuxTerminoP, AuxTerminoP->value);
-    //desapilar(stackParentesis, AuxTerminoP)
-    TerminoP = crearNodo("*", AuxTerminoP, FactorP);
+
+    TerminoP = crearNodo("*", TerminoP, FactorP);
   }
   | termino OP_DIV factor       {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
 ;
@@ -422,9 +420,6 @@ factor:
     FactorP = crearNodo("contar", init, ListaP);
   }
 ;
-
-// FactorP = crearNodo("()", ExpresionP, crearHoja("NULL"));
-
 
 lista:
 	expresion

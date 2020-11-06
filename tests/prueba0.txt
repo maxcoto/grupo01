@@ -2,7 +2,7 @@ DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
 
 
-actual:= (contador/0.342) + (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
+actual:= (contador/0.342) * (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
 
 
 *-
