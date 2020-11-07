@@ -466,21 +466,12 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	struct node *hoja;
 	hoja = (struct node *) malloc(sizeof(struct node));
 
-  struct node *izq = NULL;
+	struct node *izq = NULL;
 	struct node *der = NULL;
 
-  if(left!=NULL){
-		izq = (struct node *) malloc(sizeof(struct node));
-		izq->value = left->value;
-		izq->left  = left->left;
-		izq->right = left->right;
-	}
-
-  if(right != NULL ){
-		der = (struct node *) malloc(sizeof(struct node));
-		der->value = right->value;
-		der->right = right->right;
-		der->left  = right->left;
+	if(left!=NULL && right != NULL){
+		izq = left;
+		der = right;
 	}
 
 	(hoja)->value = nombre;
