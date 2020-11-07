@@ -54,7 +54,7 @@ struct node *AuxCondicionP = NULL;
 struct node *OperasignaP = NULL;
 struct node *AuxOperasignaP = NULL;
 
-//struct node *Lp = NULL;
+// struct node *Lp = NULL;
 struct node *BloqueSentenciaP = NULL;
 //Auxiliares para bloque de sentencia - Izq y Der
 struct node *AuxBloqueSentenciaP = NULL;
@@ -333,11 +333,13 @@ decision:
   {
     debug("Regla 26: Decision compuesta");
     DecisionP = crearNodo(_string1, AuxCondicionP, CondicionP);
+    push(stackDecision, DecisionP);
   }
   | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion
   {
     debug("Regla 26: Decision negada");
     DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);
+    push(stackDecision, DecisionP);
   }
 ;
 
