@@ -24,11 +24,9 @@
 int yylex();
 FILE  *yyin, *tsout;
 FILE * fp = NULL; /*graph*/
-
 char *yytext;
 
 // estructura de nodos para arbol sintactico -----
-
 struct node {
   char *value;
   struct node *left;
@@ -73,12 +71,11 @@ struct node *crearNodo(char *, struct node *, struct node *);
 void _print_h(struct node *, int);
 void print_h(struct node *);
 
-// TODO
-char* _string;
-char* _string1;
+char* _comparacion;
+char* _operasigna;
+char* _decision;
 
 //------------------------------------------------
-
 struct Stack {
     int top;
     unsigned capacity;
@@ -93,7 +90,6 @@ int isFull(struct Stack* stack);
 int isEmpty(struct Stack* stack);
 void push(struct Stack* stack, struct node *item);
 struct node* pop(struct Stack* stack);
-struct node* peek(struct Stack* stack);
 struct node *desapilar(struct Stack* stack, struct node* fp);
 
 // estructura para la tabla de simbolos ----------
@@ -136,13 +132,10 @@ void error(char *, char *);
 void exito(char *);
 
 /*graph */
-void _add_dot (struct node *root);
+void addDot (struct node *root);
 void crearArchivoDot(struct node * root);
-
-char* str_replace(char* search, char* replace, char* subject);
-
+char* strReplace(char* search, char* replace, char* subject);
 %}
-
 
 %union { char *strVal; }
 
@@ -179,7 +172,8 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias { root = BloqueSentenciaP; }
+	bloque_sentencias
+  { root = BloqueSentenciaP; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -203,10 +197,10 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{agregarTipo("FLOAT");}			{debug("regla TODO");}
-	| INTEGER 		{agregarTipo("INT");}				{debug("regla TODO");}
-	| STRING 			{agregarTipo("STRING");}		{debug("regla TODO");}
-	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{debug("regla TODO");}
+	FLOAT 				{agregarTipo("FLOAT");}			{debug("Regla 03: float");}
+	| INTEGER 		{agregarTipo("INT");}				{debug("Regla 04: integer");}
+	| STRING 			{agregarTipo("STRING");}		{debug("Regla 05: string");}
+	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{debug("Regla 06: boolean");}
 ;
 //------------------------------------------------------------------------------------------------------
 
@@ -214,11 +208,11 @@ tipo:
 bloque_sentencias:
 	sentencia
   {
-    debug("Regla 01 bloque de sentencia simple");
+    debug("Regla 07: sentencia simple");
     BloqueSentenciaP = SentenciaP; }
 	| bloque_sentencias { AuxBloqueSentenciaP = BloqueSentenciaP; } sentencia
   {
-    debug("Regla 02 bloque de sentencias");
+    debug("Regla 08: bloque de sentencias");
     BloqueSentenciaP = crearNodo("BS", AuxBloqueSentenciaP, SentenciaP);
   }
 ;
@@ -226,29 +220,30 @@ bloque_sentencias:
 bloque_interno:
   sentencia
   {
-    debug("Regla 05 bloque interno simple");
+    debug("Regla 09: sentencia interna simple");
     BloqueInternoP = SentenciaP;
   }
   | bloque_interno { AuxBloqueInternoP = BloqueInternoP; } sentencia
   {
-    debug("Regla 06 bloque interno");
+    debug("Regla 10: bloque interno");
     BloqueInternoP = crearNodo("BI", AuxBloqueInternoP, SentenciaP);
   }
 
 sentencia:
-	ciclo						 			{debug("Regla 07: sentencia es ciclo");}                      {SentenciaP = CicloP;}
-	| if  					 			{debug("Regla 08: sentencia es if");}                         {SentenciaP = IFp;}
-	| asignacion 		 			{debug("Regla 09: sentencia es asignacion ");}                {SentenciaP = AsignacionP;}
-	| operasignacion 			{debug("Regla 10: sentencia es operacion y asignacion ");}    {SentenciaP = OperasignaP;}
-	| salida				 			{debug("Regla 11: sentencia es salida");}                     {SentenciaP = SalidaP;}
-	| entrada 			 			{debug("Regla 12: sentencia es entrada");}                    {SentenciaP = EntradaP;}
-	| constante      		 	{debug("Regla 13: sentencia es declaracion de constante");}   {SentenciaP = ConstanteP;}
+	ciclo						 			{debug("Regla 11: sentencia es ciclo");}                      {SentenciaP = CicloP;}
+	| if  					 			{debug("Regla 12: sentencia es if");}                         {SentenciaP = IFp;}
+	| asignacion 		 			{debug("Regla 13: sentencia es asignacion ");}                {SentenciaP = AsignacionP;}
+	| operasignacion 			{debug("Regla 14: sentencia es operacion y asignacion ");}    {SentenciaP = OperasignaP;}
+	| salida				 			{debug("Regla 15: sentencia es salida");}                     {SentenciaP = SalidaP;}
+	| entrada 			 			{debug("Regla 16: sentencia es entrada");}                    {SentenciaP = EntradaP;}
+	| constante      		 	{debug("Regla 17: sentencia es declaracion de constante");}   {SentenciaP = ConstanteP;}
 	| tipo 								{error("Uso de palabra reservada", ""); }
 ;
 
 ciclo:
   WHILE P_A decision P_C L_A bloque_interno L_C
   {
+    debug("Regla 18: ciclo while");
     DecisionP = desapilar(stackDecision, DecisionP);
     CicloP = crearNodo("while", DecisionP, BloqueInternoP);
   }
@@ -257,19 +252,19 @@ ciclo:
 if:
 	IF P_A decision P_C L_A bloque_interno L_C
   {
-    debug("Regla 14: if");
+    debug("Regla 19: if");
     DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, BloqueInternoP);
   }
 	| IF P_A decision P_C sentencia
   {
-    debug("Regla 15: if simple");
+    debug("Regla 20: if simple");
     DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, SentenciaP);
   }
 	| IF P_A decision P_C L_A bloque_interno L_C { BSd = BloqueInternoP; } ELSE L_A bloque_interno L_C { BSi = BloqueInternoP; }
   {
-    debug("Regla 16: if/else");
+    debug("Regla 21: if/else");
     DecisionP = desapilar(stackDecision, DecisionP);
     struct node *cuerpo = crearNodo("cuerpo", BSd, BSi);
     IFp = crearNodo("if", DecisionP, cuerpo);
@@ -279,7 +274,7 @@ if:
 asignacion:
 	ID OP_ASIGNACION expresion PUNTOCOMA
   {
-    debug("Regla 18: Asignacion simple");
+    debug("Regla 22: Asignacion simple");
     validarAsignacion($1);
     AsignacionP = crearNodo(":=", crearHoja($1), ExpresionP);
   }
@@ -288,7 +283,7 @@ asignacion:
 constante:
 	CONST nombre_constante OP_ASIGNACION expresion PUNTOCOMA
   {
-    debug("Regla 19: Declaracion de constante");
+    debug("Regla 23: Declaracion de constante");
     ConstanteP = crearNodo("CONST", AuxConstanteP, ExpresionP);
   }
 ;
@@ -296,7 +291,6 @@ constante:
 nombre_constante:
 	ID
   {
-    debug("Regla 20: lista_var es id constante");
     procesarSimbolo(yylval.strVal, 1);
     asignacionConst = 1;
     AuxConstanteP = crearHoja(yylval.strVal);
@@ -306,74 +300,76 @@ nombre_constante:
 operasignacion:
 	ID {AuxOperasignaP = crearHoja(yylval.strVal);} operasigna expresion PUNTOCOMA
   {
-    OperasignaP = crearNodo(_string, AuxOperasignaP, ExpresionP);
+    debug("Regla 25: Operacion con asignacion");
+    OperasignaP = crearNodo(_comparacion, AuxOperasignaP, ExpresionP);
   }
 ;
 
 operasigna:
-	OP_ASIG_SUMA      {debug("Regla 21: Asignacion y suma");}             {_string = "+=";}
-	| OP_ASIG_RESTA 	{debug("Regla 22: Asignacion y resta");}            {_string = "-=";}
-	| OP_ASIG_POR   	{debug("Regla 23: Asignacion y multiplicacion");}   {_string = "*=";}
-	| OP_ASIG_DIV     {debug("Regla 24: Asignacion y division");}         {_string = "/=";}
+	OP_ASIG_SUMA      {debug("Regla 26: Asignacion y suma");}             {_comparacion = "+=";}
+	| OP_ASIG_RESTA 	{debug("Regla 27: Asignacion y resta");}            {_comparacion = "-=";}
+	| OP_ASIG_POR   	{debug("Regla 28: Asignacion y multiplicacion");}   {_comparacion = "*=";}
+	| OP_ASIG_DIV     {debug("Regla 29: Asignacion y division");}         {_comparacion = "/=";}
 ;
 
 decision:
   condicion
   {
-    debug("Regla 25: Decision simple");
+    debug("Regla 30: Decision simple");
     DecisionP = CondicionP;
     push(stackDecision, DecisionP);
   }
   | condicion {AuxCondicionP = CondicionP;} logico condicion
   {
-    debug("Regla 26: Decision compuesta");
-    DecisionP = crearNodo(_string1, AuxCondicionP, CondicionP);
+    debug("Regla 31: Decision compuesta");
+    DecisionP = crearNodo(_decision, AuxCondicionP, CondicionP);
     push(stackDecision, DecisionP);
   }
   | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion
   {
-    debug("Regla 26: Decision negada");
+    debug("Regla 32: Decision negada");
     DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);
     push(stackDecision, DecisionP);
   }
 ;
 
 logico:
-	OP_AND      												{debug("Regla 27: Decision multiple and");}    {_string1 = "AND";}
-	| OP_OR     												{debug("Regla 28: Decision multiple or");}     {_string1 = "OR";}
+	OP_AND    {debug("Regla 33: Decision multiple and");}    {_decision = "AND";}
+	| OP_OR   {debug("Regla 34: Decision multiple or");}     {_decision = "OR";}
 ;
 
 condicion:
   expresion {AuxExpresionP = ExpresionP;} comparacion expresion
   {
-    CondicionP = crearNodo(_string, AuxExpresionP, ExpresionP);
+    debug("Regla 35: Condicion");
+    CondicionP = crearNodo(_comparacion, AuxExpresionP, ExpresionP);
   }
 ;
 
 comparacion:
-	OP_COMP_IGUAL         {debug("Regla 29: Comparacion igual");}          {_string = "==";}
-	| OP_COMP_DIST				{debug("Regla 30: Comparacion distinto");}       {_string = "<>";}
-	| OP_MAYOR						{debug("Regla 31: Comparacion mayor");}          {_string = ">";}
-	| OP_MENOR						{debug("Regla 32: Comparacion menor");}          {_string = "<";}
-	| OP_COMP_MEN_IGUAL		{debug("Regla 33: Comparacion menor o igual");}  {_string = "<=";}
-	| OP_COMP_MAY_IGUAL		{debug("Regla 34: Comparacion mayor o igual");}  {_string = ">=";}
+	OP_COMP_IGUAL         {debug("Regla 36: Comparacion igual");}          {_comparacion = "==";}
+	| OP_COMP_DIST				{debug("Regla 37: Comparacion distinto");}       {_comparacion = "<>";}
+	| OP_MAYOR						{debug("Regla 38: Comparacion mayor");}          {_comparacion = ">";}
+	| OP_MENOR						{debug("Regla 39: Comparacion menor");}          {_comparacion = "<";}
+	| OP_COMP_MEN_IGUAL		{debug("Regla 40: Comparacion menor o igual");}  {_comparacion = "<=";}
+	| OP_COMP_MAY_IGUAL		{debug("Regla 41: Comparacion mayor o igual");}  {_comparacion = ">=";}
 ;
 
 expresion:
   termino
   {
-    debug("expresion = termino");
+    debug("Regla 41: Expresion es termino");
     ExpresionP = TerminoP;
   }
   | expresion { push(stackParentesis, ExpresionP); } OP_SUMA termino
   {
-    debug("Regla 36: expresion suma termino");
+    debug("Regla 42: expresion suma termino");
     ExpresionP = desapilar(stackParentesis, ExpresionP);
     ExpresionP = crearNodo("+", ExpresionP, TerminoP);
   }
   | expresion { push(stackParentesis, ExpresionP); } OP_RESTA termino
   {
-    debug("Regla 37: expresion resta termino");
+    debug("Regla 43: expresion resta termino");
     ExpresionP = desapilar(stackParentesis, ExpresionP);
     ExpresionP = crearNodo("-", ExpresionP, TerminoP);
   }
@@ -382,19 +378,19 @@ expresion:
 termino:
   factor
   {
-    debug("regla termino = factor");
+    debug("Regla 44: termino es factor");
     TerminoP = FactorP;
   }
   | termino { push(stackParentesis, TerminoP); } OP_MUL factor
   {
-    debug("regla termino * factor");
-  
+    debug("Regla 45: termino multiplica factor");
+
     TerminoP = desapilar(stackParentesis, TerminoP);
  	  TerminoP = crearNodo("*", TerminoP, FactorP);
   }
   | termino {push(stackParentesis, TerminoP) ;} OP_DIV factor
   {
-    debug("Regla 40: termino dividido factor");
+    debug("Regla 46: termino dividido factor");
     TerminoP = desapilar(stackParentesis, TerminoP);
     TerminoP = crearNodo("/", TerminoP, FactorP);
   }
@@ -408,12 +404,12 @@ factor:
 	| BOOLEAN
   | P_A expresion P_C
   {
-    debug("\nregla ( exp )");
+    debug("Regla 47: expresion entre parentesis");
     FactorP = ExpresionP;
   }
 	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C
   {
-    debug("Regla 41: funcion contar");
+    debug("Regla 48: funcion contar");
     struct node *cont = crearNodo(":=", crearHoja("@cont"), crearHoja("0"));
     struct node *aux  = crearNodo(":=", crearHoja("@aux"), AuxExpresion2P);
     struct node *init = crearNodo("init", aux, cont);
@@ -424,12 +420,14 @@ factor:
 lista:
 	expresion
   {
+    debug("Regla 49: lista es expresion");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
     struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
     ListaP = crearNodo("if", compara, aumenta);
   }
 	| lista { AuxListaP = ListaP; } COMA expresion
   {
+    debug("Regla 50: lista, lista");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
     struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
     struct node *condicion = crearNodo("if", compara, aumenta);
@@ -439,12 +437,24 @@ lista:
 ;
 
 salida:
-  PUT TEXTO PUNTOCOMA {SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));}
-  | PUT ID PUNTOCOMA  {SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));}
+  PUT TEXTO PUNTOCOMA
+  {
+    debug("Regla 51: salida por pantalla");
+    SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));
+  }
+  | PUT ID PUNTOCOMA
+  {
+    debug("Regla 52: salida por pantalla - ID");
+    SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));
+  }
 ;
 
 entrada:
-  GET ID PUNTOCOMA    {EntradaP = crearNodo("IO", crearHoja("in"), crearHoja(yylval.strVal));}
+  GET ID PUNTOCOMA
+  {
+    debug("Regla 53: entrada de datos");
+    EntradaP = crearNodo("IO", crearHoja("in"), crearHoja(yylval.strVal));
+  }
 ;
 
 %%
@@ -501,7 +511,7 @@ void crearArchivoDot(struct node * root){
 	fp = fopen("intermedia.dot", "a");
 	fprintf(fp, " digraph G { \n");
 
-	_add_dot (root);
+	addDot (root);
 	fprintf(fp,"}");
     fclose(fp);
 	const char * cmd1 = " dot intermedia.dot -Tpng -o intermedia.png ";
@@ -509,18 +519,18 @@ void crearArchivoDot(struct node * root){
 }
 
 /*Agrega nodo a .dot*/
-void _add_dot (struct node *root) {
+void addDot (struct node *root) {
   if (root == NULL) return;
   char* value;
 	if (root -> left != NULL){
-    value = str_replace("\"", "'", root->left->value);
+    value = strReplace("\"", "'", root->left->value);
 		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,value);
-    	_add_dot(root->left);
+    	addDot(root->left);
 	}
 	if (root -> right != NULL){
-    value = str_replace("\"", "'", root->right->value);
+    value = strReplace("\"", "'", root->right->value);
 		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->right,value);
-		_add_dot(root->right);
+		addDot(root->right);
 	}
 }
 
@@ -543,19 +553,8 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 
-  print_h(root);
+  // print_h(root);
   crearArchivoDot(root);
-
-  printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
-
-  // codigo temporal para ver la pila que estoy usando -------------
-  struct node *n = pop(stackParentesis);
-  while(n){
-    print_h(n);
-    printf("----------------------------------------------------------------------------");
-    n = pop(stackParentesis);
-  }
-  // ---------------------------------------------------------------
 
 	fclose(yyin);
 	fclose(tsout);
@@ -835,13 +834,9 @@ struct node* pop(struct Stack* stack) {
   return stack->array[stack->top--];
 }
 
-struct node* peek(struct Stack* stack) {
-    if (isEmpty(stack)) return NULL;
-    return stack->array[stack->top];
-}
 // --------------------------------------------------------------------
 
-char* str_replace(char* search, char* replace, char* subject) {
+char* strReplace(char* search, char* replace, char* subject) {
 	int i, j, k;
 
 	int searchSize = strlen(search);
