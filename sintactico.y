@@ -54,7 +54,7 @@ struct node *AuxCondicionP = NULL;
 struct node *OperasignaP = NULL;
 struct node *AuxOperasignaP = NULL;
 
-//struct node *Lp = NULL;
+// struct node *Lp = NULL;
 struct node *BloqueSentenciaP = NULL;
 //Auxiliares para bloque de sentencia - Izq y Der
 struct node *AuxBloqueSentenciaP = NULL;
@@ -333,11 +333,13 @@ decision:
   {
     debug("Regla 26: Decision compuesta");
     DecisionP = crearNodo(_string1, AuxCondicionP, CondicionP);
+    push(stackDecision, DecisionP);
   }
   | OP_NOT expresion {AuxExpresionP = ExpresionP;} comparacion expresion
   {
     debug("Regla 26: Decision negada");
     DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);
+    push(stackDecision, DecisionP);
   }
 ;
 
@@ -384,10 +386,10 @@ termino:
   | termino {AuxTerminoP = TerminoP;} OP_MUL factor
   {
     debug("\ntermino * factor");
-    if(TerminoP == FactorP){
-      FactorP = desapilar(stackParentesis, FactorP);
-      TerminoP = desapilar(stackParentesis, TerminoP);
-    }
+    // if(TerminoP == FactorP){
+    //   FactorP = desapilar(stackParentesis, FactorP);
+    //   TerminoP = desapilar(stackParentesis, TerminoP);
+    // }
 
     printf("\nfactor: %p %s", FactorP, FactorP->value);
     printf("\ntermin: %p %s", TerminoP, TerminoP->value);
@@ -401,7 +403,7 @@ termino:
 factor:
 	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
 	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);} //push(stackParentesis, FactorP);}
+	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
 	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
 	| BOOLEAN
   | P_A expresion P_C
@@ -464,21 +466,12 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	struct node *hoja;
 	hoja = (struct node *) malloc(sizeof(struct node));
 
-  struct node *izq = NULL;
+	struct node *izq = NULL;
 	struct node *der = NULL;
 
-  if(left!=NULL){
-		izq = (struct node *) malloc(sizeof(struct node));
-		izq->value = left->value;
-		izq->left  = left->left;
-		izq->right = left->right;
-	}
-
-  if(right != NULL ){
-		der = (struct node *) malloc(sizeof(struct node));
-		der->value = right->value;
-		der->right = right->right;
-		der->left  = right->left;
+	if(left!=NULL && right != NULL){
+		izq = left;
+		der = right;
 	}
 
 	(hoja)->value = nombre;
