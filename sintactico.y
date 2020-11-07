@@ -53,10 +53,7 @@ struct node *CondicionP = NULL;
 struct node *AuxCondicionP = NULL;
 struct node *OperasignaP = NULL;
 struct node *AuxOperasignaP = NULL;
-
-// struct node *Lp = NULL;
 struct node *BloqueSentenciaP = NULL;
-//Auxiliares para bloque de sentencia - Izq y Der
 struct node *AuxBloqueSentenciaP = NULL;
 struct node *BloqueInternoP = NULL;
 struct node *AuxBloqueInternoP = NULL;
@@ -64,10 +61,8 @@ struct node *BSi = NULL;
 struct node *BSd = NULL;
 struct node *SentenciaP = NULL;
 struct node *CicloP = NULL;
-
 struct node *EntradaP = NULL;
 struct node *SalidaP = NULL;
-
 struct node *ListaP = NULL;
 struct node *AuxListaP = NULL;
 struct node *ContarP = NULL;
@@ -78,6 +73,7 @@ struct node *crearNodo(char *, struct node *, struct node *);
 void _print_h(struct node *, int);
 void print_h(struct node *);
 
+// TODO
 char* _string;
 char* _string1;
 
@@ -143,7 +139,6 @@ void exito(char *);
 void _add_dot (struct node *root);
 void crearArchivoDot(struct node * root);
 
-
 char* str_replace(char* search, char* replace, char* subject);
 
 %}
@@ -184,7 +179,7 @@ programa:
 	{debug("Bloque de declaraciones");}
 	bloque_declaracion
 	{debug("Bloque de sentencias");}
-	bloque_sentencias                        { root = BloqueSentenciaP; }
+	bloque_sentencias { root = BloqueSentenciaP; }
 ;
 
 // declaracion de variables ---------------------------------------------------------------------------
@@ -208,10 +203,10 @@ tipo_variables:
 ;
 
 tipo:
-	FLOAT 				{agregarTipo("FLOAT");}			{}
-	| INTEGER 		{agregarTipo("INT");}				{}
-	| STRING 			{agregarTipo("STRING");}		{}
-	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{}
+	FLOAT 				{agregarTipo("FLOAT");}			{debug("regla TODO");}
+	| INTEGER 		{agregarTipo("INT");}				{debug("regla TODO");}
+	| STRING 			{agregarTipo("STRING");}		{debug("regla TODO");}
+	| BOOLEAN 		{agregarTipo("BOOLEAN");}		{debug("regla TODO");}
 ;
 //------------------------------------------------------------------------------------------------------
 
@@ -370,34 +365,39 @@ expresion:
     debug("expresion = termino");
     ExpresionP = TerminoP;
   }
-  | expresion {AuxExpresion3P = ExpresionP;} OP_SUMA termino                  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
-  //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_SUMA P_A termino P_C  {debug("Regla 36: expresion suma termino");}		{ExpresionP = crearNodo("+", AuxExpresion3P, TerminoP);}
-  | expresion {AuxExpresion3P = ExpresionP;} OP_RESTA termino                 {debug("Regla 37: expresion resta termino");} 	{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
-  //| P_A expresion P_C {AuxExpresion3P = ExpresionP;} OP_RESTA P_A termino P_C {debug("Regla 37: expresion resta termino");}		{ExpresionP = crearNodo("-", AuxExpresion3P, TerminoP);}
+  | expresion { push(stackParentesis, ExpresionP); } OP_SUMA termino
+  {
+    debug("Regla 36: expresion suma termino");
+    ExpresionP = desapilar(stackParentesis, ExpresionP);
+    ExpresionP = crearNodo("+", ExpresionP, TerminoP);
+  }
+  | expresion { push(stackParentesis, ExpresionP); } OP_RESTA termino
+  {
+    debug("Regla 37: expresion resta termino");
+    ExpresionP = desapilar(stackParentesis, ExpresionP);
+    ExpresionP = crearNodo("-", ExpresionP, TerminoP);
+  }
 ;
 
 termino:
   factor
   {
-    debug("\ntermino = factor");
-    printf("\nfactor: %p %s", FactorP, FactorP->value);
+    debug("regla termino = factor");
     TerminoP = FactorP;
   }
-  | termino {AuxTerminoP = TerminoP;} OP_MUL factor
+  | termino { push(stackParentesis, TerminoP); } OP_MUL factor
   {
-    debug("\ntermino * factor");
-    // if(TerminoP == FactorP){
-    //   FactorP = desapilar(stackParentesis, FactorP);
-    //   TerminoP = desapilar(stackParentesis, TerminoP);
-    // }
-
-    printf("\nfactor: %p %s", FactorP, FactorP->value);
-    printf("\ntermin: %p %s", TerminoP, TerminoP->value);
-    printf("\nauxili: %p %s", AuxTerminoP, AuxTerminoP->value);
-
-    TerminoP = crearNodo("*", TerminoP, FactorP);
+    debug("regla termino * factor");
+  
+    TerminoP = desapilar(stackParentesis, TerminoP);
+ 	  TerminoP = crearNodo("*", TerminoP, FactorP);
   }
-  | termino OP_DIV factor       {debug("Regla 40: termino dividido factor");}		{TerminoP = crearNodo("/", TerminoP, FactorP);}
+  | termino {push(stackParentesis, TerminoP) ;} OP_DIV factor
+  {
+    debug("Regla 40: termino dividido factor");
+    TerminoP = desapilar(stackParentesis, TerminoP);
+    TerminoP = crearNodo("/", TerminoP, FactorP);
+  }
 ;
 
 factor:
@@ -408,10 +408,8 @@ factor:
 	| BOOLEAN
   | P_A expresion P_C
   {
-    debug("\n( exp )");
-    printf("\nfactor: %p %s", ExpresionP, ExpresionP->value);
+    debug("\nregla ( exp )");
     FactorP = ExpresionP;
-    push(stackParentesis, FactorP);
   }
 	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C
   {
@@ -469,7 +467,7 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	struct node *izq = NULL;
 	struct node *der = NULL;
 
-	if(left!=NULL && right != NULL){
+	if(left != NULL && right != NULL){
 		izq = left;
 		der = right;
 	}
@@ -549,7 +547,6 @@ int main(int argc,char *argv[]) {
   crearArchivoDot(root);
 
   printf("\n\n--------------------------------------------------------------------------------------------------------------------------------------------");
-
 
   // codigo temporal para ver la pila que estoy usando -------------
   struct node *n = pop(stackParentesis);

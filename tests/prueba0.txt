@@ -1,5 +1,11 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
+
+
+actual := (contador/0.342) + (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
+
+*-
+actual := (1*2) - (3*(4/16)) / (5+6);
 while(actual > 2 and suma <> 0) {
   while(promedio > 3 or contador == 1) {
     suma += 2;
@@ -7,11 +13,6 @@ while(actual > 2 and suma <> 0) {
     promedio := ( suma + contador ) / 4;
   }
 }
-
-*-
-
-actual := (1*2) * (3*4) * (5*6);
-
 
 actual:= (contador/0.342) + (contador* contar (actual*contador ;[256,promedio*suma,52,4]));
 suma := 2.5;
