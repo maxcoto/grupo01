@@ -9,7 +9,7 @@
 #define VERBOSE 1
 #define COLOR 0
 
-#define MIN_INT -32768
+#define MIN_INT 0
 #define MAX_INT 32767
 
 #define MIN_FLOAT 0.002146
@@ -641,7 +641,7 @@ void procesarINT(int numero){
 	int pos = buscarSimbolo(texto);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
-		error("Entero fuera de rango:", "(-32768; 32767)");
+		error("Entero fuera de rango:", "(0; 32767)");
 	}
 
 	if(pos == -1) {
