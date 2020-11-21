@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "y.tab.h"
 
-#define VERBOSE 1
+#define VERBOSE 00
 #define COLOR 0
 
 #define MIN_INT 0
@@ -22,9 +22,10 @@
 #define COUNT 10
 
 int yylex();
-FILE  *yyin, *tsout;
+FILE  *yyin, *tsout,*pAsem;
 FILE * fp = NULL; /*graph*/
 char *yytext;
+
 
 // estructura de nodos para arbol sintactico -----
 struct node {
@@ -64,7 +65,7 @@ struct node *SalidaP = NULL;
 struct node *ListaP = NULL;
 struct node *AuxListaP = NULL;
 struct node *ContarP = NULL;
-
+struct node *subArbol=NULL;
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
 
@@ -109,6 +110,8 @@ int posicionTipo = 0;
 int asignacionConst = 0;
 int cantVariables = 0;
 int cantTipos = 0;
+int cantAux=1;
+
 
 void validarTipo(int);
 
@@ -131,10 +134,17 @@ void debug(char *);
 void error(char *, char *);
 void exito(char *);
 
+
+
 /*graph */
 void addDot (struct node *root);
 void crearArchivoDot(struct node * root);
 char* strReplace(char* search, char* replace, char* subject);
+
+struct node * arbolIzqConDosHijos( struct node * arbol);
+void genera_assembler(struct node * arbol);
+void reemplazarNodo(struct node *nodoViejo, char * aux );
+char * pasar_assembler(struct node * arbol);
 %}
 
 %union { char *strVal; }
@@ -160,12 +170,16 @@ char* strReplace(char* search, char* replace, char* subject);
 %token <strVal>TEXTO ENTERO REAL
 %token <strVal>ID
 
+
 %%
 
 inicio:
   {exito("Iniciando compilacion ...");}
-	programa
-	{exito("\nCompilacion exitosa !!!\n");}
+	programa 
+	{
+		genera_assembler(root);
+
+	exito("\nCompilacion exitosa !!!\n");}
 ;
 
 programa:
@@ -545,6 +559,11 @@ int main(int argc,char *argv[]) {
 			fclose(yyin);
 			return 1;
 		}
+		if((pAsem=fopen("assembler.asm","wt"))==NULL){
+				fprintf(stderr, "\nNo se puede abrir o crear el archivo: assemble.asm\n");
+			fclose(yyin);
+			return 1;
+		}
 
     stackDecision = createStack(100);
     stackParentesis = createStack(100);
@@ -552,12 +571,13 @@ int main(int argc,char *argv[]) {
 		yyparse();
 		escribirArchivo();
 	}
-
+	
   // print_h(root);
   crearArchivoDot(root);
 
 	fclose(yyin);
 	fclose(tsout);
+	fclose(pAsem);
 	return 0;
 }
 //--------------------------------------------------------------------
@@ -887,4 +907,113 @@ char* strReplace(char* search, char* replace, char* subject) {
 
 	free(foundBuffer);
 	return ret;
+}
+void genera_assembler(struct node * arbol){
+	char *reemplazo=NULL;
+	while(arbol->left && arbol->right){
+		struct node * nodo=arbolIzqConDosHijos(arbol);
+		printf("\t\t\t\t ---------------------SIN ESTE NO FUNCIONA----------------- \n");
+		if(nodo){
+			reemplazo= pasar_assembler(nodo);
+			reemplazarNodo(nodo,reemplazo);
+		}
+		
+	}
+}
+void reemplazarNodo(struct node *nodo, char * aux ){
+	// libero el espacio reservado para los nodos de izquierda y derecha
+	free(nodo->left);
+	free(nodo->right);
+	nodo->left=NULL;
+	nodo->right=NULL;
+	nodo->value=aux;
+
+}
+
+
+struct node * arbolIzqConDosHijos( struct node * arbol){
+/*	struct node {
+  char *value;
+  struct node *left;
+  struct node *right;
+};
+*/
+	struct node * izq=NULL;
+	struct node * der=NULL;
+	if(!arbol){
+		return NULL;
+	}       
+	printf("nodo %s \n ", arbol->value);
+
+// me fijo si  existe un subArbol con dos hijos (primero a la izquierda , despues a la derecha)
+	if(arbol ->left && arbol->left->left && arbol ->left -> right) {
+			printf("\t fue a la izquierda\n");
+		izq=arbolIzqConDosHijos(arbol->left);
+	}
+	else if	(arbol -> right && arbol->right->left && arbol ->right -> right){
+		printf("\t fue a la derecha\n");
+		der=arbolIzqConDosHijos(arbol->right);
+	}
+	
+	if(izq){
+		printf("\t\t retorna %s \n ", izq->value);
+		return izq;
+	}
+	else if(der){
+			printf("\t\t retorna %s \n ", der->value);
+		return der;
+	}
+		printf("\t\t retorna %s \n ", arbol->value);
+	return arbol;
+
+}
+char *  pasar_assembler(struct node * arbol){
+	char * cant;
+	itoa(cantAux,cant,10);
+	int cantDigitos= strlen(cant);
+	char *reemplazo=(char *)malloc(sizeof(char)*3*cantDigitos+1);
+	strcpy(reemplazo,"aux");
+	strcat(reemplazo,cant);
+
+	//printf("valor que llega %s \n ",arbol->value);
+		// reemplazo deberia tener el nombre del aux donde se guarde la operacion
+	if(strstr(arbol->value,":=")){
+			fprintf(pAsem,"FLD %s\n" , arbol->right->value);
+			fprintf(pAsem,"FSTP %s\n",arbol->left->value);
+
+	}
+	else if( strstr(arbol->value,"+")){
+			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
+			fprintf(pAsem,"FADD %s\n" , arbol->right->value);
+			fprintf(pAsem,"FSTP aux%d\n",cantAux);
+			cantAux++;
+	}
+
+	else if( strstr(arbol->value,"*")){
+			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
+			
+			fprintf(pAsem,"FIMULT %s\n" , arbol->right->value);
+			
+			fprintf(pAsem,"FSTP aux%d\n",cantAux);
+			cantAux++;
+		}
+	else if(strstr(arbol->value,"/")){
+			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
+			
+			fprintf(pAsem,"FDIV %s\n" , arbol->right->value);
+			
+			fprintf(pAsem,"FSTP aux%d\n",cantAux);
+			cantAux++;
+	}
+	else if( strstr(arbol->value,"-")){
+			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
+			fprintf(pAsem,"FSUB %s\n" , arbol->right->value);
+			fprintf(pAsem,"FSTP aux%d\n",cantAux);
+			cantAux++;
+	}
+		
+	else
+		reemplazo="ninguna";
+		printf(" \nREEMPLAZO %s",reemplazo);
+	return reemplazo;
 }
