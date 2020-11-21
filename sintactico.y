@@ -133,7 +133,7 @@ int yyerror(char *);
 void debug(char *);
 void error(char *, char *);
 void exito(char *);
-
+void imprimirVariables();
 
 
 /*graph */
@@ -908,7 +908,20 @@ char* strReplace(char* search, char* replace, char* subject) {
 	free(foundBuffer);
 	return ret;
 }
+
+/*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
 void genera_assembler(struct node * arbol){
+    	fprintf(pAsem,"include macros2.asm\n");
+    	fprintf(pAsem,"include number.asm\n");
+    	fprintf(pAsem,".MODEL LARGE\n.386\n.STACK 200h\n\n.DATA\n ");
+    	imprimirVariables();
+    	fprintf(pAsem,"\n.CODE\n");
+    	fprintf(pAsem,"START:\n");
+    	fprintf(pAsem,"\n\tMOV AX, @DATA\n");
+    	fprintf(pAsem,"\n\tMOV DS, AX\n");
+    	fprintf(pAsem,"\n\tMOV ES, AX\n");
+    	fprintf(pAsem,"\n\n;Comienzo codigo de usuario\n\n");
+    
 	char *reemplazo=NULL;
 	while(arbol->left && arbol->right){
 		struct node * nodo=arbolIzqConDosHijos(arbol);
@@ -917,9 +930,13 @@ void genera_assembler(struct node * arbol){
 			reemplazo= pasar_assembler(nodo);
 			reemplazarNodo(nodo,reemplazo);
 		}
-		
 	}
+	fprintf(pAsem,"\n;finaliza el asm\n ");
+    	fprintf(pAsem,"\tmov ax,4c00h\n" );
+    	fprintf(pAsem,"\tint 21h\n" );
+    	fprintf(pAsem,"\n\nEND" );
 }
+
 void reemplazarNodo(struct node *nodo, char * aux ){
 	// libero el espacio reservado para los nodos de izquierda y derecha
 	free(nodo->left);
@@ -1011,9 +1028,20 @@ char *  pasar_assembler(struct node * arbol){
 			fprintf(pAsem,"FSTP aux%d\n",cantAux);
 			cantAux++;
 	}
-		
+	else if( strstr(arbol->value,"IO") && strstr(arbol->left->value,"in")){
+      	fprintf(pAsem,"\nsoy get\n");
+  	}
+  	else if( strstr(arbol->value,"IO") && strstr(arbol->left->value,"out")){
+      	fprintf(pAsem,"\n\tMOV DX, OFFSET %s \n",arbol->right->value);
+      	fprintf(pAsem,"\tMOV AH, 9\n");
+      	fprintf(pAsem,"\tINT 21H\n");
+  	}	
 	else
 		reemplazo="ninguna";
 		printf(" \nREEMPLAZO %s",reemplazo);
 	return reemplazo;
+}
+
+void imprimirVariables(){
+
 }
