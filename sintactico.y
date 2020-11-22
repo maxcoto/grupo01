@@ -932,6 +932,7 @@ void imprimirSimbolosAssembler(){
 
 void imprimirBodyAssembler(){
   fprintf(pAsem,"\n.CODE");
+  fprintf(pAsem,"\nSTART:");
 	fprintf(pAsem,"\nMOV AX, @DATA");
 	fprintf(pAsem,"\nMOV DS, AX");
 	fprintf(pAsem,"\nMOV ES, AX\n\n");
