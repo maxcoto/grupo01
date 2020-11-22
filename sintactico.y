@@ -1201,12 +1201,19 @@ char *pasarAssembler(struct node *arbol){
     if(strstr(arbol->left->value,"in")){
       fprintf(pAsem,"\nsoy get\n");
     } else {
-      strcpy(dato,"MOV DX, OFFSET ");
-      strcat(dato,arbol->right->value);
-      strcat(dato,"\n");
-      strcat(dato,"MOV AH, 9\n");
-      strcat(dato,"INT 21H\n");
-      encolar(cola, &dato);
+      if( strstr(arbol->right->value, "_string") != NULL ) {
+        strcpy(dato,"MOV DX, OFFSET ");
+        strcat(dato,arbol->right->value);
+        strcat(dato,"\n");
+        strcat(dato,"MOV AH, 9\n");
+        strcat(dato,"INT 21H\n");
+        encolar(cola, &dato);
+      } else {
+        strcpy(dato,"DisplayFloat ");
+        strcat(dato,arbol->right->value);
+        strcat(dato, ", 2\n");
+        encolar(cola, &dato);
+      }
     }
   }	else {
 		reemplazo = "ninguna";

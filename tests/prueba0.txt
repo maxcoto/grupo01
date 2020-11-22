@@ -4,9 +4,5 @@ CONST pepe := "metemos un texto.";
 
 PUT "Prueba.txt LyC Tema 4!";
 
-if(10 <> 20){
-  actual := 30.2 * 40;
-}
-
-
-PUT actual;
+PUT "La suma es: ";
+PUT suma;
