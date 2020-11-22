@@ -1,7 +1,0 @@
-NOMBRE                         |   TIPO         | VALOR           | LONGITUD 
-----------------------------------------------------------------------------
-contador                      |	INT           |	                |	        	
-promedio                      |	FLOAT         |	                |	        	
-actual                        |	FLOAT         |	                |	        	
-suma                          |	FLOAT         |	                |	        	
-_string0                      |	              |	La suma es:     |	12      	

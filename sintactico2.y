@@ -19,6 +19,8 @@
 #define TIPO_NUMERO 1
 #define TIPO_STRING 2
 
+#define COUNT 10
+
 int yylex();
 FILE *yyin, *tsout, *pAsem;
 FILE *fp = NULL;
@@ -112,7 +114,6 @@ typedef struct {
 } t_ts;
 //------------------------------------------------
 
-const char *stringName = "_string";
 const char *etiquetaIF = "IF1";
 const char *etiquetaELSE = "ELSE1";
 struct node *lastParent = NULL;
@@ -122,11 +123,9 @@ int validaTipo = 0;
 int posicionTabla = 0;
 int posicionTipo = 0;
 int asignacionConst = 0;
-int salidaString = 0;
 int cantVariables = 0;
 int cantTipos = 0;
 int cantAux = 0;
-int stringCount = 0;
 t_cola *cola;
 
 void validarTipo(int);
@@ -138,7 +137,7 @@ void procesarSimbolo(char *, int);
 void procesarID(char *);
 char *procesarINT(float);
 char *procesarFLOAT(float);
-char *procesarSTRING(char *);
+void procesarSTRING(char *);
 
 void agregarTipo(char *);
 void validarAsignacion(char *);
@@ -442,7 +441,8 @@ factor:
   }
 	| TEXTO
   {
-    FactorP = crearHoja(procesarSTRING(yylval.strVal));
+    procesarSTRING(yylval.strVal);
+    FactorP = crearHoja(yylval.strVal);
   }
 	| ENTERO
   {
@@ -492,8 +492,7 @@ salida:
   PUT TEXTO PUNTOCOMA
   {
     debug("Regla 51: salida por pantalla");
-    salidaString = 1;
-    SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(procesarSTRING(yylval.strVal)));
+    SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));
   }
   | PUT ID PUNTOCOMA
   {
@@ -702,12 +701,10 @@ char *procesarINT(float numero){
 }
 //--------------------------------------------------------------------
 // valida y almacena strings -----------------------------------------
-char *procesarSTRING(char *str){
+void procesarSTRING(char *str){
 	int a = 0;
 	char *aux = str;
 	int i;
-  char texto[15];
-  char *_texto = (char *)malloc(50);
 
   int largo = strlen(aux);
   char cadenaPura[30];
@@ -715,11 +712,6 @@ char *procesarSTRING(char *str){
 	if(largo > 30){
 		error("Cadena demasiado larga:", "(<30)");
 	}
-
-  sprintf(texto, "%d", stringCount);
-  strcpy(_texto, stringName);
-  strcat(_texto, texto);
-  stringCount++;
 
 	for(i = 1; i<largo-1; i++){
     cadenaPura[a] = str[i];
@@ -729,21 +721,17 @@ char *procesarSTRING(char *str){
 	cadenaPura[a--]='\0';
 
   if(buscarSimbolo(cadenaPura) == -1){
-		escribirTabla(_texto, cadenaPura, largo, 0);
+		escribirTabla(cadenaPura, cadenaPura, largo, 0);
 	}
 
 	if(asignacionConst == 1){
 		agregarTipo("STRING");
 		asignacionConst = 0;
 	} else {
-    if(salidaString == 1){
-      salidaString = 0;
-    } else {
-      validarTipo(TIPO_STRING);
-    }
+		validarTipo(TIPO_STRING);
 	}
 
-	return _texto;
+	return;
 }
 //--------------------------------------------------------------------
 // valida y almacena floats -----------------------------------------
@@ -956,11 +944,11 @@ void imprimirSimbolosAssembler(){
 	for(i = 0; i<posicionTabla; i++){
     char *valor = strcmp(tablaSimbolos[i].valor, "") != 0 ? tablaSimbolos[i].valor : "?";
 
-    if(tablaSimbolos[i].longitud > 0) {
-      fprintf(pAsem, "%s\tdb\t\"%s\",'$',%d dup (?)\n", tablaSimbolos[i].nombre, valor, tablaSimbolos[i].longitud);
-    } else {
-      fprintf(pAsem, "%s\tdd\t%s\n", tablaSimbolos[i].nombre, valor);
-    }
+    //int longi = tablaSimbolos[i].longitud;
+	  //char longitud_texto[10] = {""};
+		//if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
+
+		fprintf(pAsem, "%s\tdd\t%s\n", tablaSimbolos[i].nombre, valor); //, longitud_texto);
 	}
 }
 
@@ -993,8 +981,8 @@ void generarAssembler(struct node *arbol){
 
   while(arbol->left && arbol->right){
 		struct node *nodo = arbolIzqConDosHijos(arbol);
-    //printf("asdasd"); // no tocar
-    fflush(stdin);
+		fflush(stdin);
+    //printf("pasdasd"); // no tocar
 
     if(nodo){
 			reemplazo = pasarAssembler(nodo);
@@ -1037,12 +1025,12 @@ char *pasarAssembler(struct node *arbol){
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
-    char *dato2 = (char *)malloc(100);
+   char *dato2 = (char *)malloc(100);
    strcpy(dato2,"");
-
+  
   char *dato = (char *)malloc(100);
   int salta = 0;
-
+  
   if(strcmp(arbol->value, "if") == 0){
     strcpy(dato, etiquetaIF);
     strcat(dato, ":");
@@ -1051,10 +1039,8 @@ char *pasarAssembler(struct node *arbol){
     return reemplazo;
   }
 
-  if(lastParent != NULL){
-    //char *dato2 = (char *)malloc(100);
-    printf("\t\t\t\t\t lastParent: %s == arbol: %s \n",lastParent->right->value,arbol->value);
-
+  if(lastParent != NULL ){
+  //  char *dato2 = (char *)malloc(100);
     if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right==arbol){
       lastParent = NULL;
       strcpy(dato2, "JMP ");
@@ -1063,7 +1049,7 @@ char *pasarAssembler(struct node *arbol){
       strcat(dato2, etiquetaELSE);
       strcat(dato2, ":");
       strcat(dato2, "\n\n");
-     // encolar(cola, &dato2);
+      //encolar(cola, &dato2);
     }
   }
 
@@ -1072,7 +1058,7 @@ char *pasarAssembler(struct node *arbol){
     strcmp(arbol->value, "==") == 0 ||
     strcmp(arbol->value, ">")  == 0 ||
     strcmp(arbol->value, "<")  == 0 ||
-    strcmp(arbol->value, ">=") == 0 ||
+    strcmp(arbol->value, ">=") == 0 || 
     strcmp(arbol->value, "<=") == 0
   ){
     strcpy(dato, "FLD ");
@@ -1091,30 +1077,30 @@ char *pasarAssembler(struct node *arbol){
   if(strcmp(arbol->value, "<>") == 0){
 		strcat(dato, "JE");
 	}
-
+  
   if(strcmp(arbol->value, "==") == 0){
     strcat(dato, "JNE");
 	}
-
+  
   if(strcmp(arbol->value, ">") == 0){
     strcat(dato, "JNA");
 	}
-
+  
   if(strcmp(arbol->value, "<") == 0){
 		strcat(dato, "JAE");
 	}
-
+  
   if(strcmp(arbol->value, ">=") == 0){
 		strcat(dato, "JB");
 	}
-
+  
   if(strcmp(arbol->value, "<=") == 0){
 		strcat(dato, "JA");
 	}
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0 ||( strcmp(arbol->value,"BI") ==0 &&  lastParent->right==arbol &&strcmp(lastParent->right->value, "cuerpo") == 0)){
+    if(strcmp(lastParent->right->value, "cuerpo") == 0){
       strcat(dato, etiquetaELSE);
     } else {
       strcat(dato, etiquetaIF);
@@ -1124,9 +1110,9 @@ char *pasarAssembler(struct node *arbol){
     encolar(cola, &dato);
     return reemplazo;
   }
-
+  
   if(strstr(arbol->value, ":=")){
-		  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
+	  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
 	  	strcpy(dato,dato2);
 	  printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
 		strcat(dato, "FLD ");
@@ -1138,7 +1124,7 @@ char *pasarAssembler(struct node *arbol){
 		encolar(cola, &dato);
     return reemplazo;
 	}
-
+  
   if( strstr(arbol->value,"+")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
@@ -1156,7 +1142,7 @@ char *pasarAssembler(struct node *arbol){
 		cantAux++;
     return reemplazo;
 	}
-
+  
   if( strstr(arbol->value,"*")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
@@ -1172,7 +1158,7 @@ char *pasarAssembler(struct node *arbol){
 		cantAux++;
     return reemplazo;
 	}
-
+  
   if(strstr(arbol->value,"/")){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
@@ -1188,7 +1174,7 @@ char *pasarAssembler(struct node *arbol){
 		cantAux++;
     return reemplazo;
 	}
-
+  
   if( strstr(arbol->value,"-")){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
@@ -1204,30 +1190,19 @@ char *pasarAssembler(struct node *arbol){
 		cantAux++;
     return reemplazo;
 	}
-
+  
   if(strstr(arbol->value,"IO")){
     if(strstr(arbol->left->value,"in")){
-      strcpy(dato,"GetFloat ");
-      strcat(dato,arbol->right->value);
-      strcat(dato,"\n");
+      fprintf(pAsem,"\nsoy get\n");
     } else {
-      if( strstr(arbol->right->value, "_string") != NULL ) {
-        strcpy(dato,"MOV DX, OFFSET ");
-        strcat(dato,arbol->right->value);
-        strcat(dato,"\n");
-        strcat(dato,"MOV AH, 9\n");
-        strcat(dato,"INT 21H\n");
-      } else {
-        strcpy(dato,"DisplayFloat ");
-        strcat(dato,arbol->right->value);
-        strcat(dato, ", 2\n");
-      }
+    	fprintf(pAsem,"\n\tMOV DX, OFFSET %s \n",arbol->right->value);
+    	fprintf(pAsem,"\tMOV AH, 9\n");
+    	fprintf(pAsem,"\tINT 21H\n");
     }
-    encolar(cola, &dato);
   }	else {
 		reemplazo = "ninguna";
   }
-
+  
   return reemplazo;
 }
 
