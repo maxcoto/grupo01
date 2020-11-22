@@ -22,8 +22,8 @@
 #define COUNT 10
 
 int yylex();
-void itoa(int n, char s[]);
-void reverse(char s[]);
+void _itoa(int n, char s[]);
+void _reverse(char s[]);
 
 FILE *yyin, *tsout, *pAsem;
 FILE *fp = NULL;
@@ -996,7 +996,7 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 
 char *pasarAssembler(struct node * arbol){
 	char *cant;
-	itoa(cantAux, cant);
+	_itoa(cantAux, cant);
 	int cantDigitos = strlen(cant);
 	char *reemplazo = (char *)malloc(sizeof(char)*(5+cantDigitos));
 	strcpy(reemplazo, "@aux");
@@ -1118,7 +1118,7 @@ int colaVacia(t_cola * cola){
   return cola->inicio == NULL ? 1 : 0;
 }
 
-void itoa(int n, char s[]){
+void _itoa(int n, char s[]){
   int i, sign;
 
   if ((sign = n) < 0)  /* record sign */
@@ -1130,10 +1130,10 @@ void itoa(int n, char s[]){
   if (sign < 0)
      s[i++] = '-';
   s[i] = '\0';
-  reverse(s);
+  _reverse(s);
 }
 
-void reverse(char s[]){
+void _reverse(char s[]){
   int i, j;
   char c;
   for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
