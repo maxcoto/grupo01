@@ -131,9 +131,9 @@ int buscarSimbolo(char *);
 
 void procesarSimbolo(char *, int);
 void procesarID(char *);
-void procesarINT(int);
+char *procesarINT(float);
+char *procesarFLOAT(float);
 void procesarSTRING(char *);
-void procesarFLOAT(float);
 
 void agregarTipo(char *);
 void validarAsignacion(char *);
@@ -163,6 +163,8 @@ void imprimirFooterAssembler();
 
 void intToString(int n, char s[]);
 void reverseString(char s[]);
+
+char strAuxGuion[40];
 
 %}
 
@@ -442,21 +444,13 @@ factor:
   }
 	| ENTERO
   {
-    char str[40];
-    strcpy(str, "_");
-    strcat(str, yylval.strVal);
-
-    procesarINT(atoi(yylval.strVal));
-    FactorP = crearHoja(str);
+    char *result = procesarINT(atof(yylval.strVal));
+    FactorP = crearHoja(result);
   }
 	| REAL
   {
-    char str[40];
-    strcpy(str, "_");
-    strcat(str, yylval.strVal);
-
-    procesarFLOAT(atof(yylval.strVal));
-    FactorP = crearHoja(str);
+    char *result = procesarFLOAT(atof(yylval.strVal));
+    FactorP = crearHoja(result);
   }
   | P_A expresion P_C
   {
@@ -678,18 +672,20 @@ void procesarID(char *simbolo){
 }
 //--------------------------------------------------------------------
 // valida y almacena enteros -----------------------------------------
-void procesarINT(int numero){
+char *procesarINT(float numero){
 	char texto[32];
-	sprintf(texto, "%d", numero);
-
-	int pos = buscarSimbolo(texto);
+  char *_texto = (char *)malloc(100);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
 		error("Entero fuera de rango:", "(0; 32767)");
 	}
 
-	if(pos == -1) {
-		escribirTabla(texto, texto, 0, 0);
+  sprintf(texto, "%f", numero);
+  strcpy(_texto, "_");
+  strcat(_texto, texto);
+
+	if(buscarSimbolo(texto) == -1) {
+		escribirTabla(_texto, texto, 0, 0);
 	}
 
 	if(asignacionConst == 1){
@@ -699,7 +695,7 @@ void procesarINT(int numero){
 		validarTipo(TIPO_NUMERO);
 	}
 
-	return;
+	return _texto;
 }
 //--------------------------------------------------------------------
 // valida y almacena strings -----------------------------------------
@@ -737,17 +733,20 @@ void procesarSTRING(char *str){
 }
 //--------------------------------------------------------------------
 // valida y almacena floats -----------------------------------------
-void procesarFLOAT(float numero){
-	char texto[32];
+char *procesarFLOAT(float numero){
+  char texto[32];
+  char *_texto = (char *)malloc(100);
 
 	if(numero < MIN_FLOAT || numero > MAX_FLOAT){
 		error("Float fuera de rango", "(-1.17549e-38; 3.40282e38)");
 	}
 
-	sprintf(texto, "%f", numero);
+  sprintf(texto, "%f", numero);
+  strcpy(_texto, "_");
+  strcat(_texto, texto);
 
 	if(buscarSimbolo(texto) == -1){
-		escribirTabla(texto, texto, 0, 0);
+		escribirTabla(_texto, texto, 0, 0);
 	}
 
 	if(asignacionConst == 1){
@@ -757,7 +756,7 @@ void procesarFLOAT(float numero){
 		validarTipo(TIPO_NUMERO);
 	}
 
-	return;
+	return _texto;
 }
 //--------------------------------------------------------------------
 void agregarTipo(char *tipo){
@@ -811,7 +810,6 @@ void escribirArchivo(){
 	int i;
 
 	for(i = 0; i<posicionTabla; i++){
-		char *guion = ((strcmp(tablaSimbolos[i].tipo, "") != 0) || strcmp(tablaSimbolos[i].valor, "") == 0) ? " " : "_";
 		char tipo_str[14] = {""};
 		strcpy(tipo_str, tablaSimbolos[i].tipo);
 		if(tablaSimbolos[i].es_const) { strcat(tipo_str, " CONST"); }
@@ -820,7 +818,7 @@ void escribirArchivo(){
 	  char longitud_texto[10] = {""};
 		if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
 
-		fprintf(tsout, "%s%-30s|\t%-14s|\t%-16s|\t%-8s\t\n", guion, tablaSimbolos[i].nombre, tipo_str, tablaSimbolos[i].valor, longitud_texto);
+		fprintf(tsout, "%-30s|\t%-14s|\t%-16s|\t%-8s\t\n", tablaSimbolos[i].nombre, tipo_str, tablaSimbolos[i].valor, longitud_texto);
 	}
 }
 //--------------------------------------------------------------------
@@ -942,14 +940,13 @@ void imprimirHeaderAssembler(){
 void imprimirSimbolosAssembler(){
 	int i;
 	for(i = 0; i<posicionTabla; i++){
-		char *guion = strcmp(tablaSimbolos[i].valor, "") == 0 ? "" : "_";
     char *valor = strcmp(tablaSimbolos[i].valor, "") != 0 ? tablaSimbolos[i].valor : "?";
 
     //int longi = tablaSimbolos[i].longitud;
 	  //char longitud_texto[10] = {""};
 		//if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
 
-		fprintf(pAsem, "%s%s\tdd\t%s\n", guion, tablaSimbolos[i].nombre, valor); //, longitud_texto);
+		fprintf(pAsem, "%s\tdd\t%s\n", tablaSimbolos[i].nombre, valor); //, longitud_texto);
 	}
 }
 
@@ -1016,7 +1013,8 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 	return arbol;
 }
 
-const char *etiqueta = "IF1";
+const char *etiquetaIF = "IF1";
+const char *etiquetaELSE = "ELSE1";
 
 char *pasarAssembler(struct node *arbol){
   char *cant;
@@ -1029,16 +1027,16 @@ char *pasarAssembler(struct node *arbol){
   
   
   if(strcmp(arbol->value, "if") == 0){
-    strcat(dato, etiqueta);
+    strcat(dato, etiquetaIF);
     strcat(dato, ":");
 		strcat(dato, "\n");
-    
-    // if(strcmp(arbol->value, "cuerpo") == 0){
-    // 
-    // } else {
-    //   arbol->right->value
-    // }
-
+    return reemplazo;
+  }
+  
+  if(strcmp(arbol->value, "cuerpo") == 0){
+    strcat(dato, etiquetaELSE);
+    strcat(dato, ":");
+		strcat(dato, "\n");
     return reemplazo;
   }
 
@@ -1064,7 +1062,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(strcmp(arbol->value, "<>") == 0){
 		strcat(dato, "JE ");
-    strcat(dato, etiqueta);
+    strcat(dato, etiquetaIF);
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
