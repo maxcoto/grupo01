@@ -35,7 +35,7 @@ FMUL 30
 FSTP @aux0
 
 FLD 10
-FADD @aux1
+FADD @aux0
 FSTP @aux1
 
 FLD 50
@@ -43,18 +43,18 @@ FADD 60
 FSTP @aux2
 
 FLD 40
-FDIV @aux3
+FDIV @aux2
 FSTP @aux3
 
-FLD @aux4
-FSUB @aux4
+FLD @aux1
+FSUB @aux3
 FSTP @aux4
 
-FLD @aux5
+FLD @aux4
 FADD 70
 FSTP @aux5
 
-FLD @aux6
+FLD @aux5
 FSTP actual
 MOV AX,4c00h
 int 21h

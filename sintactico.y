@@ -161,6 +161,9 @@ void imprimirBodyAssembler();
 void imprimirCodigoAssembler();
 void imprimirFooterAssembler();
 
+void intToString(int n, char s[]);
+void reverseString(char s[]);
+
 %}
 
 %union { char *strVal; }
@@ -990,10 +993,15 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 }
 
 char *pasarAssembler(struct node *arbol){
-	char *reemplazo;
+  char *cant;
+  intToString(cantAux, cant);
+  int cantDigitos = strlen(cant);
+  char *reemplazo = (char *)malloc(5+cantDigitos);
+  strcpy(reemplazo, "@aux");
+  strcat(reemplazo, cant);
+
   char *dato = (char *)malloc(100);
-  sprintf(reemplazo, "@aux%d", cantAux);
-  
+
   if(strcmp(arbol->value, "<>") == 0){
     strcpy(dato, "CMP ");
 		strcat(dato, arbol->left->value);
@@ -1189,4 +1197,29 @@ void desencolar(t_cola * cola, t_dato * dato){
 
 int colaVacia(t_cola * cola){
   return cola->inicio == NULL ? 1 : 0;
+}
+
+void intToString(int n, char s[]){
+  int i, sign;
+
+  if ((sign = n) < 0)  /* record sign */
+     n = -n;          /* make n positive */
+  i = 0;
+  do {       /* generate digits in reverse order */
+     s[i++] = n % 10 + '0';   /* get next digit */
+  } while ((n /= 10) > 0);     /* delete it */
+  if (sign < 0)
+     s[i++] = '-';
+  s[i] = '\0';
+  reverseString(s);
+}
+
+void reverseString(char s[]){
+  int i, j;
+  char c;
+  for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+    c = s[i];
+    s[i] = s[j];
+    s[j] = c;
+  }
 }
