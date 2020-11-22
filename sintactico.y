@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "y.tab.h"
 
-#define VERBOSE 00
+#define VERBOSE 0
 #define COLOR 0
 
 #define MIN_INT 0
@@ -28,7 +28,6 @@ void reverse(char s[]);
 FILE *yyin, *tsout, *pAsem;
 FILE *fp = NULL;
 char *yytext;
-
 
 struct node {
   char *value;
@@ -91,27 +90,22 @@ int isEmpty(struct Stack* stack);
 void push(struct Stack* stack, struct node *item);
 struct node* pop(struct Stack* stack);
 struct node *desapilar(struct Stack* stack, struct node* fp);
+
 typedef char*  t_dato;
-typedef struct s_nodo
-{
-    t_dato dato;
-    struct s_nodo* sig;
-}t_nodo;
+typedef struct s_nodo {
+  t_dato dato;
+  struct s_nodo* sig;
+} t_nodo;
 
-typedef struct
-{
-    t_nodo * fin;
-    t_nodo * inicio;
+typedef struct {
+  t_nodo * fin;
+  t_nodo * inicio;
 } t_cola;
-
 
 t_cola * crearCola ();
 void encolar (t_cola * cola, t_dato * dato);
-
 void desencolar (t_cola * cola, t_dato * dato);
-
 int colaVacia (t_cola * cola);
-
 
 // estructura para la tabla de simbolos ----------
 typedef struct {
@@ -132,7 +126,6 @@ int cantVariables = 0;
 int cantTipos = 0;
 int cantAux = 0;
 t_cola *cola;
-
 
 void validarTipo(int);
 
@@ -196,13 +189,13 @@ void imprimirFooterAssembler();
 %token <strVal>TEXTO ENTERO REAL
 %token <strVal>ID
 
-
 %%
 
 inicio:
   { exito("Iniciando compilacion ..."); }
 	programa
 	{
+    crearArchivoDot(root);
 		generarAssembler(root);
     exito("\nCompilacion exitosa !!!\n");
   }
@@ -582,8 +575,6 @@ int main(int argc,char *argv[]) {
 		yyparse();
 		escribirArchivo();
 	}
-
-  crearArchivoDot(root);
 
 	fclose(yyin);
 	fclose(tsout);
@@ -1025,12 +1016,12 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FADD ");
+		strcat(dato,"FIADD ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
 		strcat(dato,reemplazo);
-		strcat(dato,"\n");
+		strcat(dato,"\n\n");
 		encolar(cola,&dato);
 	  escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1039,12 +1030,12 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FIMULT ");
+		strcat(dato,"FIMUL ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
 		strcat(dato,reemplazo);
-		strcat(dato,"\n");
+		strcat(dato,"\n\n");
 		encolar(cola,&dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1053,12 +1044,12 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FDIV ");
+		strcat(dato,"FIDIV ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
 	  strcat(dato,reemplazo);
-		strcat(dato,"\n");
+		strcat(dato,"\n\n");
 		encolar(cola,&dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1067,12 +1058,12 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FSUB ");
+		strcat(dato,"FISUB ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
 		strcat(dato,reemplazo);
-		strcat(dato,"\n");
+		strcat(dato,"\n\n");
 		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1087,7 +1078,7 @@ char *pasarAssembler(struct node * arbol){
   }	else {
 		reemplazo = "ninguna";
   }
-	
+
   printf("\nREEMPLAZO %s",reemplazo);
   return reemplazo;
 }
@@ -1110,7 +1101,7 @@ void encolar(t_cola * cola, t_dato * dato){
     cola->inicio = nue;
   }
 
-  cola->fin = nue;   
+  cola->fin = nue;
 }
 
 void desencolar(t_cola * cola, t_dato * dato){

@@ -28,23 +28,29 @@ MOV AX, @DATA
 MOV DS, AX
 MOV ES, AX
 FLD 20
-FIMULT 30
+FIMUL 30
 FSTP @aux0
+
 FLD 10
-FADD @aux0
+FIADD @aux0
 FSTP @aux1
+
 FLD 50
-FADD 60
+FIADD 60
 FSTP @aux2
+
 FLD 40
-FDIV @aux2
+FIDIV @aux2
 FSTP @aux3
+
 FLD @aux1
-FSUB @aux3
+FISUB @aux3
 FSTP @aux4
+
 FLD @aux4
-FADD 70
+FIADD 70
 FSTP @aux5
+
 mov ax,4c00h
 int 21h
 
