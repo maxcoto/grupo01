@@ -430,11 +430,34 @@ termino:
 ;
 
 factor:
-	ID 							{procesarID(yylval.strVal);}					{FactorP = crearHoja(yylval.strVal);}
-	| TEXTO 				{procesarSTRING(yylval.strVal);}			{FactorP = crearHoja(yylval.strVal);}
-	| ENTERO    		{procesarINT(atoi(yylval.strVal));}		{FactorP = crearHoja(yylval.strVal);}
-	| REAL  				{procesarFLOAT(atof(yylval.strVal));} {FactorP = crearHoja(yylval.strVal);}
-	| BOOLEAN
+	ID
+  {
+    procesarID(yylval.strVal);
+    FactorP = crearHoja(yylval.strVal);
+  }
+	| TEXTO
+  {
+    procesarSTRING(yylval.strVal);
+    FactorP = crearHoja(yylval.strVal);
+  }
+	| ENTERO
+  {
+    char str[40];
+    strcpy(str, "_");
+    strcat(str, yylval.strVal);
+
+    procesarINT(atoi(yylval.strVal));
+    FactorP = crearHoja(str);
+  }
+	| REAL
+  {
+    char str[40];
+    strcpy(str, "_");
+    strcat(str, yylval.strVal);
+
+    procesarFLOAT(atof(yylval.strVal));
+    FactorP = crearHoja(str);
+  }
   | P_A expresion P_C
   {
     debug("Regla 47: expresion entre parentesis");
@@ -947,9 +970,9 @@ void imprimirCodigoAssembler(){
 }
 
 void imprimirFooterAssembler(){
-  fprintf(pAsem,"MOV AX,4c00h\n" );
-  fprintf(pAsem,"int 21h\n" );
-  fprintf(pAsem,"\nEND" );
+  fprintf(pAsem, "\n\nMOV AX,4c00h\n" );
+  fprintf(pAsem, "int 21h\n" );
+  fprintf(pAsem, "\nEND" );
 }
 
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
@@ -993,83 +1016,95 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 	return arbol;
 }
 
+const char *etiqueta = "IF1";
+
 char *pasarAssembler(struct node *arbol){
   char *cant;
+  char *dato = (char *)malloc(100);
   intToString(cantAux, cant);
   int cantDigitos = strlen(cant);
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
+  
+  
+  if(strcmp(arbol->value, "if") == 0){
+    strcat(dato, etiqueta);
+    strcat(dato, ":");
+		strcat(dato, "\n");
+    
+    // if(strcmp(arbol->value, "cuerpo") == 0){
+    // 
+    // } else {
+    //   arbol->right->value
+    // }
 
-  char *dato = (char *)malloc(100);
+    return reemplazo;
+  }
 
-  if(strcmp(arbol->value, "<>") == 0){
-    strcpy(dato, "CMP ");
+  if(
+    strcmp(arbol->value, "<>") == 0 ||
+    strcmp(arbol->value, "==") == 0 ||
+    strcmp(arbol->value, ">")  == 0 ||
+    strcmp(arbol->value, "<")  == 0 ||
+    strcmp(arbol->value, ">=") == 0 || 
+    strcmp(arbol->value, "<=") == 0
+  ){
+    strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
+    strcat(dato, "\n");
+    strcat(dato, "FCOMP ");
     strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
-		strcat(dato, "JE");
+    strcat(dato, "FSTSW AX");
+    strcat(dato, "\n");
+    strcat(dato, "SAHF");
+		strcat(dato, "\n");  
+  }
+
+  if(strcmp(arbol->value, "<>") == 0){
+		strcat(dato, "JE ");
+    strcat(dato, etiqueta);
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
 	}
   
   if(strcmp(arbol->value, "==") == 0){
-    strcpy(dato, "CMP ");
-		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
-    strcat(dato, arbol->right->value);
-		strcat(dato, "\n");
-		strcat(dato, "JNE");
+    strcat(dato, "JNE");
+    // etiqueta
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
 	}
   
   if(strcmp(arbol->value, ">") == 0){
-    strcpy(dato, "CMP ");
-		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
-    strcat(dato, arbol->right->value);
-		strcat(dato, "\n");
-		strcat(dato, "JNA");
+    strcat(dato, "JNA");
+    // etiqueta
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
 	}
   
   if(strcmp(arbol->value, "<") == 0){
-    strcpy(dato, "CMP ");
-		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
-    strcat(dato, arbol->right->value);
-		strcat(dato, "\n");
 		strcat(dato, "JAE");
+    // etiqueta
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
 	}
   
   if(strcmp(arbol->value, ">=") == 0){
-    strcpy(dato, "CMP ");
-		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
-    strcat(dato, arbol->right->value);
-		strcat(dato, "\n");
 		strcat(dato, "JB");
+    // etiqueta
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
 	}
   
   if(strcmp(arbol->value, "<=") == 0){
-    strcpy(dato, "CMP ");
-		strcat(dato, arbol->left->value);
-    strcat(dato, ",");
-    strcat(dato, arbol->right->value);
-		strcat(dato, "\n");
 		strcat(dato, "JA");
+    // etiqueta
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;

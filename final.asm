@@ -24,25 +24,29 @@ _70	dd	70
 @aux5	dd	?
 
 .CODE
+START:
 MOV AX, @DATA
 MOV DS, AX
 MOV ES, AX
 
-CMP 10,20
-JE
-FLD 20
-FMUL 30
+FLD _70
+FCOMP _70
+FSTSW AX
+SAHF
+JE IF1
+FLD _70
+FMUL _70
 FSTP @aux0
 
-FLD 10
-FADD @aux0
+FLD @aux0
+FADD
 FSTP @aux1
 
-FLD 50
-FADD 60
+FLD _70
+FADD
 FSTP @aux2
 
-FLD 40
+FLD _70
 FDIV @aux2
 FSTP @aux3
 
@@ -50,12 +54,14 @@ FLD @aux1
 FSUB @aux3
 FSTP @aux4
 
-FLD @aux4
-FADD 70
+FLD _70
+FADD
 FSTP @aux5
 
 FLD @aux5
 FSTP actual
+
+
 MOV AX,4c00h
 int 21h
 
