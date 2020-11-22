@@ -16,7 +16,7 @@ _40	dd	40
 _50	dd	50
 _60	dd	60
 _70	dd	70
-Ä‡J‚	dd	?
+P	dd	?
 @aux1	dd	?
 @aux2	dd	?
 @aux3	dd	?
@@ -29,7 +29,7 @@ MOV DS, AX
 MOV ES, AX
 FLD 20
 FMUL 30
-FSTP Ä‡J‚
+FSTP P
 
 FLD 10
 FADD @aux1

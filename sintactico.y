@@ -992,8 +992,8 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 char *pasarAssembler(struct node *arbol){
 	char *reemplazo;
   sprintf(reemplazo, "@aux%d", cantAux);
-
-	if(strstr(arbol->value,":=")){
+  
+  if(strstr(arbol->value,":=")){
 		char *dato=(char *)malloc(sizeof(char)*100);
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
