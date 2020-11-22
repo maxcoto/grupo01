@@ -22,9 +22,6 @@
 #define COUNT 10
 
 int yylex();
-void itoa(int n, char s[]);
-void reverse(char s[]);
-
 FILE *yyin, *tsout, *pAsem;
 FILE *fp = NULL;
 char *yytext;
@@ -953,13 +950,15 @@ void imprimirFooterAssembler(){
 
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
 void generarAssembler(struct node *arbol){
-	char *reemplazo=NULL;
+	char *reemplazo = NULL;
 
   while(arbol->left && arbol->right){
 		struct node * nodo = arbolIzqConDosHijos(arbol);
+    printf(""); // no tocar
+
 		if(nodo){
 			reemplazo = pasarAssembler(nodo);
-			reemplazarNodo(nodo,reemplazo);
+      reemplazarNodo(nodo, reemplazo);
 		}
 	}
 
@@ -981,36 +980,28 @@ void reemplazarNodo(struct node *nodo, char * aux ){
 struct node *arbolIzqConDosHijos( struct node * arbol){
 	if(!arbol) return NULL;
 
-	printf("nodo %s \n ", arbol->value);
-
 	if(arbol->left && arbol->left->left && arbol->left->right){
-		printf("\t fue a la izquierda\n");
 		return arbolIzqConDosHijos(arbol->left);
 	} else if	(arbol->right && arbol->right->left && arbol->right->right){
-		printf("\t fue a la derecha\n");
 		return arbolIzqConDosHijos(arbol->right);
 	}
 
 	return arbol;
 }
 
-char *pasarAssembler(struct node * arbol){
-	char *cant;
-	itoa(cantAux, cant);
-	int cantDigitos = strlen(cant);
-	char *reemplazo = (char *)malloc(sizeof(char)*(5+cantDigitos));
-	strcpy(reemplazo, "@aux");
-	strcat(reemplazo, cant);
+char *pasarAssembler(struct node *arbol){
+	char *reemplazo;
+  sprintf(reemplazo, "@aux%d", cantAux);
 
 	if(strstr(arbol->value,":=")){
 		char *dato=(char *)malloc(sizeof(char)*100);
-		strcpy(dato,"FLD ");
-		strcat(dato,arbol->right->value);
-		strcat(dato,"\n");
-		strcat(dato,"FSTP ");
-		strcat(dato,arbol->left->value);
-		strcat(dato,"\n");
-		encolar(cola,&dato);
+		strcpy(dato, "FLD ");
+		strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "FSTP ");
+		strcat(dato, arbol->left->value);
+		strcat(dato, "\n");
+		encolar(cola, &dato);
 	} else if( strstr(arbol->value,"+")){
 		char *dato=(char *)malloc(sizeof(char)*100);
 		strcpy(dato,"FLD ");
@@ -1079,7 +1070,6 @@ char *pasarAssembler(struct node * arbol){
 		reemplazo = "ninguna";
   }
 
-  printf("\nREEMPLAZO %s",reemplazo);
   return reemplazo;
 }
 
@@ -1116,29 +1106,4 @@ void desencolar(t_cola * cola, t_dato * dato){
 
 int colaVacia(t_cola * cola){
   return cola->inicio == NULL ? 1 : 0;
-}
-
-void itoa(int n, char s[]){
-  int i, sign;
-
-  if ((sign = n) < 0)  /* record sign */
-     n = -n;          /* make n positive */
-  i = 0;
-  do {       /* generate digits in reverse order */
-     s[i++] = n % 10 + '0';   /* get next digit */
-  } while ((n /= 10) > 0);     /* delete it */
-  if (sign < 0)
-     s[i++] = '-';
-  s[i] = '\0';
-  reverse(s);
-}
-
-void reverse(char s[]){
-  int i, j;
-  char c;
-  for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-    c = s[i];
-    s[i] = s[j];
-    s[j] = c;
-  }
 }

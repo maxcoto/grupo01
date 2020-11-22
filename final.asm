@@ -16,7 +16,7 @@ _40	dd	40
 _50	dd	50
 _60	dd	60
 _70	dd	70
-@aux0	dd	?
+Ä‡J‚	dd	?
 @aux1	dd	?
 @aux2	dd	?
 @aux3	dd	?
@@ -28,29 +28,31 @@ MOV AX, @DATA
 MOV DS, AX
 MOV ES, AX
 FLD 20
-FIMUL 30
-FSTP @aux0
+FMUL 30
+FSTP Ä‡J‚
 
 FLD 10
-FIADD @aux0
+FADD @aux1
 FSTP @aux1
 
 FLD 50
-FIADD 60
+FADD 60
 FSTP @aux2
 
 FLD 40
-FIDIV @aux2
+FDIV @aux3
 FSTP @aux3
 
-FLD @aux1
-FISUB @aux3
+FLD @aux4
+FSUB @aux4
 FSTP @aux4
 
-FLD @aux4
-FIADD 70
+FLD @aux5
+FADD 70
 FSTP @aux5
 
+FLD @aux6
+FSTP actual
 mov ax,4c00h
 int 21h
 
