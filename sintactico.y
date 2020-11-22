@@ -22,12 +22,14 @@
 #define COUNT 10
 
 int yylex();
-FILE  *yyin, *tsout,*pAsem;
-FILE * fp = NULL; /*graph*/
+void itoa(int n, char s[]);
+void reverse(char s[]);
+
+FILE *yyin, *tsout, *pAsem;
+FILE *fp = NULL;
 char *yytext;
 
 
-// estructura de nodos para arbol sintactico -----
 struct node {
   char *value;
   struct node *left;
@@ -69,9 +71,6 @@ struct node *subArbol=NULL;
 struct node *crearHoja(char *);
 struct node *crearNodo(char *, struct node *, struct node *);
 
-void _print_h(struct node *, int);
-void print_h(struct node *);
-
 char* _comparacion;
 char* _operasigna;
 char* _decision;
@@ -107,14 +106,11 @@ typedef struct
 
 
 t_cola * crearCola ();
-void aColar (t_cola * cola, t_dato * dato);
+void encolar (t_cola * cola, t_dato * dato);
 
-void desAcolar (t_cola * cola, t_dato * dato);
+void desencolar (t_cola * cola, t_dato * dato);
 
-int cola_vacia (t_cola * cola);
-
-
-
+int colaVacia (t_cola * cola);
 
 
 // estructura para la tabla de simbolos ----------
@@ -134,7 +130,7 @@ int posicionTipo = 0;
 int asignacionConst = 0;
 int cantVariables = 0;
 int cantTipos = 0;
-int cantAux=1;
+int cantAux = 0;
 t_cola *cola;
 
 
@@ -158,8 +154,6 @@ int yyerror(char *);
 void debug(char *);
 void error(char *, char *);
 void exito(char *);
-void imprimirAssembler();
-
 
 /*graph */
 void addDot (struct node *root);
@@ -167,9 +161,16 @@ void crearArchivoDot(struct node * root);
 char* strReplace(char* search, char* replace, char* subject);
 
 struct node * arbolIzqConDosHijos( struct node * arbol);
-void genera_assembler(struct node * arbol);
+void generarAssembler(struct node * arbol);
 void reemplazarNodo(struct node *nodoViejo, char * aux );
-char * pasar_assembler(struct node * arbol);
+char *pasarAssembler(struct node * arbol);
+
+void imprimirHeaderAssembler();
+void imprimirSimbolosAssembler();
+void imprimirBodyAssembler();
+void imprimirCodigoAssembler();
+void imprimirFooterAssembler();
+
 %}
 
 %union { char *strVal; }
@@ -199,12 +200,12 @@ char * pasar_assembler(struct node * arbol);
 %%
 
 inicio:
-  {exito("Iniciando compilacion ...");}
-	programa 
+  { exito("Iniciando compilacion ..."); }
+	programa
 	{
-		genera_assembler(root);
-
-	exito("\nCompilacion exitosa !!!\n");}
+		generarAssembler(root);
+    exito("\nCompilacion exitosa !!!\n");
+  }
 ;
 
 programa:
@@ -528,22 +529,6 @@ struct node *crearNodo(char *nombre, struct node *left, struct node *right){
 	return hoja;
 }
 
-void _print_h(struct node *root, int space) {
-	int i;
-  if (root == NULL) return;
-  space += COUNT;
-  _print_h(root->right, space);
-  printf("\n");
-  for (i = COUNT; i < space; i++) printf(" ");
-  printf("%p %s \n", root,root->value);
-  _print_h(root->left, space);
-}
-
-void print_h(struct node *root){
-  _print_h(root, 0);
-  printf("\n\n");
-}
-
 void crearArchivoDot(struct node * root){
 	fp = fopen("intermedia.dot","w");
 	fprintf(fp, " ");
@@ -564,7 +549,7 @@ void addDot (struct node *root) {
 	if (root -> left != NULL){
     value = strReplace("\"", "'", root->left->value);
 		fprintf(fp, "\"%p_%s\"->\"%p_%s\" \n",root,root->value, root->left,value);
-    	addDot(root->left);
+    addDot(root->left);
 	}
 	if (root -> right != NULL){
     value = strReplace("\"", "'", root->right->value);
@@ -576,28 +561,28 @@ void addDot (struct node *root) {
 // funcion principal ----------------------------------------------------------------
 int main(int argc,char *argv[]) {
 	if((yyin = fopen(argv[1], "rt")) == NULL){
-		fprintf(stderr, "\nNo se puede abrir el archivo: %s\n", argv[1]);
+		printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
 		return 1;
   } else {
 		if((tsout = fopen("ts.txt", "wt")) == NULL){
-			fprintf(stderr, "\nNo se puede abrir o crear el archivo: ts.txt\n");
+			printf("\nNo se puede abrir o crear el archivo: ts.txt\n");
 			fclose(yyin);
 			return 1;
 		}
-		if((pAsem=fopen("final.asm","wt"))==NULL){
-				fprintf(stderr, "\nNo se puede abrir o crear el archivo: assemble.asm\n");
+		if((pAsem = fopen("final.asm","wt")) == NULL){
+			printf("\nNo se puede abrir o crear el archivo: assemble.asm\n");
 			fclose(yyin);
 			return 1;
 		}
-	cola=crearCola();
+
+    cola = crearCola();
     stackDecision = createStack(100);
     stackParentesis = createStack(100);
 
 		yyparse();
 		escribirArchivo();
 	}
-	
-  // print_h(root);
+
   crearArchivoDot(root);
 
 	fclose(yyin);
@@ -812,7 +797,7 @@ void escribirArchivo(){
 	int i;
 
 	for(i = 0; i<posicionTabla; i++){
-		char *guion = strcmp(tablaSimbolos[i].tipo, "") ? " " : "_";
+		char *guion = ((strcmp(tablaSimbolos[i].tipo, "") != 0) || strcmp(tablaSimbolos[i].valor, "") == 0) ? " " : "_";
 		char tipo_str[14] = {""};
 		strcpy(tipo_str, tablaSimbolos[i].tipo);
 		if(tablaSimbolos[i].es_const) { strcat(tipo_str, " CONST"); }
@@ -934,280 +919,235 @@ char* strReplace(char* search, char* replace, char* subject) {
 	return ret;
 }
 
+void imprimirHeaderAssembler(){
+  fprintf(pAsem, "include macros2.asm\n");
+  fprintf(pAsem, "include number.asm\n");
+  fprintf(pAsem, ".MODEL LARGE\n.386\n.STACK 200h\n\n.DATA\n");
+}
+
+void imprimirSimbolosAssembler(){
+	int i;
+	for(i = 0; i<posicionTabla; i++){
+		char *guion = strcmp(tablaSimbolos[i].valor, "") == 0 ? "" : "_";
+    char *valor = strcmp(tablaSimbolos[i].valor, "") != 0 ? tablaSimbolos[i].valor : "?";
+
+    //int longi = tablaSimbolos[i].longitud;
+	  //char longitud_texto[10] = {""};
+		//if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
+
+		fprintf(pAsem, "%s%s\tdd\t%s\n", guion, tablaSimbolos[i].nombre, valor); //, longitud_texto);
+	}
+}
+
+void imprimirBodyAssembler(){
+  fprintf(pAsem,"\n.CODE");
+	fprintf(pAsem,"\nMOV AX, @DATA");
+	fprintf(pAsem,"\nMOV DS, AX");
+	fprintf(pAsem,"\nMOV ES, AX\n");
+}
+
+void imprimirCodigoAssembler(){
+	char *dato = (char *)malloc(sizeof(char)*100);
+	while(!colaVacia(cola)){
+    desencolar(cola, &dato);
+    fprintf(pAsem, "%s", dato);
+	}
+}
+
+void imprimirFooterAssembler(){
+  fprintf(pAsem,"mov ax,4c00h\n" );
+  fprintf(pAsem,"int 21h\n" );
+  fprintf(pAsem,"\nEND" );
+}
+
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
-void genera_assembler(struct node * arbol){
-    
-    
+void generarAssembler(struct node *arbol){
 	char *reemplazo=NULL;
-	while(arbol->left && arbol->right){
-		struct node * nodo=arbolIzqConDosHijos(arbol);
-		printf("\t\t\t\t ---------------------SIN ESTE NO FUNCIONA----------------- \n");
+
+  while(arbol->left && arbol->right){
+		struct node * nodo = arbolIzqConDosHijos(arbol);
 		if(nodo){
-			reemplazo= pasar_assembler(nodo);
+			reemplazo = pasarAssembler(nodo);
 			reemplazarNodo(nodo,reemplazo);
 		}
 	}
-		fprintf(pAsem,"include macros2.asm\n");
-    	fprintf(pAsem,"include number.asm\n");
-    	fprintf(pAsem,".MODEL LARGE\n.386\n.STACK 200h\n\n.DATA\n ");
-    	
-    	fprintf(pAsem,"\n.CODE\n");
-    	fprintf(pAsem,"START:\n");
-    	fprintf(pAsem,"\n\tMOV AX, @DATA\n");
-    	fprintf(pAsem,"\n\tMOV DS, AX\n");
-    	fprintf(pAsem,"\n\tMOV ES, AX\n");
-    	fprintf(pAsem,"\n\n;Comienzo codigo de usuario\n\n");
-		imprimirAssembler();
-		fprintf(pAsem,"\n;finaliza el asm\n ");
-    	fprintf(pAsem,"\tmov ax,4c00h\n" );
-    	fprintf(pAsem,"\tint 21h\n" );
-    	fprintf(pAsem,"\n\nEND" );
+
+	imprimirHeaderAssembler();
+	imprimirSimbolosAssembler();
+  imprimirBodyAssembler();
+  imprimirCodigoAssembler();
+  imprimirFooterAssembler();
 }
 
 void reemplazarNodo(struct node *nodo, char * aux ){
-	// libero el espacio reservado para los nodos de izquierda y derecha
 	free(nodo->left);
 	free(nodo->right);
-	nodo->left=NULL;
-	nodo->right=NULL;
-	nodo->value=aux;
-
+	nodo->left = NULL;
+	nodo->right = NULL;
+	nodo->value = aux;
 }
 
+struct node *arbolIzqConDosHijos( struct node * arbol){
+	if(!arbol) return NULL;
 
-struct node * arbolIzqConDosHijos( struct node * arbol){
-/*	struct node {
-  char *value;
-  struct node *left;
-  struct node *right;
-};
-*/
-	struct node * izq=NULL;
-	struct node * der=NULL;
-	if(!arbol){
-		return NULL;
-	}       
 	printf("nodo %s \n ", arbol->value);
 
-// me fijo si  existe un subArbol con dos hijos (primero a la izquierda , despues a la derecha)
-	if(arbol ->left && arbol->left->left && arbol ->left -> right) {
-			printf("\t fue a la izquierda\n");
-		izq=arbolIzqConDosHijos(arbol->left);
-	}
-	else if	(arbol -> right && arbol->right->left && arbol ->right -> right){
+	if(arbol->left && arbol->left->left && arbol->left->right){
+		printf("\t fue a la izquierda\n");
+		return arbolIzqConDosHijos(arbol->left);
+	} else if	(arbol->right && arbol->right->left && arbol->right->right){
 		printf("\t fue a la derecha\n");
-		der=arbolIzqConDosHijos(arbol->right);
+		return arbolIzqConDosHijos(arbol->right);
 	}
-	
-	if(izq){
-		printf("\t\t retorna %s \n ", izq->value);
-		return izq;
-	}
-	else if(der){
-			printf("\t\t retorna %s \n ", der->value);
-		return der;
-	}
-		printf("\t\t retorna %s \n ", arbol->value);
+
 	return arbol;
-
 }
-char *  pasar_assembler(struct node * arbol){
-	char * cant;
-	itoa(cantAux,cant,10);
-	int cantDigitos= strlen(cant);
-	char *reemplazo=(char *)malloc(sizeof(char)*4*cantDigitos+1);
-	strcpy(reemplazo,"@aux");
-	strcat(reemplazo,cant);
 
-	//printf("valor que llega %s \n ",arbol->value);
-		// reemplazo deberia tener el nombre del aux donde se guarde la operacion
+char *pasarAssembler(struct node * arbol){
+	char *cant;
+	itoa(cantAux, cant);
+	int cantDigitos = strlen(cant);
+	char *reemplazo = (char *)malloc(sizeof(char)*(5+cantDigitos));
+	strcpy(reemplazo, "@aux");
+	strcat(reemplazo, cant);
+
 	if(strstr(arbol->value,":=")){
-			char *dato=(char *)malloc(sizeof(char)*100);
-			strcpy(dato,"FLD ");
-			strcat(dato,arbol->right->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSTP ");
-			strcat(dato,arbol->left->value);
-			strcat(dato,"\n");
-			aColar(cola,&dato);
-			
-			
-		
-			
-
-	}
-	else if( strstr(arbol->value,"+")){
-			char *dato=(char *)malloc(sizeof(char)*100);
-			strcpy(dato,"FLD ");
-			strcat(dato,arbol->left->value);
-			strcat(dato,"\n");
-			strcat(dato,"FADD ");
-			strcat(dato,arbol->right->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSTP ");
-			strcat(dato,reemplazo);
-			strcat(dato,"\n");
-			aColar(cola,&dato);
-			//fprintf(pAsem,"FLD %s\n" , arbol->left->value);
-			//fprintf(pAsem,"FADD %s\n" , arbol->right->value);
-		//	fprintf(pAsem,"FSTP aux%d\n",cantAux);
-		//void escribirTabla(char *nombre, char *valor, int longitud, int es_const)
-		
-		 escribirTabla(reemplazo,"",0,1);
-			cantAux++;
-	}
-
-	else if( strstr(arbol->value,"*")){
 		char *dato=(char *)malloc(sizeof(char)*100);
-			strcpy(dato,"FLD ");
-			strcat(dato,arbol->left->value);
-			strcat(dato,"\n");
-			strcat(dato,"FIMULT ");
-			strcat(dato,arbol->right->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSTP ");
-			strcat(dato,reemplazo);
-			strcat(dato,"\n");
-			aColar(cola,&dato);
-
-		/*	fprintf(pAsem,"FLD %s\n" , arbol->left->value);
-			
-			fprintf(pAsem,"FIMULT %s\n" , arbol->right->value);
-			
-			fprintf(pAsem,"FSTP aux%d\n",cantAux);*/
-			escribirTabla(reemplazo,reemplazo,0,0);
-			cantAux++;
-		}
-	else if(strstr(arbol->value,"/")){
+		strcpy(dato,"FLD ");
+		strcat(dato,arbol->right->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSTP ");
+		strcat(dato,arbol->left->value);
+		strcat(dato,"\n");
+		encolar(cola,&dato);
+	} else if( strstr(arbol->value,"+")){
 		char *dato=(char *)malloc(sizeof(char)*100);
-			strcpy(dato,"FLD ");
-			strcat(dato,arbol->left->value);
-			strcat(dato,"\n");
-			strcat(dato,"FDIV");
-			strcat(dato,arbol->right->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSTP ");
+		strcpy(dato,"FLD ");
+		strcat(dato,arbol->left->value);
+		strcat(dato,"\n");
+		strcat(dato,"FADD ");
+		strcat(dato,arbol->right->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSTP ");
 		strcat(dato,reemplazo);
-			strcat(dato,"\n");
-			aColar(cola,&dato);
-/*
-			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
-			
-			fprintf(pAsem,"FDIV %s\n" , arbol->right->value);
-			
-			fprintf(pAsem,"FSTP aux%d\n",cantAux);*/
-			escribirTabla(reemplazo,reemplazo,0,0);
-			cantAux++;
-	}
-	else if( strstr(arbol->value,"-")){
+		strcat(dato,"\n");
+		encolar(cola,&dato);
+	  escribirTabla(reemplazo, "", 0, 0);
+		cantAux++;
+	} else if( strstr(arbol->value,"*")){
 		char *dato=(char *)malloc(sizeof(char)*100);
-			strcpy(dato,"FLD ");
-			strcat(dato,arbol->left->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSUB ");
-			strcat(dato,arbol->right->value);
-			strcat(dato,"\n");
-			strcat(dato,"FSTP ");
-			strcat(dato,reemplazo);
-			strcat(dato,"\n");
-			aColar(cola,&dato);
-			/*
-			fprintf(pAsem,"FLD %s\n" , arbol->left->value);
-			fprintf(pAsem,"FSUB %s\n" , arbol->right->value);
-			fprintf(pAsem,"FSTP aux%d\n",cantAux);*/
-			escribirTabla(reemplazo,reemplazo,0,0);
-			cantAux++;
-	}
-	else if( strstr(arbol->value,"IO") && strstr(arbol->left->value,"in")){
-      	fprintf(pAsem,"\nsoy get\n");
-  	}
-  	else if( strstr(arbol->value,"IO") && strstr(arbol->left->value,"out")){
-      	fprintf(pAsem,"\n\tMOV DX, OFFSET %s \n",arbol->right->value);
-      	fprintf(pAsem,"\tMOV AH, 9\n");
-      	fprintf(pAsem,"\tINT 21H\n");
-  	}	
-	else
-		reemplazo="ninguna";
-		printf(" \nREEMPLAZO %s",reemplazo);
-	return reemplazo;
+		strcpy(dato,"FLD ");
+		strcat(dato,arbol->left->value);
+		strcat(dato,"\n");
+		strcat(dato,"FIMULT ");
+		strcat(dato,arbol->right->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSTP ");
+		strcat(dato,reemplazo);
+		strcat(dato,"\n");
+		encolar(cola,&dato);
+		escribirTabla(reemplazo, "", 0, 0);
+		cantAux++;
+	} else if(strstr(arbol->value,"/")){
+		char *dato=(char *)malloc(sizeof(char)*100);
+		strcpy(dato,"FLD ");
+		strcat(dato,arbol->left->value);
+		strcat(dato,"\n");
+		strcat(dato,"FDIV ");
+		strcat(dato,arbol->right->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSTP ");
+	  strcat(dato,reemplazo);
+		strcat(dato,"\n");
+		encolar(cola,&dato);
+		escribirTabla(reemplazo, "", 0, 0);
+		cantAux++;
+	} else if( strstr(arbol->value,"-")){
+		char *dato=(char *)malloc(sizeof(char)*100);
+		strcpy(dato,"FLD ");
+		strcat(dato,arbol->left->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSUB ");
+		strcat(dato,arbol->right->value);
+		strcat(dato,"\n");
+		strcat(dato,"FSTP ");
+		strcat(dato,reemplazo);
+		strcat(dato,"\n");
+		encolar(cola, &dato);
+		escribirTabla(reemplazo, "", 0, 0);
+		cantAux++;
+	} else if(strstr(arbol->value,"IO")){
+    if(strstr(arbol->left->value,"in")){
+      fprintf(pAsem,"\nsoy get\n");
+    } else {
+    	fprintf(pAsem,"\n\tMOV DX, OFFSET %s \n",arbol->right->value);
+    	fprintf(pAsem,"\tMOV AH, 9\n");
+    	fprintf(pAsem,"\tINT 21H\n");
+    }
+  }	else {
+		reemplazo = "ninguna";
+  }
+	
+  printf("\nREEMPLAZO %s",reemplazo);
+  return reemplazo;
 }
 
-void imprimirAssembler(){
-	char *dato=(char *)malloc(sizeof(char)*100);
-	while(!cola_vacia(cola)){
-	desAcolar(cola,&dato);
-	fprintf(pAsem,dato);
-	}
-
-}/*
-struct nodeCola * crearCola(){
-
-}
-struct nodeCola * insertarEnCola(struct nodeCola *cola,struct nodeCola * nuevo){
-
-}
-struct nodeCola * sacarDeCola(struct nodeCola *cola){}
-struct nodeCole * colaVacia(struct nodeCola * cola){}
-*/
-
-
-
-t_cola * crearCola ()
-{
+t_cola *crearCola(){
 	t_cola * cola = (t_cola*)malloc(sizeof(t_cola));
-    cola->inicio = cola->fin = NULL;
+  cola->inicio = cola->fin = NULL;
 	return cola;
 }
 
-void aColar (t_cola * cola, t_dato * dato)
-{
-    t_nodo * nue = (t_nodo*)malloc(sizeof(t_nodo));
-    if (nue==NULL)
-        return ;
+void encolar(t_cola * cola, t_dato * dato){
+  t_nodo * nue = (t_nodo*)malloc(sizeof(t_nodo));
+  if (nue == NULL) return;
+  nue->dato = *dato;
+  nue->sig = NULL;
 
-    nue->dato = *dato;
-    nue->sig = NULL;
+  if(cola->inicio){
+    cola->fin->sig = nue;
+  } else {
+    cola->inicio = nue;
+  }
 
-    if(!cola->inicio)
-    {
-        cola->inicio = nue;
-    }
-    else
-    {
-        cola->fin->sig =nue;
-    }
-
-    cola->fin = nue;
-
-   
+  cola->fin = nue;   
 }
 
-
-
-void desAcolar (t_cola * cola, t_dato * dato)
-{
-    if(cola->inicio == NULL)
-        return ;
-
-    t_nodo * nae;
-    nae = cola->inicio;
-    *dato = nae->dato;
-    cola->inicio = nae->sig;
-
-    free(nae);
-
-    if (cola->inicio == NULL)
-        cola->fin = NULL;
-
+void desencolar(t_cola * cola, t_dato * dato){
+  if(cola->inicio == NULL) return;
+  t_nodo * nae;
+  nae = cola->inicio;
+  *dato = nae->dato;
+  cola->inicio = nae->sig;
+  free(nae);
+  if (cola->inicio == NULL) cola->fin = NULL;
 }
 
+int colaVacia(t_cola * cola){
+  return cola->inicio == NULL ? 1 : 0;
+}
 
+void itoa(int n, char s[]){
+  int i, sign;
 
+  if ((sign = n) < 0)  /* record sign */
+     n = -n;          /* make n positive */
+  i = 0;
+  do {       /* generate digits in reverse order */
+     s[i++] = n % 10 + '0';   /* get next digit */
+  } while ((n /= 10) > 0);     /* delete it */
+  if (sign < 0)
+     s[i++] = '-';
+  s[i] = '\0';
+  reverse(s);
+}
 
-int cola_vacia (t_cola * cola)
-{
-    if(cola->inicio == NULL)
-        return 1;
-    else
-        return 0;
+void reverse(char s[]){
+  int i, j;
+  char c;
+  for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+    c = s[i];
+    s[i] = s[j];
+    s[j] = c;
+  }
 }
