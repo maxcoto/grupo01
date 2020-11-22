@@ -13,10 +13,7 @@ _10.000000	dd	10.000000
 _20.000000	dd	20.000000
 _30.200001	dd	30.200001
 _40.000000	dd	40.000000
-_50.000000	dd	50.000000
-_60.000000	dd	60.000000
 @aux0	dd	?
-@aux1	dd	?
 
 .CODE
 START:
@@ -35,12 +32,7 @@ FSTP @aux0
 
 FLD @aux0
 FSTP actual
-FLD _60.000000
-FADD
-FSTP @aux1
-
-FLD @aux1
-FSTP actual
+IF1:
 
 
 MOV AX,4c00h

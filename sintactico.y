@@ -153,7 +153,7 @@ char* strReplace(char* search, char* replace, char* subject);
 struct node * arbolIzqConDosHijos( struct node * arbol);
 void generarAssembler(struct node * arbol);
 void reemplazarNodo(struct node *nodoViejo, char * aux );
-char *pasarAssembler(struct node * arbol);
+char *pasarAssembler(struct node *);
 
 void imprimirHeaderAssembler();
 void imprimirSimbolosAssembler();
@@ -972,15 +972,20 @@ void imprimirFooterAssembler(){
   fprintf(pAsem, "\nEND" );
 }
 
+const char *etiquetaIF = "IF1";
+const char *etiquetaELSE = "ELSE1";
+struct node *lastParent = NULL;
+
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
 void generarAssembler(struct node *arbol){
 	char *reemplazo = NULL;
+  struct node *anterior = arbol;
 
   while(arbol->left && arbol->right){
-		struct node * nodo = arbolIzqConDosHijos(arbol);
+		struct node *nodo = arbolIzqConDosHijos(arbol);
     printf(""); // no tocar
 
-		if(nodo){
+    if(nodo){
 			reemplazo = pasarAssembler(nodo);
       reemplazarNodo(nodo, reemplazo);
 		}
@@ -1001,11 +1006,12 @@ void reemplazarNodo(struct node *nodo, char * aux ){
 	nodo->value = aux;
 }
 
-struct node *arbolIzqConDosHijos( struct node * arbol){
+struct node *arbolIzqConDosHijos( struct node *arbol){
 	if(!arbol) return NULL;
 
 	if(arbol->left && arbol->left->left && arbol->left->right){
-		return arbolIzqConDosHijos(arbol->left);
+    lastParent = arbol;
+    return arbolIzqConDosHijos(arbol->left);
 	} else if	(arbol->right && arbol->right->left && arbol->right->right){
 		return arbolIzqConDosHijos(arbol->right);
 	}
@@ -1013,31 +1019,37 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 	return arbol;
 }
 
-const char *etiquetaIF = "IF1";
-const char *etiquetaELSE = "ELSE1";
-
 char *pasarAssembler(struct node *arbol){
   char *cant;
-  char *dato = (char *)malloc(100);
   intToString(cantAux, cant);
   int cantDigitos = strlen(cant);
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
   
+  char *dato = (char *)malloc(100);
+  int salta = 0;
   
   if(strcmp(arbol->value, "if") == 0){
-    strcat(dato, etiquetaIF);
+    strcpy(dato, etiquetaIF);
     strcat(dato, ":");
 		strcat(dato, "\n");
+    encolar(cola, &dato);
     return reemplazo;
   }
-  
-  if(strcmp(arbol->value, "cuerpo") == 0){
-    strcat(dato, etiquetaELSE);
-    strcat(dato, ":");
-		strcat(dato, "\n");
-    return reemplazo;
+
+  if(lastParent != NULL){
+    char *dato2 = (char *)malloc(100);
+    if(strcmp(lastParent->value, "cuerpo") == 0 && arbol->right->value[0] == '@'){
+      lastParent = NULL;
+      strcpy(dato2, "JMP ");
+      strcat(dato2, etiquetaIF);
+      strcat(dato2, "\n");
+      strcat(dato2, etiquetaELSE);
+      strcat(dato2, ":");
+      strcat(dato2, "\n\n");
+      encolar(cola, &dato2);
+    }
   }
 
   if(
@@ -1057,56 +1069,46 @@ char *pasarAssembler(struct node *arbol){
     strcat(dato, "FSTSW AX");
     strcat(dato, "\n");
     strcat(dato, "SAHF");
-		strcat(dato, "\n");  
+		strcat(dato, "\n");
+    salta = 1;
   }
 
   if(strcmp(arbol->value, "<>") == 0){
-		strcat(dato, "JE ");
-    strcat(dato, etiquetaIF);
-		strcat(dato, "\n");
-    encolar(cola, &dato);
-    return reemplazo;
+		strcat(dato, "JE");
 	}
   
   if(strcmp(arbol->value, "==") == 0){
     strcat(dato, "JNE");
-    // etiqueta
-		strcat(dato, "\n");
-    encolar(cola, &dato);
-    return reemplazo;
 	}
   
   if(strcmp(arbol->value, ">") == 0){
     strcat(dato, "JNA");
-    // etiqueta
-		strcat(dato, "\n");
-    encolar(cola, &dato);
-    return reemplazo;
 	}
   
   if(strcmp(arbol->value, "<") == 0){
 		strcat(dato, "JAE");
-    // etiqueta
-		strcat(dato, "\n");
-    encolar(cola, &dato);
-    return reemplazo;
 	}
   
   if(strcmp(arbol->value, ">=") == 0){
 		strcat(dato, "JB");
-    // etiqueta
-		strcat(dato, "\n");
-    encolar(cola, &dato);
-    return reemplazo;
 	}
   
   if(strcmp(arbol->value, "<=") == 0){
 		strcat(dato, "JA");
-    // etiqueta
-		strcat(dato, "\n");
+	}
+
+  if(salta == 1){
+    strcat(dato, " ");
+    if(strcmp(lastParent->right->value, "cuerpo") == 0){
+      strcat(dato, etiquetaELSE);
+    } else {
+      strcat(dato, etiquetaIF);
+    }
+
+    strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
-	}
+  }
   
   if(strstr(arbol->value, ":=")){
 		strcpy(dato, "FLD ");
@@ -1123,7 +1125,7 @@ char *pasarAssembler(struct node *arbol){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
     strcat(dato, "\n");
-    strcpy(dato, "FLD ");
+    strcat(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
 		strcat(dato, "FADD");
