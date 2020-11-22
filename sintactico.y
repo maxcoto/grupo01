@@ -1089,9 +1089,11 @@ char *pasarAssembler(struct node *arbol){
   if( strstr(arbol->value,"+")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
-		strcat(dato, "\n");
-		strcat(dato, "FADD ");
+    strcat(dato, "\n");
+    strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "FADD");
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, reemplazo);
