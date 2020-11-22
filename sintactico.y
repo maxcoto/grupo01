@@ -931,7 +931,7 @@ void imprimirBodyAssembler(){
   fprintf(pAsem,"\n.CODE");
 	fprintf(pAsem,"\nMOV AX, @DATA");
 	fprintf(pAsem,"\nMOV DS, AX");
-	fprintf(pAsem,"\nMOV ES, AX\n");
+	fprintf(pAsem,"\nMOV ES, AX\n\n");
 }
 
 void imprimirCodigoAssembler(){
@@ -943,7 +943,7 @@ void imprimirCodigoAssembler(){
 }
 
 void imprimirFooterAssembler(){
-  fprintf(pAsem,"mov ax,4c00h\n" );
+  fprintf(pAsem,"MOV AX,4c00h\n" );
   fprintf(pAsem,"int 21h\n" );
   fprintf(pAsem,"\nEND" );
 }
@@ -991,10 +991,82 @@ struct node *arbolIzqConDosHijos( struct node * arbol){
 
 char *pasarAssembler(struct node *arbol){
 	char *reemplazo;
+  char *dato = (char *)malloc(100);
   sprintf(reemplazo, "@aux%d", cantAux);
   
-  if(strstr(arbol->value,":=")){
-		char *dato=(char *)malloc(sizeof(char)*100);
+  if(strcmp(arbol->value, "<>") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JE");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strcmp(arbol->value, "==") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JNE");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strcmp(arbol->value, ">") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JNA");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strcmp(arbol->value, "<") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JAE");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strcmp(arbol->value, ">=") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JB");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strcmp(arbol->value, "<=") == 0){
+    strcpy(dato, "CMP ");
+		strcat(dato, arbol->left->value);
+    strcat(dato, ",");
+    strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "JA");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+	}
+  
+  if(strstr(arbol->value, ":=")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
@@ -1002,50 +1074,58 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
 		encolar(cola, &dato);
-	} else if( strstr(arbol->value,"+")){
-		char *dato=(char *)malloc(sizeof(char)*100);
-		strcpy(dato,"FLD ");
-		strcat(dato,arbol->left->value);
-		strcat(dato,"\n");
-		strcat(dato,"FADD ");
-		strcat(dato,arbol->right->value);
-		strcat(dato,"\n");
-		strcat(dato,"FSTP ");
-		strcat(dato,reemplazo);
-		strcat(dato,"\n\n");
-		encolar(cola,&dato);
+    return reemplazo;
+	}
+  
+  if( strstr(arbol->value,"+")){
+		strcpy(dato, "FLD ");
+		strcat(dato, arbol->left->value);
+		strcat(dato, "\n");
+		strcat(dato, "FADD ");
+		strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "FSTP ");
+		strcat(dato, reemplazo);
+		strcat(dato, "\n\n");
+		encolar(cola, &dato);
 	  escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
-	} else if( strstr(arbol->value,"*")){
-		char *dato=(char *)malloc(sizeof(char)*100);
-		strcpy(dato,"FLD ");
-		strcat(dato,arbol->left->value);
-		strcat(dato,"\n");
-		strcat(dato,"FMUL ");
-		strcat(dato,arbol->right->value);
-		strcat(dato,"\n");
-		strcat(dato,"FSTP ");
-		strcat(dato,reemplazo);
-		strcat(dato,"\n\n");
-		encolar(cola,&dato);
+    return reemplazo;
+	}
+  
+  if( strstr(arbol->value,"*")){
+		strcpy(dato, "FLD ");
+		strcat(dato, arbol->left->value);
+		strcat(dato, "\n");
+		strcat(dato, "FMUL ");
+		strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "FSTP ");
+		strcat(dato, reemplazo);
+		strcat(dato, "\n\n");
+		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
-	} else if(strstr(arbol->value,"/")){
-		char *dato=(char *)malloc(sizeof(char)*100);
+    return reemplazo;
+	}
+  
+  if(strstr(arbol->value,"/")){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
-		strcat(dato,"\n");
-		strcat(dato,"FDIV ");
-		strcat(dato,arbol->right->value);
-		strcat(dato,"\n");
-		strcat(dato,"FSTP ");
-	  strcat(dato,reemplazo);
-		strcat(dato,"\n\n");
-		encolar(cola,&dato);
+		strcat(dato, "\n");
+		strcat(dato, "FDIV ");
+		strcat(dato, arbol->right->value);
+		strcat(dato, "\n");
+		strcat(dato, "FSTP ");
+	  strcat(dato, reemplazo);
+		strcat(dato, "\n\n");
+		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
-	} else if( strstr(arbol->value,"-")){
-		char *dato=(char *)malloc(sizeof(char)*100);
+    return reemplazo;
+	}
+  
+  if( strstr(arbol->value,"-")){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
@@ -1058,7 +1138,10 @@ char *pasarAssembler(struct node *arbol){
 		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
-	} else if(strstr(arbol->value,"IO")){
+    return reemplazo;
+	}
+  
+  if(strstr(arbol->value,"IO")){
     if(strstr(arbol->left->value,"in")){
       fprintf(pAsem,"\nsoy get\n");
     } else {
@@ -1069,7 +1152,7 @@ char *pasarAssembler(struct node *arbol){
   }	else {
 		reemplazo = "ninguna";
   }
-
+  
   return reemplazo;
 }
 

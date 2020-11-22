@@ -1,4 +1,7 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
 
-actual := 10 + 20 * 30 - 40 / ( 50 + 60 ) + 70;
+
+if(10<>20){
+  actual := 10 + 20 * 30 - 40 / ( 50 + 60 ) + 70;
+}
