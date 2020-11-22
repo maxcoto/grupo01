@@ -7,5 +7,5 @@ if( actual >2 ){
 }
 else{
 	actual:=3;
-	actual:=(232-4)*1;
+	
 }

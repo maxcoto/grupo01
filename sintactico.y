@@ -1114,7 +1114,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0 ||( strcmp(arbol->value,"BI") ==0 &&  lastParent->right==arbol &&strcmp(lastParent->right->value, "cuerpo") == 0)){
+    if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
       strcat(dato, etiquetaELSE);
     } else {
       strcat(dato, etiquetaIF);
