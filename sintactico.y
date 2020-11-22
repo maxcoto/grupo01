@@ -993,7 +993,8 @@ void generarAssembler(struct node *arbol){
 
   while(arbol->left && arbol->right){
 		struct node *nodo = arbolIzqConDosHijos(arbol);
-    printf(""); // no tocar
+    //printf("asdasd"); // no tocar
+    fflush(stdin);
 
     if(nodo){
 			reemplazo = pasarAssembler(nodo);
@@ -1036,6 +1037,8 @@ char *pasarAssembler(struct node *arbol){
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
+    char *dato2 = (char *)malloc(100);
+   strcpy(dato2,"");
 
   char *dato = (char *)malloc(100);
   int salta = 0;
@@ -1049,8 +1052,10 @@ char *pasarAssembler(struct node *arbol){
   }
 
   if(lastParent != NULL){
-    char *dato2 = (char *)malloc(100);
-    if(strcmp(lastParent->value, "cuerpo") == 0 && arbol->right->value[0] == '@'){
+    //char *dato2 = (char *)malloc(100);
+    printf("\t\t\t\t\t lastParent: %s == arbol: %s \n",lastParent->right->value,arbol->value);
+
+    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right==arbol){
       lastParent = NULL;
       strcpy(dato2, "JMP ");
       strcat(dato2, etiquetaIF);
@@ -1058,7 +1063,7 @@ char *pasarAssembler(struct node *arbol){
       strcat(dato2, etiquetaELSE);
       strcat(dato2, ":");
       strcat(dato2, "\n\n");
-      encolar(cola, &dato2);
+     // encolar(cola, &dato2);
     }
   }
 
@@ -1109,7 +1114,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0){
+    if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
       strcat(dato, etiquetaELSE);
     } else {
       strcat(dato, etiquetaIF);
@@ -1121,7 +1126,10 @@ char *pasarAssembler(struct node *arbol){
   }
 
   if(strstr(arbol->value, ":=")){
-		strcpy(dato, "FLD ");
+		  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
+	  	strcpy(dato,dato2);
+	  printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
+		strcat(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
