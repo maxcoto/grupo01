@@ -1,8 +1,6 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
-CONST pepe := "metemos un texto.";
-
-PUT "Prueba.txt LyC Tema 4!";
+GET suma;
 
 PUT "La suma es: ";
 PUT suma;

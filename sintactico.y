@@ -1199,7 +1199,9 @@ char *pasarAssembler(struct node *arbol){
 
   if(strstr(arbol->value,"IO")){
     if(strstr(arbol->left->value,"in")){
-      fprintf(pAsem,"\nsoy get\n");
+      strcpy(dato,"GetFloat ");
+      strcat(dato,arbol->right->value);
+      strcat(dato,"\n");
     } else {
       if( strstr(arbol->right->value, "_string") != NULL ) {
         strcpy(dato,"MOV DX, OFFSET ");
@@ -1207,14 +1209,13 @@ char *pasarAssembler(struct node *arbol){
         strcat(dato,"\n");
         strcat(dato,"MOV AH, 9\n");
         strcat(dato,"INT 21H\n");
-        encolar(cola, &dato);
       } else {
         strcpy(dato,"DisplayFloat ");
         strcat(dato,arbol->right->value);
         strcat(dato, ", 2\n");
-        encolar(cola, &dato);
       }
     }
+    encolar(cola, &dato);
   }	else {
 		reemplazo = "ninguna";
   }

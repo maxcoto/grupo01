@@ -4,7 +4,4 @@ contador                      |	INT           |	                |
 promedio                      |	FLOAT         |	                |	        	
 actual                        |	FLOAT         |	                |	        	
 suma                          |	FLOAT         |	                |	        	
-pepe                          |	STRING CONST  |	                |	        	
-_string0                      |	              |	metemos un texto.|	17      	
-_string1                      |	              |	Prueba.txt LyC Tema 4!|	22      	
-_string2                      |	              |	La suma es:     |	12      	
+_string0                      |	              |	La suma es:     |	12      	
