@@ -1016,7 +1016,7 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FIADD ");
+		strcat(dato,"FADD ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
@@ -1030,7 +1030,7 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FIMUL ");
+		strcat(dato,"FMUL ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
@@ -1044,7 +1044,7 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FIDIV ");
+		strcat(dato,"FDIV ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
@@ -1058,7 +1058,7 @@ char *pasarAssembler(struct node * arbol){
 		strcpy(dato,"FLD ");
 		strcat(dato,arbol->left->value);
 		strcat(dato,"\n");
-		strcat(dato,"FISUB ");
+		strcat(dato,"FSUB ");
 		strcat(dato,arbol->right->value);
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
