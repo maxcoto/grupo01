@@ -114,6 +114,10 @@ typedef struct {
 } t_ts;
 //------------------------------------------------
 
+const char *etiquetaIF = "IF1";
+const char *etiquetaELSE = "ELSE1";
+struct node *lastParent = NULL;
+
 t_ts tablaSimbolos[5000];
 int validaTipo = 0;
 int posicionTabla = 0;
@@ -163,8 +167,6 @@ void imprimirFooterAssembler();
 
 void intToString(int n, char s[]);
 void reverseString(char s[]);
-
-char strAuxGuion[40];
 
 %}
 
@@ -971,10 +973,6 @@ void imprimirFooterAssembler(){
   fprintf(pAsem, "int 21h\n" );
   fprintf(pAsem, "\nEND" );
 }
-
-const char *etiquetaIF = "IF1";
-const char *etiquetaELSE = "ELSE1";
-struct node *lastParent = NULL;
 
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
 void generarAssembler(struct node *arbol){
