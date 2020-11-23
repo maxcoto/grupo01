@@ -22,13 +22,9 @@ _cte5	dd	0.342000
 _cte6	dd	256.000000
 _cte7	dd	52.000000
 _cte8	dd	4.000000
-_cte9	dd	0.342000
-_cte10	dd	256.000000
-_cte11	dd	52.000000
-_cte12	dd	4.000000
 _string2	db	"La suma es: ",'$',12 dup (?)
-_cte13	dd	2.000000
-_cte14	dd	0.000000
+_cte9	dd	2.000000
+_cte10	dd	0.000000
 _string3	db	"actual es > 2 y <> 0",'$',20 dup (?)
 _string4	db	"no es mayor que 2",'$',17 dup (?)
 @aux0	dd	?
@@ -43,15 +39,6 @@ _string4	db	"no es mayor que 2",'$',17 dup (?)
 @aux9	dd	?
 @aux10	dd	?
 @aux11	dd	?
-@aux12	dd	?
-@aux13	dd	?
-@aux14	dd	?
-@aux15	dd	?
-@aux16	dd	?
-@aux17	dd	?
-@aux18	dd	?
-@aux19	dd	?
-@aux20	dd	?
 .CODE
 START:
 MOV EAX,@DATA
@@ -74,7 +61,7 @@ FADD
 FSTP @aux0
 FLD @aux0
 FSTP suma
-INICIOWHILE0
+INICIOWHILE0:
 FLD contador
 FCOMP _cte3
 FSTSW AX
@@ -140,7 +127,7 @@ FADD
 FSTP @aux8
 FINIF3:
 FLD contador
-FMUL ninguna
+FMUL @cont
 FSTP @aux9
 FLD @aux2
 FLD @aux9
@@ -148,73 +135,11 @@ FADD
 FSTP @aux10
 FLD @aux10
 FSTP actual
-FLD contador
-FDIV _cte9
-FSTP @aux11
-FLD actual
-FMUL contador
-FSTP @aux12
-FLD @aux12
-FSTP @aux
-FLD 0
-FSTP @cont
-FLD @aux
-FCOMP _cte10
-FSTSW AX
-SAHF
-JNE FINIF4
-FLD @cont
-FLD 1
-FADD
-FSTP @aux13
-FINIF4:
-FLD nombre
-FMUL suma
-FSTP @aux14
-FLD @aux
-FCOMP @aux14
-FSTSW AX
-SAHF
-JNE FINIF5
-FLD @cont
-FLD 1
-FADD
-FSTP @aux15
-FINIF5:
-FLD @aux
-FCOMP _cte11
-FSTSW AX
-SAHF
-JNE FINIF6
-FLD @cont
-FLD 1
-FADD
-FSTP @aux16
-FINIF6:
-FLD @aux
-FCOMP _cte12
-FSTSW AX
-SAHF
-JNE FINIF7
-FLD @cont
-FLD 1
-FADD
-FSTP @aux17
-FINIF7:
-FLD contador
-FMUL ninguna
-FSTP @aux18
-FLD @aux11
-FLD @aux18
-FADD
-FSTP @aux19
-FLD @aux19
-FSTP actual
 FLD suma
 FLD actual
 FADD
-FSTP @aux20
-FLD @aux20
+FSTP @aux11
+FLD @aux11
 FSTP suma
 JMP INICIOWHILE0
 FINWHILE0:
@@ -223,24 +148,24 @@ MOV AH, 9
 INT 21H
 DisplayFloat suma, 2
 FLD actual
-FCOMP _cte13
+FCOMP _cte9
 FSTSW AX
 SAHF
-JNA FINIF8
+JNA FINIF4
 FLD actual
-FCOMP _cte14
+FCOMP _cte10
 FSTSW AX
 SAHF
-JE FINIF8
+JE FINIF4
 MOV DX, OFFSET _string3
 MOV AH, 9
 INT 21H
-JMP FINELSE8
-FINIF8:
+JMP FINELSE4
+FINIF4:
 MOV DX, OFFSET _string4
 MOV AH, 9
 INT 21H
-FINELSE8:
+FINELSE4:
 MOV EAX,4c00h
 int 21h
 END START

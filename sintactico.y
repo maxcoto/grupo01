@@ -1117,6 +1117,7 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       strcpy(dato2, inicioWHILE);
       sprintf(str, "%d", peekInt(stackWHILE));
       strcat(dato2, str);
+      strcat(dato2, ":");
       strcat(dato2, "\n");
       encolar(cola, &dato2);
       
@@ -1159,6 +1160,11 @@ char *pasarAssembler(struct node *arbol){
   strcat(reemplazo, cant);
   char *dato = (char *)malloc(100);
   int salta = 0;
+
+  if(strstr(arbol->value, "contar")){
+    strcpy(reemplazo, "@cont");
+    return reemplazo;
+  }
 
   if(strstr(arbol->value, "if")){
     sprintf(str, "%d", peekInt(stackIF));
