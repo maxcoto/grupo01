@@ -1234,7 +1234,7 @@ char *pasarAssembler(struct node *arbol){
     return reemplazo;
   }
 
-  if(strstr(arbol->value, ":=")){
+  if(strstr(arbol->value, ":=") || strstr(arbol->value, "CONST") ){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
