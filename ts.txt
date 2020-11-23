@@ -2,8 +2,8 @@ NOMBRE                         |   TIPO         | VALOR           | LONGITUD
 ----------------------------------------------------------------------------
 @cont                         |	              |	                |	        	
 @aux                          |	              |	                |	        	
-@uno                          |	              |	1               |	        	
-@cero                         |	              |	0               |	        	
+@uno                          |	              |	1.0             |	        	
+@cero                         |	              |	0.0             |	        	
 contador                      |	INT           |	                |	        	
 promedio                      |	FLOAT         |	                |	        	
 actual                        |	FLOAT         |	                |	        	

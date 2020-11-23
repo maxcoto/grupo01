@@ -2,6 +2,5 @@ DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
 actual:= (2+4) + contar(10 ;[10,10,10,10,20,30,40,10,3+7,20]);
 
-
 PUT "Resultado: ";
 PUT actual;

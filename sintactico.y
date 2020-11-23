@@ -620,24 +620,12 @@ int main(int argc,char *argv[]) {
     stackWHILE = createStackInt(100);
     escribirTabla("@cont", "", 0, 0);
     escribirTabla("@aux", "", 0, 0);
-    escribirTabla("@uno", "1", 0, 0);
-    escribirTabla("@cero", "0", 0, 0);
+    escribirTabla("@uno", "1.0", 0, 0);
+    escribirTabla("@cero", "0.0", 0, 0);
 
 		yyparse();
 		escribirArchivo();
 	}
-
-  // int i = popInt(stackIF);
-  // while(i != -1){
-  //   printf("stack if: %d\n\n", i);
-  //   i = popInt(stackIF);
-  // }
-  //
-  // int w = popInt(stackWHILE);
-  // while(w != -1){
-  //   printf("stack while: %d\n\n", w);
-  //   w = popInt(stackWHILE);
-  // }
 
 	fclose(yyin);
 	fclose(tsout);

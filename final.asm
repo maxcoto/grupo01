@@ -6,8 +6,8 @@ include number.asm
 .DATA
 @cont	dd	?
 @aux	dd	?
-@uno	dd	1
-@cero	dd	0
+@uno	dd	1.0
+@cero	dd	0.0
 contador	dd	?
 promedio	dd	?
 actual	dd	?
