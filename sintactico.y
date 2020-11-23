@@ -1120,13 +1120,12 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       arbol->value = "cuerpo1";
       char *dato2 = (char *)malloc(100);
       finETIQUETA = finELSE;
+      sprintf(str, "%d", peekInt(stackIF));
       strcpy(dato2, "JMP ");
       strcat(dato2, finELSE);
-      sprintf(str, "%d", peekInt(stackIF));
       strcat(dato2, str);
       strcat(dato2, "\n");
       strcat(dato2, finIF);
-      sprintf(str, "%d", peekInt(stackIF));
       strcat(dato2, str);
       strcat(dato2, ":");
       strcat(dato2, "\n\n");
