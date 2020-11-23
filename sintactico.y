@@ -1099,6 +1099,7 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
 
     if(strcmp(arbol->value, "while") == 0){
       arbol->value = "while1";
+      pushInt(stackWHILE, etiquetasWHILE++);
 
       char *dato2 = (char *)malloc(100);
       strcpy(dato2, inicioWHILE);
@@ -1108,8 +1109,7 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       encolar(cola, &dato2);
       
       finETIQUETA = finWHILE;
-      vaporwhile = 1;
-      pushInt(stackWHILE, etiquetasWHILE++);
+      vaporwhile = 1;      
     }
 
     return arbolIzqConDosHijos(arbol->left);
