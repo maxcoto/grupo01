@@ -116,6 +116,8 @@ const char *stringName = "_string";
 const char *finIF = "FINIF";
 const char *finELSE = "FINELSE";
 const char *finETIQUETA = "FINIF";
+const char *inicioWHILE = "INICIOWHILE";
+const char *finWHILE = "FINWHILE";
 struct node *lastParent = NULL;
 
 t_ts tablaSimbolos[5000];
@@ -1024,13 +1026,23 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
 	if(!arbol) return NULL;
 
 	if(arbol->left && arbol->left->left && arbol->left->right){
+    
+    if(strcmp(arbol->value, "while") == 0){
+      arbol->value = "while1";
+      char *dato2 = (char *)malloc(100);
+      finETIQUETA = finWHILE;
+      strcpy(dato2, inicioWHILE);
+      strcat(dato2, "\n");
+      encolar(cola, &dato2);
+    }
+    
     return arbolIzqConDosHijos(arbol->left);
 	} else if	(arbol->right && arbol->right->left && arbol->right->right){
 
     //printf("arbol: %s || left: %s, || right: %s\n", arbol->value, arbol->left->value, arbol->right->value);
     if(strcmp(arbol->value, "cuerpo") == 0){
       arbol->value = "cuerpo1";
-      char *dato2 = (char *)malloc(200);
+      char *dato2 = (char *)malloc(100);
       finETIQUETA = finELSE;
       strcpy(dato2, "JMP ");
       strcat(dato2, finELSE);
@@ -1060,6 +1072,17 @@ char *pasarAssembler(struct node *arbol){
   if(strcmp(arbol->value, "if") == 0){
     strcpy(dato, finETIQUETA);
     finETIQUETA = finIF;
+    strcat(dato, ":");
+		strcat(dato, "\n");
+    encolar(cola, &dato);
+    return reemplazo;
+  }
+  
+  if(strstr(arbol->value, "while")){
+    strcpy(dato, "JMP ");
+    strcat(dato, inicioWHILE);
+    strcat(dato, "\n");
+    strcat(dato, finWHILE);
     strcat(dato, ":");
 		strcat(dato, "\n");
     encolar(cola, &dato);
@@ -1113,7 +1136,8 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    strcat(dato, finIF);
+    strcat(dato, finETIQUETA);
+    finETIQUETA = finIF;
     strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
@@ -1126,9 +1150,6 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, "FSTP ");
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
-
-    //strcat(dato, dato2);
-    
 		encolar(cola, &dato);
     return reemplazo;
 	}
@@ -1217,7 +1238,6 @@ char *pasarAssembler(struct node *arbol){
         strcat(dato, ", 2\n");
       }
     }
-    //strcat(dato, dato2);
     encolar(cola, &dato);
   }	else {
 		reemplazo = "ninguna";
