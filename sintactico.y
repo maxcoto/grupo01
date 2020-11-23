@@ -1261,6 +1261,78 @@ char *pasarAssembler(struct node *arbol){
     return reemplazo;
 	}
 
+  if(strstr(arbol->value, "+=")){
+    strcpy(dato, "FLD ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    strcat(dato, "FLD ");
+    strcat(dato, arbol->right->value);
+    strcat(dato, "\n");
+    strcat(dato, "FADD");
+    strcat(dato, "\n");
+    strcat(dato, "FSTP ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    encolar(cola, &dato);
+    escribirTabla(reemplazo, "", 0, 0);
+    cantAux++;
+    return reemplazo;
+  }
+
+  if(strstr(arbol->value, "-=")){
+    strcpy(dato, "FLD ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    strcat(dato, "FLD ");
+    strcat(dato, arbol->right->value);
+    strcat(dato, "\n");
+    strcat(dato, "FSUB");
+    strcat(dato, "\n");
+    strcat(dato, "FSTP ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    encolar(cola, &dato);
+    escribirTabla(reemplazo, "", 0, 0);
+    cantAux++;
+    return reemplazo;
+  }
+
+  if(strstr(arbol->value, "*=")){
+    strcpy(dato, "FLD ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    strcat(dato, "FLD ");
+    strcat(dato, arbol->right->value);
+    strcat(dato, "\n");
+    strcat(dato, "FMUL");
+    strcat(dato, "\n");
+    strcat(dato, "FSTP ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    encolar(cola, &dato);
+    escribirTabla(reemplazo, "", 0, 0);
+    cantAux++;
+    return reemplazo;
+  }
+
+  if(strstr(arbol->value, "/=")){
+    strcpy(dato, "FLD ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    strcat(dato, "FLD ");
+    strcat(dato, arbol->right->value);
+    strcat(dato, "\n");
+    strcat(dato, "FDIV");
+    strcat(dato, "\n");
+    strcat(dato, "FSTP ");
+    strcat(dato, arbol->left->value);
+    strcat(dato, "\n");
+    encolar(cola, &dato);
+    escribirTabla(reemplazo, "", 0, 0);
+    cantAux++;
+    return reemplazo;
+  }
+
   if(strstr(arbol->value,"+")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
