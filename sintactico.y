@@ -1069,6 +1069,7 @@ void reemplazarNodo(struct node *nodo, char * aux ){
 }
 
 char str[50];
+int vaporwhile = 0;
 
 struct node *arbolIzqConDosHijos( struct node *arbol){
 	if(!arbol) return NULL;
@@ -1079,12 +1080,15 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       arbol->value = "while1";
       char *dato2 = (char *)malloc(100);
       finETIQUETA = finWHILE;
+      vaporwhile = 1;
       strcpy(dato2, inicioWHILE);
-      sprintf(str, "%d", etiquetasWHILE);
+      sprintf(str, "%d", peekInt(stackWHILE));
       strcat(dato2, str);
       strcat(dato2, "\n");
       encolar(cola, &dato2);
       pushInt(stackWHILE, etiquetasWHILE++);
+    } else {
+      vaporwhile = 0;
     }
 
     return arbolIzqConDosHijos(arbol->left);
@@ -1126,7 +1130,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(strcmp(arbol->value, "if") == 0){
     strcpy(dato, finETIQUETA);
-    sprintf(str, "%d", popInt(stackIF));
+    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     finETIQUETA = finIF;
     strcat(dato, ":");
@@ -1199,8 +1203,13 @@ char *pasarAssembler(struct node *arbol){
     strcat(dato, " ");
     strcat(dato, finETIQUETA);
     //hay q ver si el salto es por if o while
-    pushInt(stackIF, etiquetasIF++);
-    sprintf(str, "%d", peekInt(stackIF));
+    if(vaporwhile == 1) {
+      sprintf(str, "%d", peekInt(stackWHILE));
+      pushInt(stackWHILE, etiquetasWHILE++);
+    } else {
+      sprintf(str, "%d", peekInt(stackIF));
+      pushInt(stackIF, etiquetasIF++);
+    }
     strcat(dato, str);
     finETIQUETA = finIF;
     strcat(dato, "\n");
