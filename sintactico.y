@@ -139,13 +139,15 @@ const char *finWHILE = "FINWHILE";
 struct node *lastParent = NULL;
 
 t_ts tablaSimbolos[5000];
-int validaTipo = 0;
+
 int posicionTabla = 0;
-int posicionTipo = 0;
+int posicionTipo = 2;
+int cantVariables = 2;
+int cantTipos = 2;
+
+int validaTipo = 0;
 int asignacionConst = 0;
 int salidaString = 0;
-int cantVariables = 0;
-int cantTipos = 0;
 int cantAux = 0;
 int stringCount = 0;
 t_cola *cola;
@@ -614,6 +616,8 @@ int main(int argc,char *argv[]) {
     stackParentesis = createStack(100);
     stackIF = createStackInt(100);
     stackWHILE = createStackInt(100);
+    escribirTabla("@cont", "", 0, 0);
+    escribirTabla("@aux", "", 0, 0);
 
 		yyparse();
 		escribirArchivo();
@@ -764,7 +768,7 @@ char *procesarSTRING(char *str){
 	cadenaPura[a--]='\0';
 
   if(buscarSimbolo(cadenaPura) == -1){
-		escribirTabla(_texto, cadenaPura, largo, 0);
+		escribirTabla(_texto, cadenaPura, largo-2, 0);
 	}
 
 	if(asignacionConst == 1){
@@ -846,8 +850,8 @@ void validarVariables(){
 	if(cantTipos != cantVariables){
 		error("Declaracion de variables erroneas.", "No coincide la cantidad de elementos");
 	} else {
-		cantTipos = 0;
-		cantVariables = 0;
+		cantTipos = 2;
+		cantVariables = 2;
 	}
 }
 //--------------------------------------------------------------------
@@ -865,7 +869,7 @@ void escribirArchivo(){
 
 		int longi = tablaSimbolos[i].longitud;
 	  char longitud_texto[10] = {""};
-		if(longi > 0) { sprintf(longitud_texto, "%d", longi - 2); }
+		if(longi > 0) { sprintf(longitud_texto, "%d", longi); }
 
 		fprintf(tsout, "%-30s|\t%-14s|\t%-16s|\t%-8s\t\n", tablaSimbolos[i].nombre, tipo_str, tablaSimbolos[i].valor, longitud_texto);
 	}
@@ -1241,7 +1245,7 @@ char *pasarAssembler(struct node *arbol){
     return reemplazo;
 	}
 
-  if( strstr(arbol->value,"+")){
+  if(strstr(arbol->value,"+")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
     strcat(dato, "\n");
@@ -1259,7 +1263,7 @@ char *pasarAssembler(struct node *arbol){
     return reemplazo;
 	}
 
-  if( strstr(arbol->value,"*")){
+  if(strstr(arbol->value,"*")){
 		strcpy(dato, "FLD ");
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");

@@ -1,16 +1,50 @@
 NOMBRE                         |   TIPO         | VALOR           | LONGITUD 
 ----------------------------------------------------------------------------
+@cont                         |	              |	                |	        	
+@aux                          |	              |	                |	        	
 contador                      |	INT           |	                |	        	
 promedio                      |	FLOAT         |	                |	        	
 actual                        |	FLOAT         |	                |	        	
 suma                          |	FLOAT         |	                |	        	
+nombre                        |	INT CONST     |	                |	        	
+_80.000000                    |	              |	80.000000       |	        	
+_string0                      |	              |	Prueba.txt LyC Tema 4!|	22      	
+_string1                      |	              |	Ingrese entero actual: |	23      	
+_0.000000                     |	              |	0.000000        |	        	
+_2.500000                     |	              |	2.500000        |	        	
+_92.000000                    |	              |	92.000000       |	        	
 _1.000000                     |	              |	1.000000        |	        	
-_string0                      |	              |	actual es mayor que 2|	21      	
-_string1                      |	              |	no es mayor que 2|	17      	
+_0.342000                     |	              |	0.342000        |	        	
+_256.000000                   |	              |	256.000000      |	        	
+_52.000000                    |	              |	52.000000       |	        	
+_4.000000                     |	              |	4.000000        |	        	
+_0.342000                     |	              |	0.342000        |	        	
+_256.000000                   |	              |	256.000000      |	        	
+_52.000000                    |	              |	52.000000       |	        	
+_4.000000                     |	              |	4.000000        |	        	
+_string2                      |	              |	La suma es:     |	12      	
 _2.000000                     |	              |	2.000000        |	        	
-_string2                      |	              |	actual es mayor que 2|	21      	
-_string3                      |	              |	312             |	3       	
-_10.000000                    |	              |	10.000000       |	        	
-_string4                      |	              |	32323321        |	8       	
-_10.000000                    |	              |	10.000000       |	        	
-_string5                      |	              |	32323321        |	8       	
+_0.000000                     |	              |	0.000000        |	        	
+_string3                      |	              |	actual es > 2 y <> 0|	20      	
+_string4                      |	              |	no es mayor que 2|	17      	
+@aux0                         |	              |	                |	        	
+@aux1                         |	              |	                |	        	
+@aux2                         |	              |	                |	        	
+@aux3                         |	              |	                |	        	
+@aux4                         |	              |	                |	        	
+@aux5                         |	              |	                |	        	
+@aux6                         |	              |	                |	        	
+@aux7                         |	              |	                |	        	
+@aux8                         |	              |	                |	        	
+@aux9                         |	              |	                |	        	
+@aux10                        |	              |	                |	        	
+@aux11                        |	              |	                |	        	
+@aux12                        |	              |	                |	        	
+@aux13                        |	              |	                |	        	
+@aux14                        |	              |	                |	        	
+@aux15                        |	              |	                |	        	
+@aux16                        |	              |	                |	        	
+@aux17                        |	              |	                |	        	
+@aux18                        |	              |	                |	        	
+@aux19                        |	              |	                |	        	
+@aux20                        |	              |	                |	        	
