@@ -142,9 +142,9 @@ struct node *lastParent = NULL;
 t_ts tablaSimbolos[5000];
 
 int posicionTabla = 0;
-int posicionTipo = 2;
-int cantVariables = 2;
-int cantTipos = 2;
+int posicionTipo = 4;
+int cantVariables = 4;
+int cantTipos = 4;
 
 int validaTipo = 0;
 int asignacionConst = 0;
@@ -487,7 +487,7 @@ factor:
 	| CONTAR P_A expresion { AuxExpresion2P = ExpresionP; } PUNTOCOMA lista P_C
   {
     debug("Regla 48: funcion contar");
-    struct node *cont = crearNodo(":=", crearHoja("@cont"), crearHoja("0"));
+    struct node *cont = crearNodo(":=", crearHoja("@cont"), crearHoja("@cero"));
     struct node *aux  = crearNodo(":=", crearHoja("@aux"), AuxExpresion2P);
     struct node *init = crearNodo("init", aux, cont);
     FactorP = crearNodo("contar", init, ListaP);
@@ -499,14 +499,14 @@ lista:
   {
     debug("Regla 49: lista es expresion");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
-    struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
+    struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("@uno"));
     ListaP = crearNodo("if", compara, aumenta);
   }
 	| lista { AuxListaP = ListaP; } COMA expresion
   {
     debug("Regla 50: lista, lista");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
-    struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("1"));
+    struct node *aumenta = crearNodo("+=", crearHoja("@cont"), crearHoja("@uno"));
     struct node *condicion = crearNodo("if", compara, aumenta);
     ListaP = crearNodo("Lista", AuxListaP, condicion);
   }
@@ -620,6 +620,8 @@ int main(int argc,char *argv[]) {
     stackWHILE = createStackInt(100);
     escribirTabla("@cont", "", 0, 0);
     escribirTabla("@aux", "", 0, 0);
+    escribirTabla("@uno", "1", 0, 0);
+    escribirTabla("@cero", "0", 0, 0);
 
 		yyparse();
 		escribirArchivo();
@@ -630,7 +632,7 @@ int main(int argc,char *argv[]) {
   //   printf("stack if: %d\n\n", i);
   //   i = popInt(stackIF);
   // }
-  // 
+  //
   // int w = popInt(stackWHILE);
   // while(w != -1){
   //   printf("stack while: %d\n\n", w);
@@ -1120,9 +1122,9 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       strcat(dato2, ":");
       strcat(dato2, "\n");
       encolar(cola, &dato2);
-      
+
       finETIQUETA = finWHILE;
-      vaporwhile = 1;      
+      vaporwhile = 1;
     }
 
     return arbolIzqConDosHijos(arbol->left);
