@@ -1,8 +1,13 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
+if (contador >= 2){
+  suma:=4;
+} else {
+  promedio:=8;
+}
 
-
-while(actual>2){
-	actual:=2+4;
-	actual:= 2;
+if (contador >= 2){
+  suma:=4;
+} else {
+  promedio:=8;
 }
