@@ -1,0 +1,17 @@
+char* generarEtiqueta(int es_if){
+  char * etiqueta= (char*) malloc(200);
+  char * cant_If=pasarAString(cantIf);
+  char * cant_Else=pasarAString(cantElse);
+
+    if(es_if==0){
+        stycpy(etiqueta,finIF);
+        strcat(etiqueta,cantIf);        
+    }
+    else
+
+}
+char * pasarAString(int num){
+   char * numString= (char*) malloc(200);
+   itoa(num,numString,10);
+   return numString;
+}

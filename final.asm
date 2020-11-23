@@ -12,21 +12,23 @@ contador	dd	?
 promedio	dd	?
 actual	dd	?
 suma	dd	?
-_cte0	dd	2.000000
-_cte1	dd	4.000000
-_cte2	dd	10.000000
-_cte3	dd	10.000000
-_cte4	dd	10.000000
-_cte5	dd	10.000000
-_cte6	dd	10.000000
-_cte7	dd	20.000000
-_cte8	dd	30.000000
-_cte9	dd	40.000000
-_cte10	dd	10.000000
-_cte11	dd	3.000000
-_cte12	dd	7.000000
-_cte13	dd	20.000000
-_string0	db	"Resultado: ",'$',11 dup (?)
+nombre	dd	?
+_cte0	dd	80.000000
+_string0	db	"Prueba.txt LyC Tema 4!",'$',22 dup (?)
+_string1	db	"Ingrese entero actual: ",'$',23 dup (?)
+_cte1	dd	0.000000
+_cte2	dd	2.500000
+_cte3	dd	92.000000
+_cte4	dd	1.000000
+_cte5	dd	0.342000
+_cte6	dd	256.000000
+_cte7	dd	52.000000
+_cte8	dd	4.000000
+_string2	db	"La suma es: ",'$',12 dup (?)
+_cte9	dd	2.000000
+_cte10	dd	0.000000
+_string3	db	"actual es > 2 y <> 0",'$',20 dup (?)
+_string4	db	"no es mayor que 2",'$',17 dup (?)
 @aux0	dd	?
 @aux1	dd	?
 @aux2	dd	?
@@ -39,22 +41,52 @@ _string0	db	"Resultado: ",'$',11 dup (?)
 @aux9	dd	?
 @aux10	dd	?
 @aux11	dd	?
-@aux12	dd	?
 .CODE
 START:
 MOV EAX,@DATA
 MOV DS, AX
 MOV ES, AX
 FLD _cte0
+FSTP nombre
+MOV DX, OFFSET _string0
+MOV AH, 9
+INT 21H
+MOV DX, OFFSET _string1
+MOV AH, 9
+INT 21H
+GetFloat actual
 FLD _cte1
+FSTP contador
+FLD _cte2
+FLD nombre
 FADD
 FSTP @aux0
-FLD _cte2
+FLD @aux0
+FSTP suma
+INICIOWHILE0:
+FLD contador
+FCOMP _cte3
+FSTSW AX
+SAHF
+JA FINWHILE0
+FLD contador
+FLD _cte4
+FADD
+FSTP @aux1
+FLD @aux1
+FSTP contador
+FLD contador
+FDIV _cte5
+FSTP @aux2
+FLD actual
+FMUL contador
+FSTP @aux3
+FLD @aux3
 FSTP @aux
 FLD @cero
 FSTP @cont
 FLD @aux
-FCOMP _cte3
+FCOMP _cte6
 FSTSW AX
 SAHF
 JNE FINIF0
@@ -63,8 +95,11 @@ FLD @uno
 FADD
 FSTP @cont
 FINIF0:
+FLD nombre
+FMUL suma
+FSTP @aux5
 FLD @aux
-FCOMP _cte4
+FCOMP @aux5
 FSTSW AX
 SAHF
 JNE FINIF1
@@ -74,7 +109,7 @@ FADD
 FSTP @cont
 FINIF1:
 FLD @aux
-FCOMP _cte5
+FCOMP _cte7
 FSTSW AX
 SAHF
 JNE FINIF2
@@ -84,7 +119,7 @@ FADD
 FSTP @cont
 FINIF2:
 FLD @aux
-FCOMP _cte6
+FCOMP _cte8
 FSTSW AX
 SAHF
 JNE FINIF3
@@ -93,80 +128,46 @@ FLD @uno
 FADD
 FSTP @cont
 FINIF3:
-FLD @aux
-FCOMP _cte7
-FSTSW AX
-SAHF
-JNE FINIF4
-FLD @cont
-FLD @uno
+FLD contador
+FMUL @cont
+FSTP @aux9
+FLD @aux2
+FLD @aux9
 FADD
-FSTP @cont
-FINIF4:
-FLD @aux
-FCOMP _cte8
-FSTSW AX
-SAHF
-JNE FINIF5
-FLD @cont
-FLD @uno
+FSTP @aux10
+FLD @aux10
+FSTP actual
+FLD suma
+FLD actual
 FADD
-FSTP @cont
-FINIF5:
-FLD @aux
+FSTP @aux11
+FLD @aux11
+FSTP suma
+JMP INICIOWHILE0
+FINWHILE0:
+MOV DX, OFFSET _string2
+MOV AH, 9
+INT 21H
+DisplayFloat suma, 2
+FLD actual
 FCOMP _cte9
 FSTSW AX
 SAHF
-JNE FINIF6
-FLD @cont
-FLD @uno
-FADD
-FSTP @cont
-FINIF6:
-FLD @aux
+JNA FINIF4
+FLD actual
 FCOMP _cte10
 FSTSW AX
 SAHF
-JNE FINIF7
-FLD @cont
-FLD @uno
-FADD
-FSTP @cont
-FINIF7:
-FLD _cte11
-FLD _cte12
-FADD
-FSTP @aux9
-FLD @aux
-FCOMP @aux9
-FSTSW AX
-SAHF
-JNE FINIF8
-FLD @cont
-FLD @uno
-FADD
-FSTP @cont
-FINIF8:
-FLD @aux
-FCOMP _cte13
-FSTSW AX
-SAHF
-JNE FINIF9
-FLD @cont
-FLD @uno
-FADD
-FSTP @cont
-FINIF9:
-FLD @aux0
-FLD @cont
-FADD
-FSTP @aux12
-FLD @aux12
-FSTP actual
-MOV DX, OFFSET _string0
+JE FINIF4
+MOV DX, OFFSET _string3
 MOV AH, 9
 INT 21H
-DisplayFloat actual, 2
+JMP FINELSE4
+FINIF4:
+MOV DX, OFFSET _string4
+MOV AH, 9
+INT 21H
+FINELSE4:
 MOV EAX,4c00h
 int 21h
 END START

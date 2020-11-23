@@ -1060,8 +1060,8 @@ void generarAssembler(struct node *arbol){
 
   while(arbol->left && arbol->right){
 		struct node *nodo = arbolIzqConDosHijos(arbol);
-    printf("");
-    //fflush(stdin);
+    //printf("");
+    fflush(stdin);
 
     if(nodo){
 			reemplazo = pasarAssembler(nodo);

@@ -8,21 +8,23 @@ contador                      |	INT           |	                |
 promedio                      |	FLOAT         |	                |	        	
 actual                        |	FLOAT         |	                |	        	
 suma                          |	FLOAT         |	                |	        	
-_cte0                         |	              |	2.000000        |	        	
-_cte1                         |	              |	4.000000        |	        	
-_cte2                         |	              |	10.000000       |	        	
-_cte3                         |	              |	10.000000       |	        	
-_cte4                         |	              |	10.000000       |	        	
-_cte5                         |	              |	10.000000       |	        	
-_cte6                         |	              |	10.000000       |	        	
-_cte7                         |	              |	20.000000       |	        	
-_cte8                         |	              |	30.000000       |	        	
-_cte9                         |	              |	40.000000       |	        	
-_cte10                        |	              |	10.000000       |	        	
-_cte11                        |	              |	3.000000        |	        	
-_cte12                        |	              |	7.000000        |	        	
-_cte13                        |	              |	20.000000       |	        	
-_string0                      |	              |	Resultado:      |	11      	
+nombre                        |	INT CONST     |	                |	        	
+_cte0                         |	              |	80.000000       |	        	
+_string0                      |	              |	Prueba.txt LyC Tema 4!|	22      	
+_string1                      |	              |	Ingrese entero actual: |	23      	
+_cte1                         |	              |	0.000000        |	        	
+_cte2                         |	              |	2.500000        |	        	
+_cte3                         |	              |	92.000000       |	        	
+_cte4                         |	              |	1.000000        |	        	
+_cte5                         |	              |	0.342000        |	        	
+_cte6                         |	              |	256.000000      |	        	
+_cte7                         |	              |	52.000000       |	        	
+_cte8                         |	              |	4.000000        |	        	
+_string2                      |	              |	La suma es:     |	12      	
+_cte9                         |	              |	2.000000        |	        	
+_cte10                        |	              |	0.000000        |	        	
+_string3                      |	              |	actual es > 2 y <> 0|	20      	
+_string4                      |	              |	no es mayor que 2|	17      	
 @aux0                         |	              |	                |	        	
 @aux1                         |	              |	                |	        	
 @aux2                         |	              |	                |	        	
@@ -35,4 +37,3 @@ _string0                      |	              |	Resultado:      |	11
 @aux9                         |	              |	                |	        	
 @aux10                        |	              |	                |	        	
 @aux11                        |	              |	                |	        	
-@aux12                        |	              |	                |	        	

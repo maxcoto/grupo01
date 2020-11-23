@@ -8,3 +8,4 @@ pause
 TPFinal.exe prueba.txt
 del lex.yy.c
 pause
+

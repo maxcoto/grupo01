@@ -1,0 +1,10 @@
+tasm NUMBERS.ASM
+tasm final.asm
+tlink /3 final.OBJ NUMBERS.OBJ /v /s /m
+pause
+final.exe
+pause
+del final.obj
+del final.map
+del numbers.obj
+del final.exe
