@@ -1150,8 +1150,8 @@ char *pasarAssembler(struct node *arbol){
   int salta = 0;
 
   if(strstr(arbol->value, "if")){
-    strcpy(dato, finETIQUETA);
     sprintf(str, "%d", peekInt(stackIF));
+    strcpy(dato, finETIQUETA);
     strcat(dato, str);
     finETIQUETA = finIF;
     strcat(dato, ":");
@@ -1161,13 +1161,12 @@ char *pasarAssembler(struct node *arbol){
   }
 
   if(strstr(arbol->value, "while")){
+    sprintf(str, "%d", peekInt(stackWHILE));
     strcpy(dato, "JMP ");
     strcat(dato, inicioWHILE);
-    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     strcat(dato, "\n");
     strcat(dato, finWHILE);
-    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     strcat(dato, ":");
 		strcat(dato, "\n");

@@ -12,19 +12,10 @@ while (promedio <> 2){
   PUT "312";
 }
 
-if (actual > 3){
-  PUT "33333232221323";
-} else {
-  PUT "3333333";
-}
-
 while (suma == 10){
   PUT "32323321";
 }
 
-if (actual > 3){
-  PUT "33333232221323";
-}
 
 while (suma == 10){
   PUT "32323321";

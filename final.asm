@@ -15,15 +15,10 @@ _string1	db	"no es mayor que 2",'$',19 dup (?)
 _2.000000	dd	2.000000
 _string2	db	"actual es mayor que 2",'$',23 dup (?)
 _string3	db	"312",'$',5 dup (?)
-_3.000000	dd	3.000000
-_string4	db	"33333232221323",'$',16 dup (?)
-_string5	db	"3333333",'$',9 dup (?)
 _10.000000	dd	10.000000
-_string6	db	"32323321",'$',10 dup (?)
-_3.000000	dd	3.000000
-_string7	db	"33333232221323",'$',16 dup (?)
+_string4	db	"32323321",'$',10 dup (?)
 _10.000000	dd	10.000000
-_string8	db	"32323321",'$',10 dup (?)
+_string5	db	"32323321",'$',10 dup (?)
 
 .CODE
 START:
@@ -46,11 +41,6 @@ MOV DX, OFFSET _string1
 MOV AH, 9
 INT 21H
 FINELSE0:
-
-
-
-
-
 INICIOWHILE0
 FLD promedio
 FCOMP _2.000000
@@ -65,63 +55,24 @@ MOV AH, 9
 INT 21H
 JMP INICIOWHILE0
 FINWHILE0:
-
-
-
-
-FLD actual
-FCOMP _3.000000
-FSTSW AX
-SAHF
-JNA FINIF1
-MOV DX, OFFSET _string4
-MOV AH, 9
-INT 21H
-JMP FINELSE1
-FINIF1:
-
-MOV DX, OFFSET _string5
-MOV AH, 9
-INT 21H
-FINELSE1:
-
-
-
-
 INICIOWHILE1
 FLD suma
 FCOMP _10.000000
 FSTSW AX
 SAHF
 JNE FINWHILE1
-MOV DX, OFFSET _string6
+MOV DX, OFFSET _string4
 MOV AH, 9
 INT 21H
 JMP INICIOWHILE1
 FINWHILE1:
-
-
-
-
-
-FLD actual
-FCOMP _3.000000
-FSTSW AX
-SAHF
-JNA FINIF2
-MOV DX, OFFSET _string7
-MOV AH, 9
-INT 21H
-FINIF2:
-
-
 INICIOWHILE2
 FLD suma
 FCOMP _10.000000
 FSTSW AX
 SAHF
 JNE FINWHILE2
-MOV DX, OFFSET _string8
+MOV DX, OFFSET _string5
 MOV AH, 9
 INT 21H
 JMP INICIOWHILE2
