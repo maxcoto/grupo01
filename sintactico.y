@@ -129,6 +129,7 @@ int cantAux = 0;
 int stringCount = 0;
 t_cola *cola;
 
+
 void validarTipo(int);
 
 void escribirTabla(char *, char *, int, int);
@@ -293,6 +294,7 @@ if:
     debug("Regla 19: if");
     DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, BloqueInternoP);
+    
   }
 	| IF P_A decision P_C sentencia
   {
@@ -1040,7 +1042,7 @@ char *pasarAssembler(struct node *arbol){
     char *dato2 = (char *)malloc(100);
    strcpy(dato2,"");
 
-  char *dato = (char *)malloc(100);
+  char *dato = (char *)malloc(300);
   int salta = 0;
 
   if(strcmp(arbol->value, "if") == 0){
@@ -1053,18 +1055,23 @@ char *pasarAssembler(struct node *arbol){
 
   if(lastParent != NULL){
     //char *dato2 = (char *)malloc(100);
-    printf("\t\t\t\t\t lastParent: %s == arbol: %s \n",lastParent->right->value,arbol->value);
+   
 
-    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right==arbol){
-      lastParent = NULL;
+    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->left==arbol){
+      printf("\t\t\tarbol: %s\n",arbol->value);
+   
+     lastParent = NULL;
       strcpy(dato2, "JMP ");
       strcat(dato2, etiquetaIF);
-      strcat(dato2, "\n");
+      strcat(dato2, "\n");  
       strcat(dato2, etiquetaELSE);
-      strcat(dato2, ":");
-      strcat(dato2, "\n\n");
-     // encolar(cola, &dato2);
+        strcat(dato2, ":");
+        strcat(dato2, "\n\n"); 
+      encolar(cola, &dato2);
+      
     }
+     
+    
   }
 
   if(
@@ -1114,27 +1121,30 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
+    
+   /* if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
       strcat(dato, etiquetaELSE);
     } else {
-      strcat(dato, etiquetaIF);
-    }
-
+      strcat(dato, etiquetaIF); // CREO QUE NO SE NECESITA
+    }*/
+  strcat(dato, etiquetaELSE);
     strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
   }
 
   if(strstr(arbol->value, ":=")){
-		  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
-	  	strcpy(dato,dato2);
-	  printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
-		strcat(dato, "FLD ");
+	//	  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
+	  //	strcpy(dato,dato2);
+	  //printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
+		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
+ 
+
 		encolar(cola, &dato);
     return reemplazo;
 	}

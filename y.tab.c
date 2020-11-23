@@ -200,6 +200,7 @@ int cantAux = 0;
 int stringCount = 0;
 t_cola *cola;
 
+
 void validarTipo(int);
 
 void escribirTabla(char *, char *, int, int);
@@ -243,7 +244,7 @@ void reverseString(char s[]);
 
 
 /* Line 189 of yacc.c  */
-#line 247 "y.tab.c"
+#line 248 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -370,12 +371,12 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 174 "sintactico.y"
+#line 175 "sintactico.y"
  char *strVal; 
 
 
 /* Line 214 of yacc.c  */
-#line 379 "y.tab.c"
+#line 380 "y.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -400,7 +401,7 @@ typedef struct YYLTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 404 "y.tab.c"
+#line 405 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -729,18 +730,18 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   200,   200,   200,   210,   212,   210,   219,   220,   224,
-     228,   228,   229,   229,   233,   234,   238,   238,   239,   239,
-     240,   240,   241,   241,   247,   251,   251,   259,   264,   264,
-     271,   271,   272,   272,   273,   273,   274,   274,   275,   275,
-     276,   276,   277,   277,   278,   282,   291,   297,   303,   303,
-     303,   313,   322,   330,   339,   339,   347,   347,   348,   348,
-     349,   349,   350,   350,   354,   360,   360,   366,   366,   375,
-     375,   376,   376,   380,   380,   388,   388,   389,   389,   390,
-     390,   391,   391,   392,   392,   393,   393,   397,   402,   402,
-     408,   408,   417,   422,   422,   429,   429,   438,   443,   447,
-     452,   457,   462,   462,   473,   480,   480,   488,   492,   498,
-     506
+       0,   201,   201,   201,   211,   213,   211,   220,   221,   225,
+     229,   229,   230,   230,   234,   235,   239,   239,   240,   240,
+     241,   241,   242,   242,   248,   252,   252,   260,   265,   265,
+     272,   272,   273,   273,   274,   274,   275,   275,   276,   276,
+     277,   277,   278,   278,   279,   283,   292,   299,   305,   305,
+     305,   315,   324,   332,   341,   341,   349,   349,   350,   350,
+     351,   351,   352,   352,   356,   362,   362,   368,   368,   377,
+     377,   378,   378,   382,   382,   390,   390,   391,   391,   392,
+     392,   393,   393,   394,   394,   395,   395,   399,   404,   404,
+     410,   410,   419,   424,   424,   431,   431,   440,   445,   449,
+     454,   459,   464,   464,   475,   482,   482,   490,   494,   500,
+     508
 };
 #endif
 
@@ -1804,14 +1805,14 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 200 "sintactico.y"
+#line 201 "sintactico.y"
     { exito("Iniciando compilacion ..."); }
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 202 "sintactico.y"
+#line 203 "sintactico.y"
     {
     crearArchivoDot(root);
 		generarAssembler(root);
@@ -1822,119 +1823,119 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 210 "sintactico.y"
+#line 211 "sintactico.y"
     {debug("Bloque de declaraciones");}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 212 "sintactico.y"
+#line 213 "sintactico.y"
     {debug("Bloque de sentencias");}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 214 "sintactico.y"
+#line 215 "sintactico.y"
     { root = BloqueSentenciaP; }
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 224 "sintactico.y"
+#line 225 "sintactico.y"
     {validarVariables();}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 228 "sintactico.y"
+#line 229 "sintactico.y"
     { procesarSimbolo(yylval.strVal, 0);}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 228 "sintactico.y"
+#line 229 "sintactico.y"
     { debug("Regla 01: variables es ID");}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 229 "sintactico.y"
+#line 230 "sintactico.y"
     { procesarSimbolo(yylval.strVal, 0);}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 229 "sintactico.y"
+#line 230 "sintactico.y"
     { debug("Regla 02: variables es variables puntocoma id");}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 238 "sintactico.y"
+#line 239 "sintactico.y"
     {agregarTipo("FLOAT");}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 238 "sintactico.y"
+#line 239 "sintactico.y"
     {debug("Regla 03: float");}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 239 "sintactico.y"
+#line 240 "sintactico.y"
     {agregarTipo("INT");}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 239 "sintactico.y"
+#line 240 "sintactico.y"
     {debug("Regla 04: integer");}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 240 "sintactico.y"
+#line 241 "sintactico.y"
     {agregarTipo("STRING");}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 240 "sintactico.y"
+#line 241 "sintactico.y"
     {debug("Regla 05: string");}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 241 "sintactico.y"
+#line 242 "sintactico.y"
     {agregarTipo("BOOLEAN");}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 241 "sintactico.y"
+#line 242 "sintactico.y"
     {debug("Regla 06: boolean");}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 248 "sintactico.y"
+#line 249 "sintactico.y"
     {
     debug("Regla 07: sentencia simple");
     BloqueSentenciaP = SentenciaP; }
@@ -1943,14 +1944,14 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 251 "sintactico.y"
+#line 252 "sintactico.y"
     { AuxBloqueSentenciaP = BloqueSentenciaP; }
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 252 "sintactico.y"
+#line 253 "sintactico.y"
     {
     debug("Regla 08: bloque de sentencias");
     BloqueSentenciaP = crearNodo("BS", AuxBloqueSentenciaP, SentenciaP);
@@ -1960,7 +1961,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 260 "sintactico.y"
+#line 261 "sintactico.y"
     {
     debug("Regla 09: sentencia interna simple");
     BloqueInternoP = SentenciaP;
@@ -1970,14 +1971,14 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 264 "sintactico.y"
+#line 265 "sintactico.y"
     { AuxBloqueInternoP = BloqueInternoP; }
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 265 "sintactico.y"
+#line 266 "sintactico.y"
     {
     debug("Regla 10: bloque interno");
     BloqueInternoP = crearNodo("BI", AuxBloqueInternoP, SentenciaP);
@@ -1987,112 +1988,112 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 271 "sintactico.y"
+#line 272 "sintactico.y"
     {debug("Regla 11: sentencia es ciclo");}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 271 "sintactico.y"
+#line 272 "sintactico.y"
     {SentenciaP = CicloP;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 272 "sintactico.y"
+#line 273 "sintactico.y"
     {debug("Regla 12: sentencia es if");}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 272 "sintactico.y"
+#line 273 "sintactico.y"
     {SentenciaP = IFp;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 273 "sintactico.y"
+#line 274 "sintactico.y"
     {debug("Regla 13: sentencia es asignacion ");}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 273 "sintactico.y"
+#line 274 "sintactico.y"
     {SentenciaP = AsignacionP;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 274 "sintactico.y"
+#line 275 "sintactico.y"
     {debug("Regla 14: sentencia es operacion y asignacion ");}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 274 "sintactico.y"
+#line 275 "sintactico.y"
     {SentenciaP = OperasignaP;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 275 "sintactico.y"
+#line 276 "sintactico.y"
     {debug("Regla 15: sentencia es salida");}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 275 "sintactico.y"
+#line 276 "sintactico.y"
     {SentenciaP = SalidaP;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 276 "sintactico.y"
+#line 277 "sintactico.y"
     {debug("Regla 16: sentencia es entrada");}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 276 "sintactico.y"
+#line 277 "sintactico.y"
     {SentenciaP = EntradaP;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 277 "sintactico.y"
+#line 278 "sintactico.y"
     {debug("Regla 17: sentencia es declaracion de constante");}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 277 "sintactico.y"
+#line 278 "sintactico.y"
     {SentenciaP = ConstanteP;}
     break;
 
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 278 "sintactico.y"
+#line 279 "sintactico.y"
     {error("Uso de palabra reservada", ""); }
     break;
 
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 283 "sintactico.y"
+#line 284 "sintactico.y"
     {
     debug("Regla 18: ciclo while");
     DecisionP = desapilar(stackDecision, DecisionP);
@@ -2103,18 +2104,19 @@ yyreduce:
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 292 "sintactico.y"
+#line 293 "sintactico.y"
     {
     debug("Regla 19: if");
     DecisionP = desapilar(stackDecision, DecisionP);
     IFp = crearNodo("if", DecisionP, BloqueInternoP);
+    
   }
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 298 "sintactico.y"
+#line 300 "sintactico.y"
     {
     debug("Regla 20: if simple");
     DecisionP = desapilar(stackDecision, DecisionP);
@@ -2125,21 +2127,21 @@ yyreduce:
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 303 "sintactico.y"
+#line 305 "sintactico.y"
     { BSd = BloqueInternoP; }
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 303 "sintactico.y"
+#line 305 "sintactico.y"
     { BSi = BloqueInternoP; }
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 304 "sintactico.y"
+#line 306 "sintactico.y"
     {
     debug("Regla 21: if/else");
     DecisionP = desapilar(stackDecision, DecisionP);
@@ -2151,7 +2153,7 @@ yyreduce:
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 314 "sintactico.y"
+#line 316 "sintactico.y"
     {
     debug("Regla 22: Asignacion simple");
     validarAsignacion((yyvsp[(1) - (4)].strVal));
@@ -2162,7 +2164,7 @@ yyreduce:
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 323 "sintactico.y"
+#line 325 "sintactico.y"
     {
     debug("Regla 23: Declaracion de constante");
     ConstanteP = crearNodo("CONST", AuxConstanteP, ExpresionP);
@@ -2172,7 +2174,7 @@ yyreduce:
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 331 "sintactico.y"
+#line 333 "sintactico.y"
     {
     procesarSimbolo(yylval.strVal, 1);
     asignacionConst = 1;
@@ -2183,14 +2185,14 @@ yyreduce:
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 339 "sintactico.y"
+#line 341 "sintactico.y"
     {AuxOperasignaP = crearHoja(yylval.strVal);}
     break;
 
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 340 "sintactico.y"
+#line 342 "sintactico.y"
     {
     debug("Regla 25: Operacion con asignacion");
     OperasignaP = crearNodo(_comparacion, AuxOperasignaP, ExpresionP);
@@ -2200,63 +2202,63 @@ yyreduce:
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 347 "sintactico.y"
+#line 349 "sintactico.y"
     {debug("Regla 26: Asignacion y suma");}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 347 "sintactico.y"
+#line 349 "sintactico.y"
     {_comparacion = "+=";}
     break;
 
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 348 "sintactico.y"
+#line 350 "sintactico.y"
     {debug("Regla 27: Asignacion y resta");}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 348 "sintactico.y"
+#line 350 "sintactico.y"
     {_comparacion = "-=";}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 349 "sintactico.y"
+#line 351 "sintactico.y"
     {debug("Regla 28: Asignacion y multiplicacion");}
     break;
 
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 349 "sintactico.y"
+#line 351 "sintactico.y"
     {_comparacion = "*=";}
     break;
 
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 350 "sintactico.y"
+#line 352 "sintactico.y"
     {debug("Regla 29: Asignacion y division");}
     break;
 
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 350 "sintactico.y"
+#line 352 "sintactico.y"
     {_comparacion = "/=";}
     break;
 
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 355 "sintactico.y"
+#line 357 "sintactico.y"
     {
     debug("Regla 30: Decision simple");
     DecisionP = CondicionP;
@@ -2267,14 +2269,14 @@ yyreduce:
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 360 "sintactico.y"
+#line 362 "sintactico.y"
     {AuxCondicionP = CondicionP;}
     break;
 
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 361 "sintactico.y"
+#line 363 "sintactico.y"
     {
     debug("Regla 31: Decision compuesta");
     DecisionP = crearNodo(_decision, AuxCondicionP, CondicionP);
@@ -2285,14 +2287,14 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 366 "sintactico.y"
+#line 368 "sintactico.y"
     {AuxExpresionP = ExpresionP;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 367 "sintactico.y"
+#line 369 "sintactico.y"
     {
     debug("Regla 32: Decision negada");
     DecisionP = crearNodo("NOT", AuxExpresionP, ExpresionP);
@@ -2303,42 +2305,42 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 375 "sintactico.y"
+#line 377 "sintactico.y"
     {debug("Regla 33: Decision multiple and");}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 375 "sintactico.y"
+#line 377 "sintactico.y"
     {_decision = "AND";}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 376 "sintactico.y"
+#line 378 "sintactico.y"
     {debug("Regla 34: Decision multiple or");}
     break;
 
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 376 "sintactico.y"
+#line 378 "sintactico.y"
     {_decision = "OR";}
     break;
 
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 380 "sintactico.y"
+#line 382 "sintactico.y"
     {AuxExpresionP = ExpresionP;}
     break;
 
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 381 "sintactico.y"
+#line 383 "sintactico.y"
     {
     debug("Regla 35: Condicion");
     CondicionP = crearNodo(_comparacion, AuxExpresionP, ExpresionP);
@@ -2348,91 +2350,91 @@ yyreduce:
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 388 "sintactico.y"
+#line 390 "sintactico.y"
     {debug("Regla 36: Comparacion igual");}
     break;
 
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 388 "sintactico.y"
+#line 390 "sintactico.y"
     {_comparacion = "==";}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 389 "sintactico.y"
+#line 391 "sintactico.y"
     {debug("Regla 37: Comparacion distinto");}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 389 "sintactico.y"
+#line 391 "sintactico.y"
     {_comparacion = "<>";}
     break;
 
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 390 "sintactico.y"
+#line 392 "sintactico.y"
     {debug("Regla 38: Comparacion mayor");}
     break;
 
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 390 "sintactico.y"
+#line 392 "sintactico.y"
     {_comparacion = ">";}
     break;
 
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 391 "sintactico.y"
+#line 393 "sintactico.y"
     {debug("Regla 39: Comparacion menor");}
     break;
 
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 391 "sintactico.y"
+#line 393 "sintactico.y"
     {_comparacion = "<";}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 392 "sintactico.y"
+#line 394 "sintactico.y"
     {debug("Regla 40: Comparacion menor o igual");}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 392 "sintactico.y"
+#line 394 "sintactico.y"
     {_comparacion = "<=";}
     break;
 
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 393 "sintactico.y"
+#line 395 "sintactico.y"
     {debug("Regla 41: Comparacion mayor o igual");}
     break;
 
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 393 "sintactico.y"
+#line 395 "sintactico.y"
     {_comparacion = ">=";}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 398 "sintactico.y"
+#line 400 "sintactico.y"
     {
     debug("Regla 41: Expresion es termino");
     ExpresionP = TerminoP;
@@ -2442,14 +2444,14 @@ yyreduce:
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 402 "sintactico.y"
+#line 404 "sintactico.y"
     { push(stackParentesis, ExpresionP); }
     break;
 
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 403 "sintactico.y"
+#line 405 "sintactico.y"
     {
     debug("Regla 42: expresion suma termino");
     ExpresionP = desapilar(stackParentesis, ExpresionP);
@@ -2460,14 +2462,14 @@ yyreduce:
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 408 "sintactico.y"
+#line 410 "sintactico.y"
     { push(stackParentesis, ExpresionP); }
     break;
 
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 409 "sintactico.y"
+#line 411 "sintactico.y"
     {
     debug("Regla 43: expresion resta termino");
     ExpresionP = desapilar(stackParentesis, ExpresionP);
@@ -2478,7 +2480,7 @@ yyreduce:
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 418 "sintactico.y"
+#line 420 "sintactico.y"
     {
     debug("Regla 44: termino es factor");
     TerminoP = FactorP;
@@ -2488,14 +2490,14 @@ yyreduce:
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 422 "sintactico.y"
+#line 424 "sintactico.y"
     { push(stackParentesis, TerminoP); }
     break;
 
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 423 "sintactico.y"
+#line 425 "sintactico.y"
     {
     debug("Regla 45: termino multiplica factor");
 
@@ -2507,14 +2509,14 @@ yyreduce:
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 429 "sintactico.y"
+#line 431 "sintactico.y"
     {push(stackParentesis, TerminoP) ;}
     break;
 
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 430 "sintactico.y"
+#line 432 "sintactico.y"
     {
     debug("Regla 46: termino dividido factor");
     TerminoP = desapilar(stackParentesis, TerminoP);
@@ -2525,7 +2527,7 @@ yyreduce:
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 439 "sintactico.y"
+#line 441 "sintactico.y"
     {
     procesarID(yylval.strVal);
     FactorP = crearHoja(yylval.strVal);
@@ -2535,7 +2537,7 @@ yyreduce:
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 444 "sintactico.y"
+#line 446 "sintactico.y"
     {
     FactorP = crearHoja(procesarSTRING(yylval.strVal));
   }
@@ -2544,7 +2546,7 @@ yyreduce:
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 448 "sintactico.y"
+#line 450 "sintactico.y"
     {
     char *result = procesarINT(atof(yylval.strVal));
     FactorP = crearHoja(result);
@@ -2554,7 +2556,7 @@ yyreduce:
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 453 "sintactico.y"
+#line 455 "sintactico.y"
     {
     char *result = procesarFLOAT(atof(yylval.strVal));
     FactorP = crearHoja(result);
@@ -2564,7 +2566,7 @@ yyreduce:
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 458 "sintactico.y"
+#line 460 "sintactico.y"
     {
     debug("Regla 47: expresion entre parentesis");
     FactorP = ExpresionP;
@@ -2574,14 +2576,14 @@ yyreduce:
   case 102:
 
 /* Line 1455 of yacc.c  */
-#line 462 "sintactico.y"
+#line 464 "sintactico.y"
     { AuxExpresion2P = ExpresionP; }
     break;
 
   case 103:
 
 /* Line 1455 of yacc.c  */
-#line 463 "sintactico.y"
+#line 465 "sintactico.y"
     {
     debug("Regla 48: funcion contar");
     struct node *cont = crearNodo(":=", crearHoja("@cont"), crearHoja("0"));
@@ -2594,7 +2596,7 @@ yyreduce:
   case 104:
 
 /* Line 1455 of yacc.c  */
-#line 474 "sintactico.y"
+#line 476 "sintactico.y"
     {
     debug("Regla 49: lista es expresion");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
@@ -2606,14 +2608,14 @@ yyreduce:
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 480 "sintactico.y"
+#line 482 "sintactico.y"
     { AuxListaP = ListaP; }
     break;
 
   case 106:
 
 /* Line 1455 of yacc.c  */
-#line 481 "sintactico.y"
+#line 483 "sintactico.y"
     {
     debug("Regla 50: lista, lista");
     struct node *compara = crearNodo("==", crearHoja("@aux"), ExpresionP);
@@ -2626,7 +2628,7 @@ yyreduce:
   case 108:
 
 /* Line 1455 of yacc.c  */
-#line 493 "sintactico.y"
+#line 495 "sintactico.y"
     {
     debug("Regla 51: salida por pantalla");
     salidaString = 1;
@@ -2637,7 +2639,7 @@ yyreduce:
   case 109:
 
 /* Line 1455 of yacc.c  */
-#line 499 "sintactico.y"
+#line 501 "sintactico.y"
     {
     debug("Regla 52: salida por pantalla - ID");
     SalidaP = crearNodo("IO", crearHoja("out"), crearHoja(yylval.strVal));
@@ -2647,7 +2649,7 @@ yyreduce:
   case 110:
 
 /* Line 1455 of yacc.c  */
-#line 507 "sintactico.y"
+#line 509 "sintactico.y"
     {
     debug("Regla 53: entrada de datos");
     EntradaP = crearNodo("IO", crearHoja("in"), crearHoja(yylval.strVal));
@@ -2657,7 +2659,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2661 "y.tab.c"
+#line 2663 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2876,7 +2878,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 513 "sintactico.y"
+#line 515 "sintactico.y"
 
 // ----------------------------------------------------------------------------------
 
@@ -3407,7 +3409,7 @@ char *pasarAssembler(struct node *arbol){
     char *dato2 = (char *)malloc(100);
    strcpy(dato2,"");
 
-  char *dato = (char *)malloc(100);
+  char *dato = (char *)malloc(300);
   int salta = 0;
 
   if(strcmp(arbol->value, "if") == 0){
@@ -3420,18 +3422,23 @@ char *pasarAssembler(struct node *arbol){
 
   if(lastParent != NULL){
     //char *dato2 = (char *)malloc(100);
-    printf("\t\t\t\t\t lastParent: %s == arbol: %s \n",lastParent->right->value,arbol->value);
+   
 
-    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right==arbol){
-      lastParent = NULL;
+    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->left==arbol){
+      printf("\t\t\tarbol: %s\n",arbol->value);
+   
+     lastParent = NULL;
       strcpy(dato2, "JMP ");
       strcat(dato2, etiquetaIF);
-      strcat(dato2, "\n");
+      strcat(dato2, "\n");  
       strcat(dato2, etiquetaELSE);
-      strcat(dato2, ":");
-      strcat(dato2, "\n\n");
-     // encolar(cola, &dato2);
+        strcat(dato2, ":");
+        strcat(dato2, "\n\n"); 
+      encolar(cola, &dato2);
+      
     }
+     
+    
   }
 
   if(
@@ -3481,27 +3488,29 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
+   /* if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
       strcat(dato, etiquetaELSE);
     } else {
       strcat(dato, etiquetaIF);
-    }
-
+    }*/
+  strcat(dato, etiquetaELSE);
     strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
   }
 
   if(strstr(arbol->value, ":=")){
-		  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
-	  	strcpy(dato,dato2);
-	  printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
-		strcat(dato, "FLD ");
+	//	  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
+	  //	strcpy(dato,dato2);
+	  //printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
+		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
+ 
+
 		encolar(cola, &dato);
     return reemplazo;
 	}
