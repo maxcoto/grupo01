@@ -113,8 +113,9 @@ typedef struct {
 //------------------------------------------------
 
 const char *stringName = "_string";
-const char *etiquetaIF = "IF1";
-const char *etiquetaELSE = "ELSE1";
+const char *finIF = "FINIF";
+const char *finELSE = "FINELSE";
+const char *finETIQUETA = "FINIF";
 struct node *lastParent = NULL;
 
 t_ts tablaSimbolos[5000];
@@ -1017,13 +1018,29 @@ void reemplazarNodo(struct node *nodo, char * aux ){
 	nodo->value = aux;
 }
 
+
+
 struct node *arbolIzqConDosHijos( struct node *arbol){
 	if(!arbol) return NULL;
 
 	if(arbol->left && arbol->left->left && arbol->left->right){
-    lastParent = arbol;
     return arbolIzqConDosHijos(arbol->left);
 	} else if	(arbol->right && arbol->right->left && arbol->right->right){
+
+    //printf("arbol: %s || left: %s, || right: %s\n", arbol->value, arbol->left->value, arbol->right->value);
+    if(strcmp(arbol->value, "cuerpo") == 0){
+      arbol->value = "cuerpo1";
+      char *dato2 = (char *)malloc(200);
+      finETIQUETA = finELSE;
+      strcpy(dato2, "JMP ");
+      strcat(dato2, finELSE);
+      strcat(dato2, "\n");
+      strcat(dato2, finIF);
+      strcat(dato2, ":");
+      strcat(dato2, "\n\n");
+      encolar(cola, &dato2);
+    }
+    
 		return arbolIzqConDosHijos(arbol->right);
 	}
 
@@ -1037,33 +1054,16 @@ char *pasarAssembler(struct node *arbol){
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
-  char *dato2 = (char *)malloc(200);
-  strcpy(dato2,"");
   char *dato = (char *)malloc(100);
   int salta = 0;
 
   if(strcmp(arbol->value, "if") == 0){
-    strcpy(dato, etiquetaIF);
+    strcpy(dato, finETIQUETA);
+    finETIQUETA = finIF;
     strcat(dato, ":");
 		strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
-  }
-
-  if(lastParent != NULL){
-    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right && arbol && strcmp(lastParent->right->value, arbol->value) == 0){
-      lastParent = NULL;
-      printf("\nJMP");
-      strcpy(dato2, "JMP ");
-      strcat(dato2, etiquetaIF);
-      strcat(dato2, "\n");
-      strcat(dato2, etiquetaELSE);
-      strcat(dato2, ":");
-      strcat(dato2, "\n\n");
-      if(strcmp(arbol->value, "BI") == 0){
-        encolar(cola, &dato2);
-      }
-    }
   }
 
   if(
@@ -1113,12 +1113,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->value, "cuerpo")){
-      strcat(dato, etiquetaELSE);
-    } else {
-      strcat(dato, etiquetaIF);
-    }
-
+    strcat(dato, finIF);
     strcat(dato, "\n");
     encolar(cola, &dato);
     return reemplazo;
@@ -1132,7 +1127,7 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
 
-    strcat(dato, dato2);
+    //strcat(dato, dato2);
     
 		encolar(cola, &dato);
     return reemplazo;
@@ -1222,7 +1217,7 @@ char *pasarAssembler(struct node *arbol){
         strcat(dato, ", 2\n");
       }
     }
-    strcat(dato, dato2);
+    //strcat(dato, dato2);
     encolar(cola, &dato);
   }	else {
 		reemplazo = "ninguna";
