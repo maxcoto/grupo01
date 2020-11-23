@@ -993,8 +993,8 @@ void generarAssembler(struct node *arbol){
 
   while(arbol->left && arbol->right){
 		struct node *nodo = arbolIzqConDosHijos(arbol);
-    //printf("asdasd"); // no tocar
-    fflush(stdin);
+    printf("");
+    //fflush(stdin);
 
     if(nodo){
 			reemplazo = pasarAssembler(nodo);
@@ -1037,9 +1037,8 @@ char *pasarAssembler(struct node *arbol){
   char *reemplazo = (char *)malloc(5+cantDigitos);
   strcpy(reemplazo, "@aux");
   strcat(reemplazo, cant);
-    char *dato2 = (char *)malloc(100);
-   strcpy(dato2,"");
-
+  char *dato2 = (char *)malloc(200);
+  strcpy(dato2,"");
   char *dato = (char *)malloc(100);
   int salta = 0;
 
@@ -1052,18 +1051,18 @@ char *pasarAssembler(struct node *arbol){
   }
 
   if(lastParent != NULL){
-    //char *dato2 = (char *)malloc(100);
-    printf("\t\t\t\t\t lastParent: %s == arbol: %s \n",lastParent->right->value,arbol->value);
-
-    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right==arbol){
+    if(strcmp(lastParent->value, "cuerpo") == 0 && lastParent->right && arbol && strcmp(lastParent->right->value, arbol->value) == 0){
       lastParent = NULL;
+      printf("\nJMP");
       strcpy(dato2, "JMP ");
       strcat(dato2, etiquetaIF);
       strcat(dato2, "\n");
       strcat(dato2, etiquetaELSE);
       strcat(dato2, ":");
       strcat(dato2, "\n\n");
-     // encolar(cola, &dato2);
+      if(strcmp(arbol->value, "BI") == 0){
+        encolar(cola, &dato2);
+      }
     }
   }
 
@@ -1114,7 +1113,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(salta == 1){
     strcat(dato, " ");
-    if(strcmp(lastParent->right->value, "cuerpo") == 0  &&  lastParent->right==arbol){
+    if(strcmp(lastParent->value, "cuerpo")){
       strcat(dato, etiquetaELSE);
     } else {
       strcat(dato, etiquetaIF);
@@ -1126,15 +1125,15 @@ char *pasarAssembler(struct node *arbol){
   }
 
   if(strstr(arbol->value, ":=")){
-		  printf("\t\t\t\t llego asignacion y dato2: %s\n", dato2);
-	  	strcpy(dato,dato2);
-	  printf("\t\t\t\t llego asignacion y dato: %s\n", dato);
-		strcat(dato, "FLD ");
+		strcpy(dato, "FLD ");
 		strcat(dato, arbol->right->value);
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, arbol->left->value);
 		strcat(dato, "\n");
+
+    strcat(dato, dato2);
+    
 		encolar(cola, &dato);
     return reemplazo;
 	}
@@ -1223,6 +1222,7 @@ char *pasarAssembler(struct node *arbol){
         strcat(dato, ", 2\n");
       }
     }
+    strcat(dato, dato2);
     encolar(cola, &dato);
   }	else {
 		reemplazo = "ninguna";
