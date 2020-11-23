@@ -84,9 +84,11 @@ struct StackInt {
 
 struct Stack *stackDecision;
 struct Stack *stackParentesis;
-struct StackInt *stackEtiquetas;
+struct StackInt *stackIF;
+struct StackInt *stackWHILE;
 
-int etiquetasCount = 0;
+int etiquetasIF = 0;
+int etiquetasWHILE = 0;
 
 struct Stack* createStack(unsigned capacity);
 int isFull(struct Stack* stack);
@@ -96,11 +98,11 @@ struct node* pop(struct Stack* stack);
 struct node *desapilar(struct Stack* stack, struct node* fp);
 
 struct StackInt* createStackInt(int);
-int isFullInt();
-int isEmptyInt();
-void pushInt(int item);
-int popInt();
-int peekInt();
+int isFullInt(struct StackInt* stack);
+int isEmptyInt(struct StackInt* stack);
+void pushInt(struct StackInt* stack, int item);
+int popInt(struct StackInt* stack);
+int peekInt(struct StackInt* stack);
 
 typedef char*  t_dato;
 typedef struct s_nodo {
@@ -610,7 +612,8 @@ int main(int argc,char *argv[]) {
     cola = crearCola();
     stackDecision = createStack(100);
     stackParentesis = createStack(100);
-    stackEtiquetas = createStackInt(100);
+    stackIF = createStackInt(100);
+    stackWHILE = createStackInt(100);
 
 		yyparse();
 		escribirArchivo();
@@ -916,26 +919,26 @@ struct StackInt* createStackInt(int capacity){
   return stack;
 }
 
-int isFullInt(){
-  return stackEtiquetas->top == stackEtiquetas->capacity - 1;
+int isFullInt(struct StackInt* stack){
+  return stack->top == stack->capacity - 1;
 }
 
-int isEmptyInt(){
-  return stackEtiquetas->top-1;
+int isEmptyInt(struct StackInt* stack){
+  return stack->top-1;
 }
 
-void pushInt(int item){
-  if (isFullInt()) return;
-  stackEtiquetas->array[++stackEtiquetas->top] = item;
+void pushInt(struct StackInt* stack, int item){
+  if (isFullInt(stack)) return;
+  stack->array[++stack->top] = item;
 }
 
-int popInt(){
-  if (isEmptyInt()) return 0;
-  return stackEtiquetas->array[stackEtiquetas->top--];
+int popInt(struct StackInt* stack){
+  if (isEmptyInt(stack)) return 0;
+  return stack->array[stack->top--];
 }
 
-int peekInt(){
-  return stackEtiquetas->array[stackEtiquetas->top];
+int peekInt(struct StackInt* stack){
+  return stack->array[stack->top];
 }
 
 // --------------------------------------------------------------------
@@ -1077,11 +1080,11 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       char *dato2 = (char *)malloc(100);
       finETIQUETA = finWHILE;
       strcpy(dato2, inicioWHILE);
-      sprintf(str, "%d", etiquetasCount);
-      strcpy(dato2, str);
+      sprintf(str, "%d", etiquetasWHILE);
+      strcat(dato2, str);
       strcat(dato2, "\n");
       encolar(cola, &dato2);
-      pushInt(etiquetasCount++);
+      pushInt(stackWHILE, etiquetasWHILE++);
     }
 
     return arbolIzqConDosHijos(arbol->left);
@@ -1094,11 +1097,11 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       finETIQUETA = finELSE;
       strcpy(dato2, "JMP ");
       strcat(dato2, finELSE);
-      sprintf(str, "%d", peekInt());
+      sprintf(str, "%d", peekInt(stackIF));
       strcat(dato2, str);
       strcat(dato2, "\n");
       strcat(dato2, finIF);
-      sprintf(str, "%d", peekInt());
+      sprintf(str, "%d", peekInt(stackIF));
       strcat(dato2, str);
       strcat(dato2, ":");
       strcat(dato2, "\n\n");
@@ -1123,7 +1126,7 @@ char *pasarAssembler(struct node *arbol){
 
   if(strcmp(arbol->value, "if") == 0){
     strcpy(dato, finETIQUETA);
-    sprintf(str, "%d", popInt());
+    sprintf(str, "%d", popInt(stackIF));
     strcat(dato, str);
     finETIQUETA = finIF;
     strcat(dato, ":");
@@ -1135,11 +1138,11 @@ char *pasarAssembler(struct node *arbol){
   if(strstr(arbol->value, "while")){
     strcpy(dato, "JMP ");
     strcat(dato, inicioWHILE);
-    sprintf(str, "%d", peekInt());
+    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     strcat(dato, "\n");
     strcat(dato, finWHILE);
-    sprintf(str, "%d", peekInt());
+    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     strcat(dato, ":");
 		strcat(dato, "\n");
@@ -1195,8 +1198,9 @@ char *pasarAssembler(struct node *arbol){
   if(salta == 1){
     strcat(dato, " ");
     strcat(dato, finETIQUETA);
-    pushInt(etiquetasCount++);
-    sprintf(str, "%d", peekInt());
+    //hay q ver si el salto es por if o while
+    pushInt(stackIF, etiquetasIF++);
+    sprintf(str, "%d", peekInt(stackIF));
     strcat(dato, str);
     finETIQUETA = finIF;
     strcat(dato, "\n");

@@ -10,9 +10,9 @@ promedio	dd	?
 actual	dd	?
 suma	dd	?
 _2.000000	dd	2.000000
-_4.000000	dd	4.000000
-_8.000000	dd	8.000000
-_2.000000	dd	2.000000
+_string0	db	"actual es mayor que 2",'$',23 dup (?)
+_string1	db	"no es mayor que 2",'$',19 dup (?)
+_5.000000	dd	5.000000
 _4.000000	dd	4.000000
 _8.000000	dd	8.000000
 
@@ -22,32 +22,33 @@ MOV AX, @DATA
 MOV DS, AX
 MOV ES, AX
 
-FLD contador
+FLD actual
 FCOMP _2.000000
 FSTSW AX
 SAHF
-JB FINIF0
-FLD _4.000000
-FSTP suma
+JNA FINIF0
+MOV DX, OFFSET _string0
+MOV AH, 9
+INT 21H
 JMP FINELSE0
 FINIF0:
 
-FLD _8.000000
-FSTP promedio
+MOV DX, OFFSET _string1
+MOV AH, 9
+INT 21H
 FINELSE0:
-FLD contador
-FCOMP _2.000000
+INICIOWHILE0
+FLD actual
+FCOMP _5.000000
 FSTSW AX
 SAHF
-JB FINIF1
+JE FINWHILE1
 FLD _4.000000
 FSTP suma
-JMP FINELSE1
-FINIF1:
-
 FLD _8.000000
 FSTP promedio
-FINELSE1:
+JMP INICIOWHILE1
+FINWHILE1:
 
 
 MOV AX,4c00h

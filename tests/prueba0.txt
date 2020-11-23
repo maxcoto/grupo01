@@ -1,13 +1,13 @@
 DIM <contador,promedio,actual,suma> AS <Integer,Float,Float,Float>
 
-if (contador >= 2){
-  suma:=4;
+
+if (actual > 2){
+  PUT "actual es mayor que 2";
 } else {
-  promedio:=8;
+  PUT "no es mayor que 2";
 }
 
-if (contador >= 2){
-  suma:=4;
-} else {
-  promedio:=8;
+while(actual <> 5){
+    suma:=4;
+    promedio:=8;
 }
