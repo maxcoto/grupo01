@@ -131,6 +131,7 @@ typedef struct {
 //------------------------------------------------
 
 const char *stringName = "_string";
+const char *cteName = "_cte";
 const char *finIF = "FINIF";
 const char *finELSE = "FINELSE";
 const char *finETIQUETA = "FINIF";
@@ -150,6 +151,7 @@ int asignacionConst = 0;
 int salidaString = 0;
 int cantAux = 0;
 int stringCount = 0;
+int cteCount = 0;
 t_cola *cola;
 
 void validarTipo(int);
@@ -716,18 +718,21 @@ void procesarID(char *simbolo){
 // valida y almacena enteros -----------------------------------------
 char *procesarINT(float numero){
 	char texto[32];
+  char valor[32];
   char *_texto = (char *)malloc(100);
 
 	if(numero < MIN_INT || numero >= MAX_INT){
 		error("Entero fuera de rango:", "(0; 32767)");
 	}
 
-  sprintf(texto, "%f", numero);
-  strcpy(_texto, "_");
+  sprintf(valor, "%f", numero);
+  sprintf(texto, "%d", cteCount);
+  strcpy(_texto, cteName);
   strcat(_texto, texto);
+  cteCount++;
 
 	if(buscarSimbolo(texto) == -1) {
-		escribirTabla(_texto, texto, 0, 0);
+		escribirTabla(_texto, valor, 0, 0);
 	}
 
 	if(asignacionConst == 1){
@@ -788,18 +793,21 @@ char *procesarSTRING(char *str){
 // valida y almacena floats -----------------------------------------
 char *procesarFLOAT(float numero){
   char texto[32];
+  char valor[32];
   char *_texto = (char *)malloc(100);
 
 	if(numero < MIN_FLOAT || numero > MAX_FLOAT){
 		error("Float fuera de rango", "(-1.17549e-38; 3.40282e38)");
 	}
 
-  sprintf(texto, "%f", numero);
-  strcpy(_texto, "_");
+  sprintf(valor, "%f", numero);
+  sprintf(texto, "%d", cteCount);
+  strcpy(_texto, cteName);
   strcat(_texto, texto);
+  cteCount++;
 
 	if(buscarSimbolo(texto) == -1){
-		escribirTabla(_texto, texto, 0, 0);
+		escribirTabla(_texto, valor, 0, 0);
 	}
 
 	if(asignacionConst == 1){
@@ -1036,7 +1044,7 @@ void imprimirSimbolosAssembler(){
 void imprimirBodyAssembler(){
   fprintf(pAsem,"\n.CODE");
   fprintf(pAsem,"\nSTART:");
-	fprintf(pAsem,"\nMOV AX, @DATA");
+	fprintf(pAsem,"\nMOV EAX,@DATA");
 	fprintf(pAsem,"\nMOV DS, AX");
 	fprintf(pAsem,"\nMOV ES, AX\n\n");
 }
@@ -1050,9 +1058,9 @@ void imprimirCodigoAssembler(){
 }
 
 void imprimirFooterAssembler(){
-  fprintf(pAsem, "\n\nMOV AX,4c00h\n" );
+  fprintf(pAsem, "\n\nMOV EAX,4c00h\n" );
   fprintf(pAsem, "int 21h\n" );
-  fprintf(pAsem, "\nEND" );
+  fprintf(pAsem, "\nEND START" );
 }
 
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/

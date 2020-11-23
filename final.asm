@@ -12,24 +12,24 @@ promedio	dd	?
 actual	dd	?
 suma	dd	?
 nombre	dd	?
-_80.000000	dd	80.000000
+_cte0	dd	80.000000
 _string0	db	"Prueba.txt LyC Tema 4!",'$',22 dup (?)
 _string1	db	"Ingrese entero actual: ",'$',23 dup (?)
-_0.000000	dd	0.000000
-_2.500000	dd	2.500000
-_92.000000	dd	92.000000
-_1.000000	dd	1.000000
-_0.342000	dd	0.342000
-_256.000000	dd	256.000000
-_52.000000	dd	52.000000
-_4.000000	dd	4.000000
-_0.342000	dd	0.342000
-_256.000000	dd	256.000000
-_52.000000	dd	52.000000
-_4.000000	dd	4.000000
+_cte1	dd	0.000000
+_cte2	dd	2.500000
+_cte3	dd	92.000000
+_cte4	dd	1.000000
+_cte5	dd	0.342000
+_cte6	dd	256.000000
+_cte7	dd	52.000000
+_cte8	dd	4.000000
+_cte9	dd	0.342000
+_cte10	dd	256.000000
+_cte11	dd	52.000000
+_cte12	dd	4.000000
 _string2	db	"La suma es: ",'$',12 dup (?)
-_2.000000	dd	2.000000
-_0.000000	dd	0.000000
+_cte13	dd	2.000000
+_cte14	dd	0.000000
 _string3	db	"actual es > 2 y <> 0",'$',20 dup (?)
 _string4	db	"no es mayor que 2",'$',17 dup (?)
 @aux0	dd	?
@@ -56,11 +56,11 @@ _string4	db	"no es mayor que 2",'$',17 dup (?)
 
 .CODE
 START:
-MOV AX, @DATA
+MOV EAX,@DATA
 MOV DS, AX
 MOV ES, AX
 
-FLD _80.000000
+FLD _cte0
 FSTP nombre
 MOV DX, OFFSET _string0
 MOV AH, 9
@@ -69,9 +69,9 @@ MOV DX, OFFSET _string1
 MOV AH, 9
 INT 21H
 GetFloat actual
-FLD _0.000000
+FLD _cte1
 FSTP contador
-FLD _2.500000
+FLD _cte2
 FLD nombre
 FADD
 FSTP @aux0
@@ -80,19 +80,19 @@ FLD @aux0
 FSTP suma
 INICIOWHILE0
 FLD contador
-FCOMP _92.000000
+FCOMP _cte3
 FSTSW AX
 SAHF
 JA FINWHILE0
 FLD contador
-FLD _1.000000
+FLD _cte4
 FADD
 FSTP @aux1
 
 FLD @aux1
 FSTP contador
 FLD contador
-FDIV _0.342000
+FDIV _cte5
 FSTP @aux2
 
 FLD actual
@@ -104,7 +104,7 @@ FSTP @aux
 FLD 0
 FSTP @cont
 FLD @aux
-FCOMP _256.000000
+FCOMP _cte6
 FSTSW AX
 SAHF
 JNE FINIF0
@@ -130,7 +130,7 @@ FSTP @aux6
 
 FINIF1:
 FLD @aux
-FCOMP _52.000000
+FCOMP _cte7
 FSTSW AX
 SAHF
 JNE FINIF2
@@ -141,7 +141,7 @@ FSTP @aux7
 
 FINIF2:
 FLD @aux
-FCOMP _4.000000
+FCOMP _cte8
 FSTSW AX
 SAHF
 JNE FINIF3
@@ -163,7 +163,7 @@ FSTP @aux10
 FLD @aux10
 FSTP actual
 FLD contador
-FDIV _0.342000
+FDIV _cte9
 FSTP @aux11
 
 FLD actual
@@ -175,7 +175,7 @@ FSTP @aux
 FLD 0
 FSTP @cont
 FLD @aux
-FCOMP _256.000000
+FCOMP _cte10
 FSTSW AX
 SAHF
 JNE FINIF4
@@ -201,7 +201,7 @@ FSTP @aux15
 
 FINIF5:
 FLD @aux
-FCOMP _52.000000
+FCOMP _cte11
 FSTSW AX
 SAHF
 JNE FINIF6
@@ -212,7 +212,7 @@ FSTP @aux16
 
 FINIF6:
 FLD @aux
-FCOMP _4.000000
+FCOMP _cte12
 FSTSW AX
 SAHF
 JNE FINIF7
@@ -247,12 +247,12 @@ MOV AH, 9
 INT 21H
 DisplayFloat suma, 2
 FLD actual
-FCOMP _2.000000
+FCOMP _cte13
 FSTSW AX
 SAHF
 JNA FINIF8
 FLD actual
-FCOMP _0.000000
+FCOMP _cte14
 FSTSW AX
 SAHF
 JE FINIF8
@@ -268,7 +268,7 @@ INT 21H
 FINELSE8:
 
 
-MOV AX,4c00h
+MOV EAX,4c00h
 int 21h
 
-END
+END START
