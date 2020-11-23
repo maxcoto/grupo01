@@ -625,17 +625,17 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 
-  int i = popInt(stackIF);
-  while(i != -1){
-    printf("stack if: %d\n\n", i);
-    i = popInt(stackIF);
-  }
-  
-  int w = popInt(stackWHILE);
-  while(w != -1){
-    printf("stack while: %d\n\n", w);
-    w = popInt(stackWHILE);
-  }
+  // int i = popInt(stackIF);
+  // while(i != -1){
+  //   printf("stack if: %d\n\n", i);
+  //   i = popInt(stackIF);
+  // }
+  // 
+  // int w = popInt(stackWHILE);
+  // while(w != -1){
+  //   printf("stack while: %d\n\n", w);
+  //   w = popInt(stackWHILE);
+  // }
 
 	fclose(yyin);
 	fclose(tsout);
@@ -1025,7 +1025,7 @@ char* strReplace(char* search, char* replace, char* subject) {
 void imprimirHeaderAssembler(){
   fprintf(pAsem, "include macros2.asm\n");
   fprintf(pAsem, "include number.asm\n");
-  fprintf(pAsem, ".MODEL LARGE\n.386\n.STACK 200h\n\n.DATA\n");
+  fprintf(pAsem, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n");
 }
 
 void imprimirSimbolosAssembler(){
@@ -1042,11 +1042,11 @@ void imprimirSimbolosAssembler(){
 }
 
 void imprimirBodyAssembler(){
-  fprintf(pAsem,"\n.CODE");
+  fprintf(pAsem,".CODE");
   fprintf(pAsem,"\nSTART:");
 	fprintf(pAsem,"\nMOV EAX,@DATA");
 	fprintf(pAsem,"\nMOV DS, AX");
-	fprintf(pAsem,"\nMOV ES, AX\n\n");
+	fprintf(pAsem,"\nMOV ES, AX\n");
 }
 
 void imprimirCodigoAssembler(){
@@ -1058,9 +1058,9 @@ void imprimirCodigoAssembler(){
 }
 
 void imprimirFooterAssembler(){
-  fprintf(pAsem, "\n\nMOV EAX,4c00h\n" );
+  fprintf(pAsem, "MOV EAX,4c00h\n" );
   fprintf(pAsem, "int 21h\n" );
-  fprintf(pAsem, "\nEND START" );
+  fprintf(pAsem, "END START" );
 }
 
 /*---------------------------------------------------GENERAR ASSEMBLER-------------------------------------------*/
@@ -1140,7 +1140,7 @@ struct node *arbolIzqConDosHijos( struct node *arbol){
       strcat(dato2, finIF);
       strcat(dato2, str);
       strcat(dato2, ":");
-      strcat(dato2, "\n\n");
+      strcat(dato2, "\n");
       encolar(cola, &dato2);
     }
 
@@ -1264,7 +1264,7 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, reemplazo);
-		strcat(dato, "\n\n");
+		strcat(dato, "\n");
 		encolar(cola, &dato);
 	  escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1280,7 +1280,7 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 		strcat(dato, reemplazo);
-		strcat(dato, "\n\n");
+		strcat(dato, "\n");
 		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1296,7 +1296,7 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato, "\n");
 		strcat(dato, "FSTP ");
 	  strcat(dato, reemplazo);
-		strcat(dato, "\n\n");
+		strcat(dato, "\n");
 		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;
@@ -1312,7 +1312,7 @@ char *pasarAssembler(struct node *arbol){
 		strcat(dato,"\n");
 		strcat(dato,"FSTP ");
 		strcat(dato,reemplazo);
-		strcat(dato,"\n\n");
+		strcat(dato,"\n");
 		encolar(cola, &dato);
 		escribirTabla(reemplazo, "", 0, 0);
 		cantAux++;

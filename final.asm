@@ -3,7 +3,6 @@ include number.asm
 .MODEL LARGE
 .386
 .STACK 200h
-
 .DATA
 @cont	dd	?
 @aux	dd	?
@@ -53,13 +52,11 @@ _string4	db	"no es mayor que 2",'$',17 dup (?)
 @aux18	dd	?
 @aux19	dd	?
 @aux20	dd	?
-
 .CODE
 START:
 MOV EAX,@DATA
 MOV DS, AX
 MOV ES, AX
-
 FLD _cte0
 FSTP nombre
 MOV DX, OFFSET _string0
@@ -75,7 +72,6 @@ FLD _cte2
 FLD nombre
 FADD
 FSTP @aux0
-
 FLD @aux0
 FSTP suma
 INICIOWHILE0
@@ -88,17 +84,14 @@ FLD contador
 FLD _cte4
 FADD
 FSTP @aux1
-
 FLD @aux1
 FSTP contador
 FLD contador
 FDIV _cte5
 FSTP @aux2
-
 FLD actual
 FMUL contador
 FSTP @aux3
-
 FLD @aux3
 FSTP @aux
 FLD 0
@@ -112,12 +105,10 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux4
-
 FINIF0:
 FLD nombre
 FMUL suma
 FSTP @aux5
-
 FLD @aux
 FCOMP @aux5
 FSTSW AX
@@ -127,7 +118,6 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux6
-
 FINIF1:
 FLD @aux
 FCOMP _cte7
@@ -138,7 +128,6 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux7
-
 FINIF2:
 FLD @aux
 FCOMP _cte8
@@ -149,27 +138,22 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux8
-
 FINIF3:
 FLD contador
 FMUL ninguna
 FSTP @aux9
-
 FLD @aux2
 FLD @aux9
 FADD
 FSTP @aux10
-
 FLD @aux10
 FSTP actual
 FLD contador
 FDIV _cte9
 FSTP @aux11
-
 FLD actual
 FMUL contador
 FSTP @aux12
-
 FLD @aux12
 FSTP @aux
 FLD 0
@@ -183,12 +167,10 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux13
-
 FINIF4:
 FLD nombre
 FMUL suma
 FSTP @aux14
-
 FLD @aux
 FCOMP @aux14
 FSTSW AX
@@ -198,7 +180,6 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux15
-
 FINIF5:
 FLD @aux
 FCOMP _cte11
@@ -209,7 +190,6 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux16
-
 FINIF6:
 FLD @aux
 FCOMP _cte12
@@ -220,24 +200,20 @@ FLD @cont
 FLD 1
 FADD
 FSTP @aux17
-
 FINIF7:
 FLD contador
 FMUL ninguna
 FSTP @aux18
-
 FLD @aux11
 FLD @aux18
 FADD
 FSTP @aux19
-
 FLD @aux19
 FSTP actual
 FLD suma
 FLD actual
 FADD
 FSTP @aux20
-
 FLD @aux20
 FSTP suma
 JMP INICIOWHILE0
@@ -261,14 +237,10 @@ MOV AH, 9
 INT 21H
 JMP FINELSE8
 FINIF8:
-
 MOV DX, OFFSET _string4
 MOV AH, 9
 INT 21H
 FINELSE8:
-
-
 MOV EAX,4c00h
 int 21h
-
 END START
