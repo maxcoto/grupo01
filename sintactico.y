@@ -78,8 +78,8 @@ struct Stack {
 
 struct StackInt {
   int top;
-  int capacity;
-  int array[100];
+  unsigned capacity;
+  int *array;
 };
 
 struct Stack *stackDecision;
@@ -619,6 +619,18 @@ int main(int argc,char *argv[]) {
 		escribirArchivo();
 	}
 
+  int i = popInt(stackIF);
+  while(i != -1){
+    printf("stack if: %d\n\n", i);
+    i = popInt(stackIF);
+  }
+  
+  int w = popInt(stackWHILE);
+  while(w != -1){
+    printf("stack while: %d\n\n", w);
+    w = popInt(stackWHILE);
+  }
+
 	fclose(yyin);
 	fclose(tsout);
 	fclose(pAsem);
@@ -916,6 +928,8 @@ struct node* pop(struct Stack* stack) {
 struct StackInt* createStackInt(int capacity){
   struct StackInt* stack = (struct StackInt*)malloc(sizeof(struct StackInt));
   stack->capacity = capacity;
+  stack->top = -1;
+  stack->array = (int*)malloc(stack->capacity * sizeof(int));
   return stack;
 }
 
@@ -933,7 +947,7 @@ void pushInt(struct StackInt* stack, int item){
 }
 
 int popInt(struct StackInt* stack){
-  if (isEmptyInt(stack)) return 0;
+  if (isEmptyInt(stack)) return -1;
   return stack->array[stack->top--];
 }
 
